@@ -24,4 +24,3 @@ class Worker(QRunnable):
         while not self.shouldStop:
             if self.tabArea.chipTab.chipController is not None:
                 self.tabArea.chipTab.chipController.SendToRig(self.tabArea.chipTab.rig)
-        print("Done!")

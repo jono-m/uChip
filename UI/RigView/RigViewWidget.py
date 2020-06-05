@@ -109,12 +109,6 @@ class RigViewWidget(QDialog):
         self.solenoidsScrollArea.setMinimumWidth(self.solenoidsContainer.width())
         self.adjustSize()
 
-        print("Container: " + str(self.solenoidsContainer.sizeHint()) + " -- " + str(
-            self.solenoidsContainer.sizePolicy()) + " -- " + str(self.solenoidsContainer.size()))
-        print("Area: " + str(self.solenoidsScrollArea.sizeHint()) + " -- " + str(
-            self.solenoidsScrollArea.sizePolicy()) + " -- " + str(self.solenoidsScrollArea.size()))
-        print("Window: " + str(self.sizeHint()) + " -- " + str(self.sizePolicy()) + " -- " + str(self.size()))
-
     def EightSetButtonPressed(self, eightSet, isOn):
         for solenoidNumber in eightSet:
             if solenoidNumber not in self.rig.drivenSolenoids:

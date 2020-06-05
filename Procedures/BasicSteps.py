@@ -151,7 +151,7 @@ class WaitStep(Step):
         self.AddBeginPort()
         self.AddCompletedPort()
         self.startTime = None
-        self.timeInput = self.AddInput("Time (s)", int)
+        self.timeInput = self.AddInput("Time (s)", float)
         self.timeInput.SetDefaultData(1)
 
     def BeginStep(self):

@@ -168,7 +168,6 @@ class Rig:
         else:
             self.lastSolenoidStates = self.solenoidStates[:]
             self.lastDrivenSolenoids = self.drivenSolenoids
-        print(self.solenoidStates[:30])
         # propagates solenoid state changes upwards to the delegate and down to the devices
         # the device list should always be sorted by priority at this point.
         for deviceIndex in range(len(self._connectedDevices)):

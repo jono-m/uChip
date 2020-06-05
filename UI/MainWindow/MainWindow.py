@@ -7,6 +7,7 @@ from UI.ProceduresDialog import *
 from UI.RigView.RigViewWidget import *
 from UI.MainWindow.UpdaterThreading import *
 import os
+from ChipController.ChipUpdateWorker import *
 
 
 class MainWindow(QMainWindow):
@@ -126,6 +127,8 @@ class MainWindow(QMainWindow):
         self.procedureRunner.OnBegin.Register(lambda: self.SetProcedureRunning(True))
         self.procedureRunner.OnDone.Register(lambda: self.SetProcedureRunning(False))
 
+        self.updateWorker = ChipUpdateWorker(self.rig, self.procedureRunner)
+
         self.toolBar = MainToolbar(self.getMenu, self.setMenu)
         self.toolBar.OnNewLB.Register(lambda: self.tabArea.RequestLBOpen(None))
         self.toolBar.OnNewChip.Register(lambda: self.tabArea.RequestChipOpen(None))
@@ -145,6 +148,7 @@ class MainWindow(QMainWindow):
         self.tabArea.OnChipOpened.Register(self.toolBar.proceduresBox.SetChipController, True)
         self.tabArea.OnChipOpened.Register(self.getMenu.SetChipController, True)
         self.tabArea.OnChipOpened.Register(self.setMenu.SetChipController, True)
+        self.tabArea.OnChipOpened.Register(self.updateWorker.SetChipController, True)
 
         self.getMenu.OnAddGet.Register(self.tabArea.RequestAddBlock, True)
         self.setMenu.OnAddSet.Register(self.tabArea.RequestAddBlock, True)
@@ -175,6 +179,10 @@ class MainWindow(QMainWindow):
         self.tabArea.RequestChipOpen()
 
         self.SetProcedureRunning(False)
+
+        self.threadPool = QThreadPool()
+
+        self.threadPool.start(self.updateWorker)
 
     def ShowRig(self):
         self.rigViewWidget.show()
@@ -207,12 +215,11 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(name + " - μChip")
 
     def closeEvent(self, event: QCloseEvent):
-        print("Close window")
         if self.procedureRunner.IsRunning() and not self.procedureRunner.StopProcedure(True):
             event.ignore()
             return
         if self.tabArea.RequestClose():
-            self.rig.DisconnectAll()
+            self.updateWorker.stop()
             super().closeEvent(event)
         else:
             event.ignore()
