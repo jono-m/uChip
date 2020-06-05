@@ -1,0 +1,125 @@
+from PySide2.QtWidgets import *
+from UI.WorldBrowser.SelectableItem import *
+
+
+class BlockItem(QGraphicsProxyWidget, SelectableItem):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        blockWidget = QFrame()
+        blockWidget.setStyleSheet("""
+                * {
+                background-color: transparent;
+                }
+                """)
+
+        self.blockLayout = QVBoxLayout()
+        self.blockLayout.setContentsMargins(0, 0, 0, 0)
+        blockWidget.setLayout(self.blockLayout)
+
+        self.container = QFrame()
+        self.blockLayout.addWidget(self.container)
+
+        self.container.setProperty('roundedFrame', True)
+        self.container.setProperty('state', 'none')
+
+        self.displayHovered = False
+        self.displaySelected = False
+        self.container.setStyleSheet("""
+                *[state='HoverAndSelect'] {
+                    border: 4px solid rgba(52, 222, 235, 1);
+                    margin: 2px;
+                }
+                *[state='Select'] {
+                    border: 2px solid rgba(52, 222, 235, 1);
+                    margin: 4px;
+                }
+                *[state='Hover'] {
+                    border: 2px solid rgba(35, 159, 168, 1);
+                    margin: 4px;
+                }
+                *[state='None'] {
+                    border: 1px solid rgba(30, 30, 30, 1);
+                    margin: 5px;
+                }
+                *{
+                    color: white;
+                }
+                *[roundedFrame=true] {
+                    background-color: rgba(30, 30, 30, 1);
+                    border-radius: """ + str(8) + """
+                }""")
+
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        self.container.setLayout(layout)
+
+        self.setWidget(blockWidget)
+        self.UpdateStyle()
+
+    def IsContainerSelected(self, scenePos):
+        childAt = self.widget().childAt(self.mapFromScene(scenePos).toPoint())
+        if childAt is None:
+            return True
+        else:
+            if childAt.property("PreventMove") is not None:
+                return False
+            else:
+                if isinstance(childAt, QLabel) or isinstance(childAt, QFrame):
+                    return True
+                else:
+                    return False
+
+    @staticmethod
+    def IsChildFocused(widget: QWidget):
+        for child in widget.children():
+            if isinstance(child, QWidget):
+                if child.hasFocus() or BlockItem.IsChildFocused(child):
+                    return True
+        return False
+
+    @staticmethod
+    def ClearFocusAll(widget):
+        widget.clearFocus()
+        for child in widget.children():
+            if isinstance(child, QWidget):
+                BlockItem.ClearFocusAll(child)
+
+    def SetIsHovered(self, hoverOn):
+        self.displayHovered = hoverOn
+        self.UpdateStyle()
+
+    def SetIsSelected(self, isSelected):
+        self.displaySelected = isSelected
+        self.UpdateStyle()
+
+    def UpdateStyle(self):
+        oldProperty = self.container.property('state')
+        if self.displaySelected:
+            if self.displayHovered:
+                self.container.setProperty('state', 'HoverAndSelect')
+            else:
+                self.container.setProperty('state', 'Select')
+        else:
+            if self.displayHovered:
+                self.container.setProperty('state', 'Hover')
+            else:
+                self.container.setProperty('state', 'None')
+        if oldProperty != self.container.property('state'):
+            self.setStyle(self.style())
+
+    def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
+        self.ClearFocusAll(self.widget())
+        super().mousePressEvent(event)
+
+    def DoMove(self, currentPosition: QPointF, delta: QPointF):
+        self.setPos(self.pos() + delta)
+
+    def IsMovableAtPoint(self, scenePoint: QPointF):
+        return self.IsContainerSelected(scenePoint)
+
+    def TryDelete(self) -> bool:
+        if not self.IsChildFocused(self.widget()):
+            return True
+        return False
