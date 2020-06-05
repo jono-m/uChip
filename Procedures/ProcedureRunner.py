@@ -4,16 +4,16 @@ from Procedures.Procedure import *
 class ProcedureRunner:
     def __init__(self):
         self.currentProcedure: typing.Optional[Procedure] = None
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.OnTimerTick)
 
         self.OnBegin = Event()
         self.OnDone = Event()
 
-    def IsRunning(self):
-        return self.timer.isActive()
+        self.isRunning = False
 
-    def OnTimerTick(self):
+    def IsRunning(self):
+        return self.isRunning
+
+    def Step(self):
         if self.currentProcedure.Update():
             self.StopProcedure(False)
 
@@ -24,7 +24,7 @@ class ProcedureRunner:
         self.currentProcedure = procedure
 
         self.currentProcedure.Start()
-        self.timer.start()
+        self.isRunning = True
 
     def StopProcedure(self, interrupt=True):
         if self.IsRunning():
@@ -41,7 +41,7 @@ class ProcedureRunner:
                 else:
                     self.currentProcedure.Stop()
 
-            self.timer.stop()
+            self.isRunning = False
             self.currentProcedure = None
             self.OnDone.Invoke()
             return True

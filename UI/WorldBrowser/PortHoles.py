@@ -102,7 +102,7 @@ class ConnectionItem(QGraphicsPathItem, SelectableItem):
 
     @staticmethod
     def GetPath(fromCenter: QPointF, toCenter: QPointF):
-        offset = QPointF(50, 0)
+        offset = QPointF(80, 0)
         path = QPainterPath(fromCenter)
         path.lineTo(fromCenter + offset)
         path.lineTo(toCenter - offset)

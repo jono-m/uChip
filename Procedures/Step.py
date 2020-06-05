@@ -6,11 +6,6 @@ class Step(LogicBlock):
         super().__init__()
         self._beginPorts: typing.List[BeginPort] = []
         self._completedPorts: typing.List[CompletedPort] = []
-        self.OnStepStart = Event()
-        self.OnStepUpdate = Event()
-        self.OnStepFinish = Event()
-        self.OnProcedureStarted = Event()
-        self.OnProcedureStopped = Event()
 
         self._running = False
         self._hasRun = False
@@ -114,25 +109,20 @@ class Step(LogicBlock):
 
     def BeginProcedure(self):
         self._hasRun = False
-        self.OnProcedureStarted.Invoke()
 
     def BeginStep(self):
         self._running = True
-        self.OnStepStart.Invoke()
 
     # Returns true when the step is completed
     def UpdateStep(self) -> bool:
-        self.OnStepUpdate.Invoke()
         return True
 
     def FinishStep(self):
         self._running = False
         self._hasRun = True
-        self.OnStepFinish.Invoke()
 
     def StopProcedure(self):
         self._running = False
-        self.OnProcedureStopped.Invoke()
 
     # Returns the steps to execute after this step is completed
     def GetNextSteps(self) -> typing.List['Step']:

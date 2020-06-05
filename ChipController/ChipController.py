@@ -99,4 +99,3 @@ class ChipController:
         else:
             name, extension = os.path.splitext(os.path.basename(self._filename))
             return name
-

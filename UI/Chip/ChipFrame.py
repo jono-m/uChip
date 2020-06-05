@@ -1,4 +1,5 @@
 from UI.FileViewerFrame import *
+from PySide2.QtCore import *
 from UI.Chip.ChipEditor import *
 from UI.Chip.ChipParametersList import *
 from UI.Chip.ChipValvesList import *
@@ -26,10 +27,6 @@ class ChipFrame(FileViewerFrame):
         layout.addLayout(vLayout)
         layout.addWidget(self.chipEditor, stretch=1)
 
-        self.updateTimer = QTimer(self)
-        self.updateTimer.timeout.connect(self.TimerUpdate)
-        self.updateTimer.start(5)
-
         self.rig = rig
 
     def SetIsProcedureRunning(self, running):
@@ -37,11 +34,6 @@ class ChipFrame(FileViewerFrame):
         self.chipEditor.worldBrowser.update()
         self.chipParametersList.setEnabled(not running)
         self.valvesList.setEnabled(not running)
-
-    def TimerUpdate(self):
-        if self.chipController is not None:
-            self.chipController.GetLogicBlock().UpdateOutputs()
-            self.chipController.SendToRig(self.rig)
 
     def OpenChipController(self, chipController: ChipController):
         self.CloseChipController()

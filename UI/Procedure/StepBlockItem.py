@@ -68,11 +68,7 @@ class StepBlockItem(LogicBlockItem):
         """)
         self.container.setProperty("isStart", isinstance(self.step, StartStep))
 
-        self.step.OnStepStart.Register(self.UpdateProgress, True)
-        self.step.OnStepUpdate.Register(self.UpdateProgress, True)
-        self.step.OnStepFinish.Register(self.UpdateProgress, True)
-        self.step.OnProcedureStarted.Register(self.UpdateProgress, True)
-        self.step.OnProcedureStopped.Register(self.UpdateProgress, True)
+        self.step.OnOutputsUpdated.Register(self.UpdateProgress, True)
 
         self.UpdatePorts()
 
@@ -82,11 +78,7 @@ class StepBlockItem(LogicBlockItem):
 
     def Remove(self):
         super().Remove()
-        self.step.OnStepStart.Unregister(self.UpdateProgress)
-        self.step.OnStepUpdate.Unregister(self.UpdateProgress)
-        self.step.OnStepFinish.Unregister(self.UpdateProgress)
-        self.step.OnProcedureStarted.Unregister(self.UpdateProgress)
-        self.step.OnProcedureStopped.Unregister(self.UpdateProgress)
+        self.step.OnOutputsUpdated.Unregister(self.UpdateProgress)
 
     def UpdateProgress(self):
         self.progressWidget.SetProgress(self.step.GetProgress())

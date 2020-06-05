@@ -49,6 +49,7 @@ class Procedure(CompoundLogicBlock):
         self.initialData = {}
 
     def Update(self) -> bool:
+        self.UpdateOutputs()
         for step in self._currentActiveSteps[:]:
             if step.UpdateStep():
                 step.FinishStep()
