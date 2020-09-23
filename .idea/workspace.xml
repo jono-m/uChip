@@ -20,23 +20,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="99850780-df20-4af2-831c-10fab045648b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/ChipController/ChipUpdateWorker.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ChipController/ChipController.py" beforeDir="false" afterPath="$PROJECT_DIR$/ChipController/ChipController.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MediumChip/mediumOne.ucc" beforeDir="false" afterPath="$PROJECT_DIR$/MediumChip/mediumOne.ucc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MediumChip/multiplexer.ulb" beforeDir="false" afterPath="$PROJECT_DIR$/MediumChip/multiplexer.ulb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Procedures/BasicSteps.py" beforeDir="false" afterPath="$PROJECT_DIR$/Procedures/BasicSteps.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Procedures/Procedure.py" beforeDir="false" afterPath="$PROJECT_DIR$/Procedures/Procedure.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Procedures/ProcedureRunner.py" beforeDir="false" afterPath="$PROJECT_DIR$/Procedures/ProcedureRunner.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Procedures/Step.py" beforeDir="false" afterPath="$PROJECT_DIR$/Procedures/Step.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Rig/Rig.py" beforeDir="false" afterPath="$PROJECT_DIR$/Rig/Rig.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/Chip/ChipFrame.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Chip/ChipFrame.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/MainWindow/UpdaterThreading.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/MainWindow/UpdaterThreading.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/Procedure/StepBlockItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Procedure/StepBlockItem.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/RigView/RigViewWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/RigView/RigViewWidget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/WorldBrowser/PortHoles.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/WorldBrowser/PortHoles.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/devicePreferences.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/devicePreferences.pkl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -114,47 +98,28 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state width="2173" height="409" key="GridCell.Tab.0.bottom" timestamp="1591380257260">
+    <state width="2173" height="330" key="GridCell.Tab.0.bottom" timestamp="1600892740682">
       <screen x="0" y="0" width="2194" height="1194" />
     </state>
-    <state width="2173" height="409" key="GridCell.Tab.0.bottom/0.0.2194.1194@0.0.2194.1194" timestamp="1591380257260" />
-    <state width="2173" height="409" key="GridCell.Tab.0.center" timestamp="1591380257260">
+    <state width="2173" height="330" key="GridCell.Tab.0.bottom/0.0.2194.1194@0.0.2194.1194" timestamp="1600892740682" />
+    <state width="2173" height="330" key="GridCell.Tab.0.center" timestamp="1600892740681">
       <screen x="0" y="0" width="2194" height="1194" />
     </state>
-    <state width="2173" height="409" key="GridCell.Tab.0.center/0.0.2194.1194@0.0.2194.1194" timestamp="1591380257260" />
-    <state width="2173" height="409" key="GridCell.Tab.0.left" timestamp="1591380257260">
+    <state width="2173" height="330" key="GridCell.Tab.0.center/0.0.2194.1194@0.0.2194.1194" timestamp="1600892740681" />
+    <state width="2173" height="330" key="GridCell.Tab.0.left" timestamp="1600892740681">
       <screen x="0" y="0" width="2194" height="1194" />
     </state>
-    <state width="2173" height="409" key="GridCell.Tab.0.left/0.0.2194.1194@0.0.2194.1194" timestamp="1591380257260" />
-    <state width="2173" height="409" key="GridCell.Tab.0.right" timestamp="1591380257260">
+    <state width="2173" height="330" key="GridCell.Tab.0.left/0.0.2194.1194@0.0.2194.1194" timestamp="1600892740681" />
+    <state width="2173" height="330" key="GridCell.Tab.0.right" timestamp="1600892740682">
       <screen x="0" y="0" width="2194" height="1194" />
     </state>
-    <state width="2173" height="409" key="GridCell.Tab.0.right/0.0.2194.1194@0.0.2194.1194" timestamp="1591380257260" />
-    <state width="2173" height="409" key="GridCell.Tab.1.bottom" timestamp="1591380257261">
+    <state width="2173" height="330" key="GridCell.Tab.0.right/0.0.2194.1194@0.0.2194.1194" timestamp="1600892740682" />
+    <state x="606" y="242" key="SettingsEditor" timestamp="1600891878496">
       <screen x="0" y="0" width="2194" height="1194" />
     </state>
-    <state width="2173" height="409" key="GridCell.Tab.1.bottom/0.0.2194.1194@0.0.2194.1194" timestamp="1591380257261" />
-    <state width="2173" height="409" key="GridCell.Tab.1.center" timestamp="1591380257260">
-      <screen x="0" y="0" width="2194" height="1194" />
-    </state>
-    <state width="2173" height="409" key="GridCell.Tab.1.center/0.0.2194.1194@0.0.2194.1194" timestamp="1591380257260" />
-    <state width="2173" height="409" key="GridCell.Tab.1.left" timestamp="1591380257260">
-      <screen x="0" y="0" width="2194" height="1194" />
-    </state>
-    <state width="2173" height="409" key="GridCell.Tab.1.left/0.0.2194.1194@0.0.2194.1194" timestamp="1591380257260" />
-    <state width="2173" height="409" key="GridCell.Tab.1.right" timestamp="1591380257261">
-      <screen x="0" y="0" width="2194" height="1194" />
-    </state>
-    <state width="2173" height="409" key="GridCell.Tab.1.right/0.0.2194.1194@0.0.2194.1194" timestamp="1591380257261" />
-    <state x="606" y="242" key="SettingsEditor" timestamp="1591375271493">
-      <screen x="0" y="0" width="2194" height="1194" />
-    </state>
-    <state x="606" y="242" key="SettingsEditor/0.0.2194.1194@0.0.2194.1194" timestamp="1591375271493" />
-    <state x="809" y="330" width="576" height="534" key="find.popup" timestamp="1591378442197">
-      <screen x="0" y="0" width="2194" height="1194" />
-    </state>
-    <state x="809" y="330" width="576" height="534" key="find.popup/0.0.2194.1194@0.0.2194.1194" timestamp="1591378442197" />
+    <state x="606" y="242" key="SettingsEditor/0.0.2194.1194@0.0.2194.1194" timestamp="1600891878496" />
   </component>
 </project>
