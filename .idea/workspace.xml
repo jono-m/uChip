@@ -20,7 +20,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="99850780-df20-4af2-831c-10fab045648b" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/uChip.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/uChip.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/devicePreferences.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/devicePreferences.pkl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -117,9 +121,9 @@
       <screen x="0" y="0" width="2194" height="1194" />
     </state>
     <state width="2173" height="330" key="GridCell.Tab.0.right/0.0.2194.1194@0.0.2194.1194" timestamp="1600892740682" />
-    <state x="606" y="242" key="SettingsEditor" timestamp="1600892813574">
+    <state x="606" y="242" key="SettingsEditor" timestamp="1601323176024">
       <screen x="0" y="0" width="2194" height="1194" />
     </state>
-    <state x="606" y="242" key="SettingsEditor/0.0.2194.1194@0.0.2194.1194" timestamp="1600892813574" />
+    <state x="606" y="242" key="SettingsEditor/0.0.2194.1194@0.0.2194.1194" timestamp="1601323176024" />
   </component>
 </project>
