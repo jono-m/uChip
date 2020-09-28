@@ -20,11 +20,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="99850780-df20-4af2-831c-10fab045648b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/uChip.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/uChip.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/devicePreferences.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/devicePreferences.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -105,25 +102,57 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state width="2173" height="330" key="GridCell.Tab.0.bottom" timestamp="1600892740682">
+    <state width="1075" height="409" key="GridCell.Tab.0.bottom" timestamp="1601324893665">
       <screen x="0" y="0" width="2194" height="1194" />
     </state>
-    <state width="2173" height="330" key="GridCell.Tab.0.bottom/0.0.2194.1194@0.0.2194.1194" timestamp="1600892740682" />
-    <state width="2173" height="330" key="GridCell.Tab.0.center" timestamp="1600892740681">
+    <state width="1075" height="409" key="GridCell.Tab.0.bottom/0.0.2194.1194@0.0.2194.1194" timestamp="1601324893665" />
+    <state width="1075" height="409" key="GridCell.Tab.0.center" timestamp="1601324893664">
       <screen x="0" y="0" width="2194" height="1194" />
     </state>
-    <state width="2173" height="330" key="GridCell.Tab.0.center/0.0.2194.1194@0.0.2194.1194" timestamp="1600892740681" />
-    <state width="2173" height="330" key="GridCell.Tab.0.left" timestamp="1600892740681">
+    <state width="1075" height="409" key="GridCell.Tab.0.center/0.0.2194.1194@0.0.2194.1194" timestamp="1601324893664" />
+    <state width="1075" height="409" key="GridCell.Tab.0.left" timestamp="1601324893663">
       <screen x="0" y="0" width="2194" height="1194" />
     </state>
-    <state width="2173" height="330" key="GridCell.Tab.0.left/0.0.2194.1194@0.0.2194.1194" timestamp="1600892740681" />
-    <state width="2173" height="330" key="GridCell.Tab.0.right" timestamp="1600892740682">
+    <state width="1075" height="409" key="GridCell.Tab.0.left/0.0.2194.1194@0.0.2194.1194" timestamp="1601324893663" />
+    <state width="1075" height="409" key="GridCell.Tab.0.right" timestamp="1601324893665">
       <screen x="0" y="0" width="2194" height="1194" />
     </state>
-    <state width="2173" height="330" key="GridCell.Tab.0.right/0.0.2194.1194@0.0.2194.1194" timestamp="1600892740682" />
+    <state width="1075" height="409" key="GridCell.Tab.0.right/0.0.2194.1194@0.0.2194.1194" timestamp="1601324893665" />
+    <state width="1075" height="409" key="GridCell.Tab.1.bottom" timestamp="1601324893667">
+      <screen x="0" y="0" width="2194" height="1194" />
+    </state>
+    <state width="1075" height="409" key="GridCell.Tab.1.bottom/0.0.2194.1194@0.0.2194.1194" timestamp="1601324893667" />
+    <state width="1075" height="409" key="GridCell.Tab.1.center" timestamp="1601324893666">
+      <screen x="0" y="0" width="2194" height="1194" />
+    </state>
+    <state width="1075" height="409" key="GridCell.Tab.1.center/0.0.2194.1194@0.0.2194.1194" timestamp="1601324893666" />
+    <state width="1075" height="409" key="GridCell.Tab.1.left" timestamp="1601324893666">
+      <screen x="0" y="0" width="2194" height="1194" />
+    </state>
+    <state width="1075" height="409" key="GridCell.Tab.1.left/0.0.2194.1194@0.0.2194.1194" timestamp="1601324893666" />
+    <state width="1075" height="409" key="GridCell.Tab.1.right" timestamp="1601324893666">
+      <screen x="0" y="0" width="2194" height="1194" />
+    </state>
+    <state width="1075" height="409" key="GridCell.Tab.1.right/0.0.2194.1194@0.0.2194.1194" timestamp="1601324893666" />
     <state x="606" y="242" key="SettingsEditor" timestamp="1601323176024">
       <screen x="0" y="0" width="2194" height="1194" />
     </state>
     <state x="606" y="242" key="SettingsEditor/0.0.2194.1194@0.0.2194.1194" timestamp="1601323176024" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/UI/LogicBlock/LogicBlockItem.py</url>
+          <line>123</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="self.block._inputs" language="Python" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>
