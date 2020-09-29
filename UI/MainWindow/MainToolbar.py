@@ -3,6 +3,7 @@ from Util import *
 from LogicBlocks.NumberBlocks import *
 from LogicBlocks.BooleanBlocks import *
 from LogicBlocks.ConditionalBlocks import *
+from LogicBlocks.ScriptedBlock import *
 from UI.Procedure.ProceduresBox import *
 from LogicBlocks.IOBlocks import *
 from PySide2.QtGui import *
@@ -283,7 +284,13 @@ class MainToolbar(QFrame):
             filename = dialog.selectedFiles()
 
             if filename is not None:
-                newBlock = CompoundLogicBlock.LoadFromFile(filename[0])
+                name, extension = os.path.splitext(filename[0])
+                if extension == '.ulb':
+                    newBlock = CompoundLogicBlock.LoadFromFile(filename[0])
+                elif extension == '.usb':
+                    newBlock = ScriptedBlock(filename[0])
+                else:
+                    return
                 self.OnAddLogicBlock.Invoke(newBlock)
 
     def BrowseForImage(self):
@@ -321,4 +328,4 @@ class BrowseForCustomDialog(QFileDialog):
         self.setWindowTitle("Open a logic block")
         self.setFileMode(QFileDialog.ExistingFile)
         self.setAcceptMode(QFileDialog.AcceptOpen)
-        self.setNameFilters(["μChip Logic Block (*.ulb)"])
+        self.setNameFilters(["μChip Block (*.ulb *.usb)", "μChip Logic Block (*.ulb)", 'μChip Scripted Block (*.usb)'])
