@@ -16,24 +16,24 @@ class ChipController:
         self.OnProcedureAdded = Event()
         self.OnProcedureRemoved = Event()
         self.OnSaved = Event()
-        self.OnDestroyed = Event()
+        self.OnClosed = Event()
 
         self._logicBlock.OnModified.Register(self.OnModified.Invoke)
         self._logicBlock.OnBlockAdded.Register(self.OnBlockAdded)
-        self._logicBlock.OnBlockRemoved.Register(self.OnBlockAdded)
+        self._logicBlock.OnBlockRemoved.Register(self.OnBlockRemoved)
 
         self.valveBlocks: typing.List[ValveLogicBlock] = []
 
         self.AddProcedure(Procedure())
 
-    def Destroy(self):
+    def Close(self):
         self._logicBlock.OnModified.Unregister(self.OnModified.Invoke)
         self._logicBlock.OnBlockAdded.Unregister(self.OnBlockAdded)
-        self._logicBlock.OnBlockRemoved.Unregister(self.OnBlockAdded)
-        self._logicBlock.Destroy()
+        self._logicBlock.OnBlockRemoved.Unregister(self.OnBlockRemoved)
+        self._logicBlock.Close()
         for procedure in self._procedures:
-            procedure.Destroy()
-        self.OnDestroyed.Invoke(self)
+            procedure.Close()
+        self.OnClosed.Invoke(self)
 
     def GetLogicBlock(self):
         return self._logicBlock

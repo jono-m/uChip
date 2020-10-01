@@ -17,11 +17,13 @@ class ProcedureRunner:
         if self.currentProcedure.Update():
             self.StopProcedure(False)
 
-    def RunProcedure(self, procedure: Procedure):
-        if self.IsRunning():
+    def SetProcedure(self, procedure: Procedure):
+        self.currentProcedure = procedure
+
+    def RunProcedure(self):
+        if self.IsRunning() or self.currentProcedure is None:
             return
         self.OnBegin.Invoke()
-        self.currentProcedure = procedure
 
         self.currentProcedure.Start()
         self.isRunning = True
@@ -42,6 +44,5 @@ class ProcedureRunner:
                     self.currentProcedure.Stop()
 
             self.isRunning = False
-            self.currentProcedure = None
             self.OnDone.Invoke()
             return True

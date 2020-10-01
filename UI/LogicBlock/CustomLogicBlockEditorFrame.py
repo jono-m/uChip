@@ -1,0 +1,61 @@
+from UI.BaseEditorFrame import *
+
+
+class CustomLogicBlockEditorFrame(BaseEditorFrame):
+    def __init__(self, logicBlock: CompoundLogicBlock):
+        super().__init__()
+
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(layout)
+
+        self.logicBlock = logicBlock
+
+        self.editor = LogicBlockEditor()
+        self.nameFilters = "μChip Logic Block (*.ulb)"
+
+        layout.addWidget(self.editor)
+
+        self.logicBlock.OnModified.Register(self.FileModified, True)
+        self.logicBlock.OnSaved.Register(self.FileSaved, True)
+
+        self.editor.LoadBlock(self.logicBlock)
+
+        self.updateTimer = QTimer(self)
+        self.updateTimer.timeout.connect(self.TimerUpdate)
+        self.updateTimer.start(100)
+
+        self.hasFilename = logicBlock.GetFilename() is not None
+
+    def TimerUpdate(self):
+        if self.logicBlock is not None:
+            self.logicBlock.UpdateOutputs()
+
+    def AddLogicBlock(self, lb: LogicBlock):
+        lb.SetPosition(self.editor.worldBrowser.GetCenterPoint())
+        if isinstance(lb, CompoundLogicBlock) and self.logicBlock.CreatesLoop(lb):
+            QMessageBox.warning(self, "Element addition failed",
+                                "The current logic block is used in the logic block that you are trying to "
+                                "add. This would create a never-ending loop! Cannot add.")
+        else:
+            self.logicBlock.AddSubBlock(lb)
+
+    def AddImage(self, image: Image):
+        self.logicBlock.AddImage(image)
+
+    def RequestClose(self):
+        if super().RequestClose():
+            self.logicBlock.OnModified.Unregister(self.FileModified)
+            self.logicBlock.OnModified.Unregister(self.FileSaved)
+            self.logicBlock.Destroy()
+            return True
+        return False
+
+    def DoSave(self, filename=None):
+        self.logicBlock.Save(filename)
+
+    def GetName(self) -> str:
+        return self.logicBlock.GetName()
+
+    def UpdateFromSave(self):
+        self.logicBlock.ReloadFileSubBlocks()

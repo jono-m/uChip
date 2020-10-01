@@ -1,6 +1,3 @@
-from PySide2.QtWidgets import *
-from PySide2.QtGui import *
-from PySide2.QtCore import *
 from Util import *
 
 
@@ -38,10 +35,6 @@ class MenuBar(QFrame):
         fileMenu.addAction(saveAction)
         fileMenu.addAction(saveAsAction)
 
-        editMenu = self.menuBar.addMenu("&Edit")
-        viewMenu = self.menuBar.addMenu("&View")
-        helpMenu = self.menuBar.addMenu("&Help")
-
         self.setContentsMargins(0, 0, 0, 0)
 
         layout = QHBoxLayout()
@@ -52,5 +45,5 @@ class MenuBar(QFrame):
         self.setLayout(layout)
         layout.addWidget(self.menuBar, alignment=Qt.AlignCenter)
 
-    def SetIsProcedureRunning(self, isRunning):
+    def UpdateForProcedureStatus(self, isRunning):
         self.setEnabled(not isRunning)

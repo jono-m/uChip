@@ -16,7 +16,7 @@ class BlockConnection(ConnectionItem):
         self.SetToPort(None)
         self.inputWidget.inputPort.block.OnConnectionsChanged.Unregister(self.CheckExistence)
         self.outputWidget.outputPort.block.OnConnectionsChanged.Unregister(self.CheckExistence)
-        self.scene().removeItem(self)
+        del self
 
     def CheckExistence(self):
         if not LogicBlock.IsConnected(self.outputWidget.outputPort, self.inputWidget.inputPort):

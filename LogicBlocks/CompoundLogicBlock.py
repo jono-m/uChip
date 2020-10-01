@@ -29,6 +29,13 @@ class CompoundLogicBlock(LogicBlock):
             for s in self._subBlocks.copy():
                 s.Destroy()
 
+    def Close(self):
+        super().Destroy()
+        for s in self._subBlocks.copy():
+            s.Close()
+        for i in self._images:
+            i.Close()
+
     def AddImage(self, image: 'Image'):
         self._images.add(image)
         self.OnModified.Invoke()
@@ -46,7 +53,6 @@ class CompoundLogicBlock(LogicBlock):
         image.OnScaleChanged.Unregister(self.OnModified.Invoke)
         image.OnMoved.Unregister(self.OnModified.Invoke)
         self.OnImageRemoved.Invoke(image)
-        image.OnDestroyed.Invoke()
 
     def GetSubBlocks(self) -> typing.Set[LogicBlock]:
         return self._subBlocks.copy()
@@ -181,7 +187,6 @@ class CompoundLogicBlock(LogicBlock):
         block.OnDuplicated.Unregister(self.AddSubBlock)
         block.OnDestroyed.Unregister(self.RemoveSubBlock)
         block.OnMoved.Unregister(self.OnModified.Invoke)
-        block.Destroy()
         self.OnBlockRemoved.Invoke(block)
         self.OnModified.Invoke()
 
@@ -221,6 +226,7 @@ class Image:
         self.OnScaleChanged = Event()
         self.OnMoved = Event()
         self.OnDestroyed = Event()
+        self.OnClosed = Event()
 
     def SetPosition(self, position: QPointF):
         self._position = position
@@ -232,6 +238,9 @@ class Image:
 
     def Destroy(self):
         self.OnDestroyed.Invoke(self)
+
+    def Close(self):
+        self.OnClosed.Invoke(self)
 
     def GetPosition(self):
         return self._position
