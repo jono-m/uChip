@@ -1,26 +1,28 @@
 stylesheet = """
-#Container {
-            border-width: 2px;
+        #Container {
+            border-width: 0px;
         }
         *, QTabBar {
-            background-color: rgba(65, 65, 65, 1);
+            background-color: rgba(50, 50, 50, 1);
             border-color: rgba(80, 80, 80, 1);
             color: rgba(230, 230, 230, 1);
             border-style: solid;
             border-width: 0px;
        } 
        MenuBar {
-            border-width: 0px 2px 0px 2px;
+            border-width: 0px 0px 1px 0px;
+       }
+       #MainToolbar {
+            border-width: 0px 0px 1px 0px;
        }
         QMenuBar::item:selected, QMenu::item:selected {
             background-color: rgba(0, 0, 0, 0.3);
             color: white;
         }
         QPushButton, QToolButton {
-            background-color: rgba(0, 0, 0, 0.05);
             text-align: left;
             padding: 10px;
-            border-width: 1px;
+            border-width: 0px;
         }
         #menuBarButton {
             border: none;
@@ -57,7 +59,7 @@ stylesheet = """
             background-color: rgba(0, 0, 0, 0.2);
         }
         #SectionSpacer {
-            background-color: transparent;
+            background-color: rgba(80, 80, 80, 1);
         }
         QComboBox {
             color: white;

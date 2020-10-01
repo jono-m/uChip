@@ -16,6 +16,8 @@ class MainToolbar(QFrame):
         super().__init__()
         self.buttons: typing.List[QAbstractButton] = []
 
+        self.setObjectName("MainToolbar")
+
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setAlignment(Qt.AlignLeft)
@@ -270,7 +272,7 @@ class MainToolbar(QFrame):
 
         stretch = QFrame()
         stretch.setContentsMargins(0, 0, 0, 0)
-        stretch.setFixedWidth(10)
+        stretch.setFixedWidth(1)
         stretch.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
         stretch.setObjectName("SectionSpacer")
         layout.addWidget(stretch, 0, c, r + 1, 1)

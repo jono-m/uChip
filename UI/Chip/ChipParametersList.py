@@ -6,25 +6,6 @@ class ChipParametersList(QFrame):
     def __init__(self):
         super().__init__()
 
-        layout = QVBoxLayout()
-        layout.setAlignment(Qt.AlignTop)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
-        self.setLayout(layout)
-
-        self.label = QLabel("Chip Parameters")
-        layout.addWidget(self.label)
-
-        self.scrollArea = QScrollArea()
-        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.container = QFrame()
-        self.scrollArea.setWidget(self.container)
-        self.scrollArea.setWidgetResizable(True)
-
-        layout.addWidget(self.scrollArea, stretch=1)
-
-        self.chipController: typing.Optional[ChipController] = None
-
         self.setStyleSheet("""
         QLabel {
         background-color: rgba(255, 255, 255, 0.05);
@@ -34,27 +15,56 @@ class ChipParametersList(QFrame):
         }
         """)
 
-        listLayout = QVBoxLayout()
-        listLayout.setAlignment(Qt.AlignTop | Qt.AlignCenter)
-        listLayout.setContentsMargins(0, 0, 0, 0)
-        listLayout.setSpacing(0)
-        self.container.setLayout(listLayout)
+        self.label = QLabel("Chip Parameters")
+        self.label.setAlignment(Qt.AlignCenter)
+
+        self.scrollArea = QScrollArea()
+        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.scrollArea.setStyleSheet("""background-color: rgba(0, 0, 0, 0.2)""")
+
+        self.container = QFrame()
+        self.container.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
 
         self.parametersWidget = QFrame()
-        self.parametersWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-        self.parametersWidget.setLayout(QVBoxLayout())
-        self.parametersWidget.layout().setContentsMargins(0, 0, 0, 0)
-        self.parametersWidget.layout().setSpacing(10)
-        listLayout.addWidget(self.parametersWidget)
+        self.parametersWidget.setStyleSheet("""background-color: red;""")
+        self.parametersWidget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
 
         self.valvesWidget = QFrame()
-        self.valvesWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-        self.valvesWidget.setLayout(QVBoxLayout())
-        self.valvesWidget.layout().setContentsMargins(0, 0, 0, 0)
-        self.valvesWidget.layout().setSpacing(10)
-        listLayout.addWidget(self.valvesWidget)
+        self.valvesWidget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
 
-        self.setFixedWidth(200)
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignTop)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        layout.addWidget(self.label)
+        layout.addWidget(self.scrollArea, stretch=1)
+        self.setLayout(layout)
+
+        containerLayout = QVBoxLayout()
+        containerLayout.setAlignment(Qt.AlignTop)
+        containerLayout.setContentsMargins(0, 0, 0, 0)
+        containerLayout.setSpacing(0)
+        self.container.setLayout(containerLayout)
+
+        parametersLayout = QVBoxLayout()
+        parametersLayout.setContentsMargins(0, 0, 0, 0)
+        parametersLayout.setSpacing(10)
+        parametersLayout.setAlignment(Qt.AlignTop)
+        self.parametersWidget.setLayout(parametersLayout)
+        containerLayout.addWidget(self.parametersWidget)
+
+        valvesLayout = QVBoxLayout()
+        valvesLayout.setContentsMargins(0, 0, 0, 0)
+        valvesLayout.setSpacing(10)
+        valvesLayout.setAlignment(Qt.AlignTop)
+        self.valvesWidget.setLayout(valvesLayout)
+        containerLayout.addWidget(self.valvesWidget)
+
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setWidget(self.container)
+
+        self.chipController: typing.Optional[ChipController] = None
 
     def CloseChipController(self):
         if self.chipController is not None:
@@ -87,6 +97,7 @@ class ChipParametersList(QFrame):
             if inputPort not in inputPorts:
                 newField = ChipParameterField(inputPort)
                 self.parametersWidget.layout().addWidget(newField)
+                newField.setVisible(True)
 
         valves = [valvesField.valveBlock for valvesField in self.valvesWidget.children() if
                   isinstance(valvesField, UnboundValveField)]
@@ -96,6 +107,10 @@ class ChipParametersList(QFrame):
                 if valveBlock.openInput.connectedOutput is None:
                     newValveBlock = UnboundValveField(valveBlock)
                     self.valvesWidget.layout().addWidget(newValveBlock)
+                    newValveBlock.setVisible(True)
+
+        maxWidth = max(self.valvesWidget.sizeHint().width(), self.parametersWidget.sizeHint().width())
+        self.scrollArea.setMinimumWidth(maxWidth + self.scrollArea.horizontalScrollBar().sizeHint().width())
 
 
 class ChipParameterField(QFrame):
@@ -157,10 +172,6 @@ class ChipParameterField(QFrame):
 
         self.parameterSetting.Update(self.inputPort.name, self.inputPort.GetDefaultData())
 
-        self.update()
-
-        self.topLevelWidget().update()
-
 
 class UnboundValveField(QFrame):
     def __init__(self, valveBlock: ValveLogicBlock):
@@ -219,5 +230,3 @@ class UnboundValveField(QFrame):
             return
 
         self.parameterSetting.Update(self.valveBlock.GetName(), self.valveBlock.openInput.GetDefaultData())
-
-        self.topLevelWidget().update()
