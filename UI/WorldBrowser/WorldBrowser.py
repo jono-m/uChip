@@ -46,12 +46,12 @@ class WorldBrowser(QGraphicsView):
 
         self.UpdateView()
 
-    def ClearOut(self):
+    def Clear(self):
         for item in self.items():
             if item == self.tempConnectionLine:
                 continue
             else:
-                self.scene().removeItem(item)
+                del item
         self.hoverItem = None
         self.selectedItem = None
 

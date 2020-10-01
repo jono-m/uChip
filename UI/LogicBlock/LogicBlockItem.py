@@ -54,15 +54,15 @@ class LogicBlockItem(BlockItem):
         self.UpdatePos()
 
         self.block.OnPortsChanged.Register(self.UpdatePorts, True)
-        self.block.OnDestroyed.Register(self.Remove, True)
+        self.block.OnDestroyed.Register(self.Destroy, True)
         self.block.OnMoved.Register(self.UpdatePos, True)
         self.block.OnOutputsUpdated.Register(self.UpdateName, True)
 
     def UpdatePos(self):
         self.setPos(self.block.GetPosition() - self.rect().center())
 
-    def Remove(self):
-        self.block.OnDestroyed.Unregister(self.Remove)
+    def Destroy(self):
+        self.block.OnDestroyed.Unregister(self.Destroy)
         self.block.OnPortsChanged.Unregister(self.UpdatePorts)
         self.block.OnMoved.Unregister(self.UpdatePos)
         self.block.OnOutputsUpdated.Unregister(self.UpdateName)

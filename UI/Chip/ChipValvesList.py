@@ -10,6 +10,7 @@ class ChipValvesList(QFrame):
         self.label.setAlignment(Qt.AlignCenter)
 
         self.scrollArea = QScrollArea()
+        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         layout = QVBoxLayout()
         self.setLayout(layout)
@@ -48,13 +49,13 @@ class ChipValvesList(QFrame):
         self.valvesWidget.layout().setSpacing(10)
         listLayout.addWidget(self.valvesWidget)
 
-
     def CloseChipController(self):
         if self.chipController is not None:
             self.chipController.OnModified.Unregister(self.UpdateValvesList)
         self.chipController = None
+        self.Clear()
 
-    def LoadChipController(self, cc: ChipController):
+    def SetChipController(self, cc: ChipController):
         self.CloseChipController()
         self.chipController = cc
 
@@ -130,3 +131,5 @@ class ValveField(QFrame):
 
     def Update(self):
         self.parameterSetting.Update("<b><u>" + self.valveBlock.GetName() + "</b></u> - Solenoid Number:", self.valveBlock.solenoidNumberInput.GetDefaultData())
+
+        self.topLevelWidget().update()

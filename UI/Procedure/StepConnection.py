@@ -11,16 +11,16 @@ class StepConnection(ConnectionItem):
         self.beginWidget.beginPort.step.OnConnectionsChanged.Register(self.CheckExistence, True)
         self.completedWidget.completedPort.step.OnConnectionsChanged.Register(self.CheckExistence, True)
 
-    def Remove(self):
+    def Destroy(self):
         self.SetFromPort(None)
         self.SetToPort(None)
         self.beginWidget.beginPort.step.OnConnectionsChanged.Unregister(self.CheckExistence)
         self.completedWidget.completedPort.step.OnConnectionsChanged.Unregister(self.CheckExistence)
-        self.scene().removeItem(self)
+        del self
 
     def CheckExistence(self):
         if not Step.AreStepsConnected(self.completedWidget.completedPort, self.beginWidget.beginPort):
-            self.Remove()
+            self.Destroy()
 
     @staticmethod
     def GetPath(fromCenter: QPointF, toCenter: QPointF):

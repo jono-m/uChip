@@ -29,9 +29,10 @@ class LogicBlockEditor(QFrame):
             self.currentBlock.OnBlockAdded.Unregister(self.CreateBlockItem)
             self.currentBlock.OnSubBlockConnected.Unregister(self.CreateConnectionTuple)
             self.currentBlock.OnImageAdded.Unregister(self.CreateImageItem)
+            self.currentBlock.OnClosed.Unregister(self.Clear)
         self.currentBlock = None
 
-        self.worldBrowser.ClearOut()
+        self.worldBrowser.Clear()
 
     def LoadBlock(self, block: CompoundLogicBlock):
         self.Clear()
@@ -58,6 +59,7 @@ class LogicBlockEditor(QFrame):
         self.currentBlock.OnBlockAdded.Register(self.CreateBlockItem, True)
         self.currentBlock.OnSubBlockConnected.Register(self.CreateConnectionTuple, True)
         self.currentBlock.OnImageAdded.Register(self.CreateImageItem, True)
+        self.currentBlock.OnClosed.Register(self.Clear, True)
 
     def CreateBlockItem(self, newBlock: LogicBlock):
         for blockType, viewType in self.viewMapping:

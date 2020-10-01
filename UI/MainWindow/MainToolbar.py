@@ -7,13 +7,13 @@ from LogicBlocks.ScriptedBlock import *
 from UI.Procedure.ProceduresBox import *
 from LogicBlocks.IOBlocks import *
 from PySide2.QtGui import *
+from UI.Procedure.ProcedureMenu import *
 from ChipController.ChipController import *
 
 
 class MainToolbar(QFrame):
-    def __init__(self, currentParameterMenu, setParameterMenu):
+    def __init__(self):
         super().__init__()
-
         self.buttons: typing.List[QAbstractButton] = []
 
         layout = QHBoxLayout()
@@ -115,9 +115,15 @@ class MainToolbar(QFrame):
                                                                delegate=lambda: self.OnAddLogicBlock.Invoke(IfStep())),
                                                 1, 0)
 
-        self.procedureElementsSection.addWidget(self.AddButton(None, "Current Parameter", menu=currentParameterMenu), 0,
+        self.getMenu = GetMenu()
+        self.setMenu = SetMenu()
+
+        self.getMenu.OnAddGet.Register(self.OnAddLogicBlock.Invoke, True)
+        self.setMenu.OnAddSet.Register(self.OnAddLogicBlock.Invoke, True)
+
+        self.procedureElementsSection.addWidget(self.AddButton(None, "Current Parameter", menu=self.getMenu), 0,
                                                 1)
-        self.procedureElementsSection.addWidget(self.AddButton(None, "Set Parameter", menu=setParameterMenu), 1, 1)
+        self.procedureElementsSection.addWidget(self.AddButton(None, "Set Parameter", menu=self.setMenu), 1, 1)
 
         self.ioSection = self.AddMenuSection("Input/Output", 2, 2)
         self.ioSection.addWidget(self.AddButton("Assets/checkboxIcon.png", "YES/NO Input", color=color,
@@ -215,7 +221,7 @@ class MainToolbar(QFrame):
 
         self.updateGeometry()
 
-    def SetIsProcedureRunning(self, isRunning):
+    def UpdateForProcedureStatus(self, isRunning):
         self.proceduresBox.setEnabled(not isRunning)
 
         self.stopButton.setVisible(isRunning)
@@ -301,6 +307,11 @@ class MainToolbar(QFrame):
             if filename is not None:
                 newImage = Image(filename[0])
                 self.OnAddImage.Invoke(newImage)
+
+    def SetChipController(self, chipController):
+        self.getMenu.SetChipController(chipController)
+        self.setMenu.SetChipController(chipController)
+        self.proceduresBox.SetChipController(chipController)
 
     def PromptNewProcedure(self):
         (text, ok) = QInputDialog.getText(self, "New Procedure", "Procedure Name:")

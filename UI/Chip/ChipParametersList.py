@@ -16,6 +16,7 @@ class ChipParametersList(QFrame):
         layout.addWidget(self.label)
 
         self.scrollArea = QScrollArea()
+        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.container = QFrame()
         self.scrollArea.setWidget(self.container)
         self.scrollArea.setWidgetResizable(True)
@@ -59,8 +60,9 @@ class ChipParametersList(QFrame):
         if self.chipController is not None:
             self.chipController.OnModified.Unregister(self.UpdateParametersList)
         self.chipController = None
+        self.Clear()
 
-    def LoadChipController(self, cc: ChipController):
+    def SetChipController(self, cc: ChipController):
         self.CloseChipController()
         self.chipController = cc
 
@@ -155,6 +157,10 @@ class ChipParameterField(QFrame):
 
         self.parameterSetting.Update(self.inputPort.name, self.inputPort.GetDefaultData())
 
+        self.update()
+
+        self.topLevelWidget().update()
+
 
 class UnboundValveField(QFrame):
     def __init__(self, valveBlock: ValveLogicBlock):
@@ -213,3 +219,5 @@ class UnboundValveField(QFrame):
             return
 
         self.parameterSetting.Update(self.valveBlock.GetName(), self.valveBlock.openInput.GetDefaultData())
+
+        self.topLevelWidget().update()

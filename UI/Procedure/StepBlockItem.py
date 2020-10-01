@@ -76,8 +76,8 @@ class StepBlockItem(LogicBlockItem):
 
         self.setStyle(self.style())
 
-    def Remove(self):
-        super().Remove()
+    def Destroy(self):
+        super().Destroy()
         self.step.OnOutputsUpdated.Unregister(self.UpdateProgress)
 
     def UpdateProgress(self):

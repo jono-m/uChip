@@ -13,12 +13,13 @@ class LogicBlock:
         self.OnPortsChanged = Event()  # Called when an input or output port is added or removed from the logic block
         self.OnDefaultChanged = Event()  # Called when a default value is changed
         self.OnDestroyed = Event()  # Called when this block is destroyed
+        self.OnClosed = Event()
         self.OnDuplicated = Event()
         self.OnMoved = Event()
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.Timeout)
-        self.timer.start(100)
+        self.timer.start(33)
 
         self._position = QPointF(0, 0)
 
@@ -53,10 +54,14 @@ class LogicBlock:
 
     def Destroy(self):
         if not self.isDestroyed:
-            self.isDestroyed = True
             self.timer.stop()
+            self.isDestroyed = True
             self.DisconnectAll()
             self.OnDestroyed.Invoke(self)
+
+    def Close(self):
+        self.timer.stop()
+        self.OnClosed.Invoke(self)
 
     def AddInput(self, name: str, dataType: typing.Optional[typing.Type], isConnectable=True) -> 'InputPort':
         newPort = InputPort(self, name, dataType, isConnectable)

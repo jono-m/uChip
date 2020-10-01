@@ -24,6 +24,9 @@ class ChipUpdateWorker(QRunnable):
                 self.chipController.SendToRig(self.rig)
             if self.procedureRunner.IsRunning():
                 self.procedureRunner.Step()
+            else:
+                if self.procedureRunner.currentProcedure is not None:
+                    self.procedureRunner.currentProcedure.UpdateOutputs()
             QThread.msleep(10)
 
     def stop(self):
