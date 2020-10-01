@@ -249,6 +249,7 @@ class ParameterWidget(QFrame):
             layout.addWidget(self.control)
         elif self.dataType == float or self.dataType is None:
             self.control = CleanSpinBox()
+            self.control.wheelEvent = lambda event: None
             self.control.setKeyboardTracking(False)
             self.control.setRange(-(2 ** 24), 2 ** 24)
             self.control.valueChanged.connect(self.ParameterChanged)
@@ -260,6 +261,7 @@ class ParameterWidget(QFrame):
             layout.addWidget(self.control)
         elif self.dataType == int:
             self.control = QSpinBox()
+            self.control.wheelEvent = lambda event: None
             self.control.setKeyboardTracking(False)
             self.control.setRange(-2 ** 24, 2 ** 24)
             self.control.valueChanged.connect(self.ParameterChanged)

@@ -24,19 +24,19 @@ class MainWindow(QMainWindow):
         self.procedureRunner.OnBegin.Register(lambda: self.menuBarWidget.UpdateForProcedureStatus(True))
         self.procedureRunner.OnDone.Register(lambda: self.menuBarWidget.UpdateForProcedureStatus(False))
 
-        self.editorFrame = MainWorkArea(self.rig, self.procedureRunner)
-        self.editorFrame.OnTabNamesChanged.Register(self.UpdateName)
+        self.workArea = MainWorkArea(self.rig, self.procedureRunner)
+        self.workArea.OnTabNamesChanged.Register(self.UpdateName)
 
         self.updateWorker = ChipUpdateWorker(self.rig, self.procedureRunner)
-        self.editorFrame.OnChipOpened.Register(self.updateWorker.SetChipController, True)
+        self.workArea.OnChipOpened.Register(self.updateWorker.SetChipController, True)
 
         self.menuBarWidget = MenuBar()
 
-        self.menuBarWidget.OnOpen.Register(self.editorFrame.DisplayOpenDialog)
-        self.menuBarWidget.OnNewLB.Register(lambda: self.editorFrame.OpenLogicBlock(None))
-        self.menuBarWidget.OnNewChip.Register(lambda: self.editorFrame.RequestChipOpen(None))
-        self.menuBarWidget.OnSaveAs.Register(lambda: self.editorFrame.RequestSave(True))
-        self.menuBarWidget.OnSave.Register(lambda: self.editorFrame.RequestSave(False))
+        self.menuBarWidget.OnOpen.Register(self.workArea.DisplayOpenDialog)
+        self.menuBarWidget.OnNewLB.Register(lambda: self.workArea.OpenLogicBlock(None))
+        self.menuBarWidget.OnNewChip.Register(lambda: self.workArea.RequestChipOpen(None))
+        self.menuBarWidget.OnSaveAs.Register(lambda: self.workArea.RequestSave(True))
+        self.menuBarWidget.OnSave.Register(lambda: self.workArea.RequestSave(False))
 
         self.setMenuWidget(self.menuBarWidget)
 
@@ -46,7 +46,7 @@ class MainWindow(QMainWindow):
 
         self.setFocusPolicy(Qt.StrongFocus)
 
-        self.editorFrame.RequestChipOpen()
+        self.workArea.RequestChipOpen()
         self.threadPool = QThreadPool()
 
         self.threadPool.start(self.updateWorker)
@@ -54,18 +54,20 @@ class MainWindow(QMainWindow):
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
-        layout.addWidget(self.editorFrame, stretch=1)
+        layout.addWidget(self.workArea, stretch=1)
         container.setLayout(layout)
 
+        self.procedureRunner.StopProcedure()
+
     def UpdateName(self):
-        name = self.editorFrame.chipFrame.GetFrameTitle()
+        name = self.workArea.chipFrame.GetFrameTitle()
         self.setWindowTitle(name + " - μChip")
 
     def closeEvent(self, event: QCloseEvent):
         if self.procedureRunner.IsRunning() and not self.procedureRunner.StopProcedure(True):
             event.ignore()
             return
-        if self.editorFrame.RequestCloseAllTabs():
+        if self.workArea.RequestCloseAllTabs():
             self.updateWorker.stop()
             super().closeEvent(event)
         else:

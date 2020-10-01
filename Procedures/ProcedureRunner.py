@@ -46,3 +46,5 @@ class ProcedureRunner:
             self.isRunning = False
             self.OnDone.Invoke()
             return True
+        else:
+            self.OnDone.Invoke()

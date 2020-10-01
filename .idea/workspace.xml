@@ -20,34 +20,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="99850780-df20-4af2-831c-10fab045648b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/UI/MainWindow/MainWorkArea.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/UI/STYLESHEET.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ChipController/ChipController.py" beforeDir="false" afterPath="$PROJECT_DIR$/ChipController/ChipController.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ChipController/ChipUpdateWorker.py" beforeDir="false" afterPath="$PROJECT_DIR$/ChipController/ChipUpdateWorker.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LogicBlocks/CompoundLogicBlock.py" beforeDir="false" afterPath="$PROJECT_DIR$/LogicBlocks/CompoundLogicBlock.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LogicBlocks/LogicBlock.py" beforeDir="false" afterPath="$PROJECT_DIR$/LogicBlocks/LogicBlock.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Procedures/ProcedureRunner.py" beforeDir="false" afterPath="$PROJECT_DIR$/Procedures/ProcedureRunner.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/Chip/ChipFrame.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Chip/ChipEditorFrame.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/Chip/ChipParametersList.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Chip/ChipParametersList.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/Chip/ChipValvesList.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Chip/ChipValvesList.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/FileViewerFrame.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/BaseEditorFrame.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/LogicBlock/BlockConnection.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/LogicBlock/BlockConnection.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/LogicBlock/LogicBlockEditor.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/LogicBlock/LogicBlockEditor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/LogicBlock/LogicBlockFrame.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/LogicBlock/CustomLogicBlockEditorFrame.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/LogicBlock/LogicBlockItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/LogicBlock/LogicBlockItem.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/MainWindow/MainToolbar.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/MainWindow/MainToolbar.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/MainWindow/MenuBar.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/MainWindow/MenuBar.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/MainWindow/TabArea.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/MainWindow/UpdaterThreading.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/Procedure/ProcedureFrame.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Procedure/ProcedureEditorFrame.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/Procedure/StepBlockItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Procedure/StepBlockItem.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/Procedure/StepConnection.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Procedure/StepConnection.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/WorldBrowser/WorldBrowser.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/WorldBrowser/WorldBrowser.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/exe.win32-3.8/lib/library.zip" beforeDir="false" afterPath="$PROJECT_DIR$/build/exe.win32-3.8/lib/library.zip" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/exe.win32-3.8/main.exe" beforeDir="false" afterPath="$PROJECT_DIR$/build/exe.win32-3.8/main.exe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/MainWindow/MainWorkArea.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/MainWindow/MainWorkArea.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/STYLESHEET.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/STYLESHEET.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/devicePreferences.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/devicePreferences.pkl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,6 +55,7 @@
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="PyConsoleOptionsProvider">
@@ -152,46 +135,59 @@
       <screen x="0" y="0" width="2194" height="1194" />
     </state>
     <state x="329" y="352" key="FileChooserDialogImpl/0.0.2194.1194@0.0.2194.1194" timestamp="1601328827688" />
-    <state width="2173" height="143" key="GridCell.Tab.0.bottom" timestamp="1601575000987">
-      <screen x="0" y="0" width="2194" height="1194" />
+    <state width="3419" height="491" key="GridCell.Tab.0.bottom" timestamp="1601593604366">
+      <screen x="0" y="0" width="3440" height="1400" />
     </state>
     <state width="2173" height="143" key="GridCell.Tab.0.bottom/0.0.2194.1194@0.0.2194.1194" timestamp="1601575000987" />
-    <state width="2173" height="143" key="GridCell.Tab.0.center" timestamp="1601575000987">
-      <screen x="0" y="0" width="2194" height="1194" />
+    <state width="3419" height="491" key="GridCell.Tab.0.bottom/0.0.3440.1400@0.0.3440.1400" timestamp="1601593604366" />
+    <state width="3419" height="491" key="GridCell.Tab.0.center" timestamp="1601593604366">
+      <screen x="0" y="0" width="3440" height="1400" />
     </state>
     <state width="2173" height="143" key="GridCell.Tab.0.center/0.0.2194.1194@0.0.2194.1194" timestamp="1601575000987" />
-    <state width="2173" height="143" key="GridCell.Tab.0.left" timestamp="1601575000987">
-      <screen x="0" y="0" width="2194" height="1194" />
+    <state width="3419" height="491" key="GridCell.Tab.0.center/0.0.3440.1400@0.0.3440.1400" timestamp="1601593604366" />
+    <state width="3419" height="491" key="GridCell.Tab.0.left" timestamp="1601593604366">
+      <screen x="0" y="0" width="3440" height="1400" />
     </state>
     <state width="2173" height="143" key="GridCell.Tab.0.left/0.0.2194.1194@0.0.2194.1194" timestamp="1601575000987" />
-    <state width="2173" height="143" key="GridCell.Tab.0.right" timestamp="1601575000987">
-      <screen x="0" y="0" width="2194" height="1194" />
+    <state width="3419" height="491" key="GridCell.Tab.0.left/0.0.3440.1400@0.0.3440.1400" timestamp="1601593604366" />
+    <state width="3419" height="491" key="GridCell.Tab.0.right" timestamp="1601593604366">
+      <screen x="0" y="0" width="3440" height="1400" />
     </state>
     <state width="2173" height="143" key="GridCell.Tab.0.right/0.0.2194.1194@0.0.2194.1194" timestamp="1601575000987" />
-    <state width="2173" height="406" key="GridCell.Tab.1.bottom" timestamp="1601575000984">
-      <screen x="0" y="0" width="2194" height="1194" />
+    <state width="3419" height="491" key="GridCell.Tab.0.right/0.0.3440.1400@0.0.3440.1400" timestamp="1601593604366" />
+    <state width="3419" height="491" key="GridCell.Tab.1.bottom" timestamp="1601593604366">
+      <screen x="0" y="0" width="3440" height="1400" />
     </state>
     <state width="2173" height="406" key="GridCell.Tab.1.bottom/0.0.2194.1194@0.0.2194.1194" timestamp="1601575000984" />
-    <state width="2173" height="406" key="GridCell.Tab.1.center" timestamp="1601575000984">
-      <screen x="0" y="0" width="2194" height="1194" />
+    <state width="3419" height="491" key="GridCell.Tab.1.bottom/0.0.3440.1400@0.0.3440.1400" timestamp="1601593604366" />
+    <state width="3419" height="491" key="GridCell.Tab.1.center" timestamp="1601593604366">
+      <screen x="0" y="0" width="3440" height="1400" />
     </state>
     <state width="2173" height="406" key="GridCell.Tab.1.center/0.0.2194.1194@0.0.2194.1194" timestamp="1601575000984" />
-    <state width="2173" height="406" key="GridCell.Tab.1.left" timestamp="1601575000984">
-      <screen x="0" y="0" width="2194" height="1194" />
+    <state width="3419" height="491" key="GridCell.Tab.1.center/0.0.3440.1400@0.0.3440.1400" timestamp="1601593604366" />
+    <state width="3419" height="491" key="GridCell.Tab.1.left" timestamp="1601593604366">
+      <screen x="0" y="0" width="3440" height="1400" />
     </state>
     <state width="2173" height="406" key="GridCell.Tab.1.left/0.0.2194.1194@0.0.2194.1194" timestamp="1601575000984" />
-    <state width="2173" height="406" key="GridCell.Tab.1.right" timestamp="1601575000984">
-      <screen x="0" y="0" width="2194" height="1194" />
+    <state width="3419" height="491" key="GridCell.Tab.1.left/0.0.3440.1400@0.0.3440.1400" timestamp="1601593604366" />
+    <state width="3419" height="491" key="GridCell.Tab.1.right" timestamp="1601593604366">
+      <screen x="0" y="0" width="3440" height="1400" />
     </state>
     <state width="2173" height="406" key="GridCell.Tab.1.right/0.0.2194.1194@0.0.2194.1194" timestamp="1601575000984" />
+    <state width="3419" height="491" key="GridCell.Tab.1.right/0.0.3440.1400@0.0.3440.1400" timestamp="1601593604366" />
     <state x="606" y="242" key="SettingsEditor" timestamp="1601323176024">
       <screen x="0" y="0" width="2194" height="1194" />
     </state>
     <state x="606" y="242" key="SettingsEditor/0.0.2194.1194@0.0.2194.1194" timestamp="1601323176024" />
-    <state x="809" y="330" width="576" height="534" key="find.popup" timestamp="1601561359094">
-      <screen x="0" y="0" width="2194" height="1194" />
+    <state x="1284" y="429" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1601582444276">
+      <screen x="0" y="0" width="3440" height="1400" />
+    </state>
+    <state x="1284" y="429" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.0.3440.1400@0.0.3440.1400" timestamp="1601582444276" />
+    <state x="1268" y="387" width="904" height="627" key="find.popup" timestamp="1601581189871">
+      <screen x="0" y="0" width="3440" height="1400" />
     </state>
     <state x="809" y="330" width="576" height="534" key="find.popup/0.0.2194.1194@0.0.2194.1194" timestamp="1601561359094" />
+    <state x="1268" y="387" width="904" height="627" key="find.popup/0.0.3440.1400@0.0.3440.1400" timestamp="1601581189871" />
     <state x="760" y="264" width="672" height="678" key="search.everywhere.popup" timestamp="1601502463147">
       <screen x="0" y="0" width="2194" height="1194" />
     </state>
@@ -204,16 +200,6 @@
           <url>file://$APPLICATION_HOME_DIR$/plugins/python-ce/helpers/pydev/_pydevd_bundle/pydevd_exec2.py</url>
           <line>1</line>
           <option name="timeStamp" value="8" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/UI/Chip/ChipParametersList.py</url>
-          <line>222</line>
-          <option name="timeStamp" value="10" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/UI/Chip/ChipValvesList.py</url>
-          <line>134</line>
-          <option name="timeStamp" value="11" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Procedures/ProcedureRunner.py</url>

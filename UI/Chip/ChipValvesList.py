@@ -6,22 +6,6 @@ class ChipValvesList(QFrame):
     def __init__(self):
         super().__init__()
 
-        self.label = QLabel("Valve Mappings")
-        self.label.setAlignment(Qt.AlignCenter)
-
-        self.scrollArea = QScrollArea()
-        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-
-        layout = QVBoxLayout()
-        self.setLayout(layout)
-        layout.addWidget(self.label)
-        layout.addWidget(self.scrollArea, stretch=1)
-        layout.setAlignment(Qt.AlignTop)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
-
-        self.chipController: typing.Optional[ChipController] = None
-
         self.setStyleSheet("""
         QLabel {
         background-color: rgba(255, 255, 255, 0.05);
@@ -31,23 +15,37 @@ class ChipValvesList(QFrame):
         }
         """)
 
-        self.container = QFrame(self.scrollArea)
+        self.setObjectName("valvesList")
 
-        self.scrollArea.setWidget(self.container)
+        self.label = QLabel("Valve Mappings")
+        self.label.setAlignment(Qt.AlignCenter)
+
+        self.scrollArea = QScrollArea()
+        self.scrollArea.setStyleSheet("""background-color: rgba(0, 0, 0, 0.2)""")
+        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+
+        self.valvesContainer = QFrame()
+        self.valvesContainer.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignTop)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        layout.addWidget(self.label)
+        layout.addWidget(self.scrollArea, stretch=1)
+        self.setLayout(layout)
+
+        valvesLayout = QVBoxLayout()
+        valvesLayout.setContentsMargins(0, 0, 0, 0)
+        valvesLayout.setSpacing(10)
+        valvesLayout.setAlignment(Qt.AlignTop)
+        self.valvesContainer.setLayout(valvesLayout)
+
         self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setWidget(self.valvesContainer)
 
-        listLayout = QVBoxLayout()
-        listLayout.setAlignment(Qt.AlignTop | Qt.AlignCenter)
-        listLayout.setContentsMargins(0, 0, 0, 0)
-        listLayout.setSpacing(0)
-        self.container.setLayout(listLayout)
-
-        self.valvesWidget = QFrame()
-        self.valvesWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-        self.valvesWidget.setLayout(QVBoxLayout())
-        self.valvesWidget.layout().setContentsMargins(0, 0, 0, 0)
-        self.valvesWidget.layout().setSpacing(10)
-        listLayout.addWidget(self.valvesWidget)
+        self.chipController: typing.Optional[ChipController] = None
 
     def CloseChipController(self):
         if self.chipController is not None:
@@ -64,18 +62,22 @@ class ChipValvesList(QFrame):
         self.UpdateValvesList()
 
     def Clear(self):
-        for child in reversed(self.valvesWidget.children()):
+        for child in reversed(self.valvesContainer.children()):
             if isinstance(child, QWidget):
                 child.deleteLater()
 
     def UpdateValvesList(self):
-        valves = [valvesField.valveBlock for valvesField in self.valvesWidget.children() if
+        valves = [valvesField.valveBlock for valvesField in self.valvesContainer.children() if
                   isinstance(valvesField, ValveField)]
 
         for valveBlock in sorted(self.chipController.valveBlocks, key=lambda x: x.GetPosition().y()):
             if valveBlock not in valves:
                 newValveBlock = ValveField(valveBlock)
-                self.valvesWidget.layout().addWidget(newValveBlock)
+                self.valvesContainer.layout().addWidget(newValveBlock)
+                newValveBlock.setVisible(True)
+
+        self.scrollArea.setMinimumWidth(
+            self.valvesContainer.sizeHint().width() + self.scrollArea.horizontalScrollBar().sizeHint().width())
 
 
 class ValveField(QFrame):
@@ -130,6 +132,5 @@ class ValveField(QFrame):
         self.valveBlock.solenoidNumberInput.SetDefaultData(data)
 
     def Update(self):
-        self.parameterSetting.Update("<b><u>" + self.valveBlock.GetName() + "</b></u> - Solenoid Number:", self.valveBlock.solenoidNumberInput.GetDefaultData())
-
-        self.topLevelWidget().update()
+        self.parameterSetting.Update("<b><u>" + self.valveBlock.GetName() + "</b></u> - Solenoid Number:",
+                                     self.valveBlock.solenoidNumberInput.GetDefaultData())
