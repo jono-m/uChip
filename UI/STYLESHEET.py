@@ -44,7 +44,7 @@ stylesheet = """
             color: none;
             width: 0;
             height: 0;
-        } 
+        }
         QMenuBar::item:selected, QMenu::item:selected {
             background-color: rgba(0, 0, 0, 0.3);
             color: white;

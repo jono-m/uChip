@@ -118,7 +118,10 @@ class ConnectionItem(QGraphicsPathItem, SelectableItem):
         if self._toPort is None:
             bCenter = self.overridePos
         else:
-            bCenter = self._toPort.GetPositionInScene()
+            if not self._toPort.isVisible():
+                bCenter = self._toPort.graphicsParent.mapToScene(self._toPort.graphicsParent.rect().center())
+            else:
+                bCenter = self._toPort.GetPositionInScene()
         myPath = self.GetPath(aCenter, bCenter)
         self.myPath = myPath
 
