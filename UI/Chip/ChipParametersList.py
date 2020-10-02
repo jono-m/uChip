@@ -20,14 +20,12 @@ class ChipParametersList(QFrame):
 
         self.scrollArea = QScrollArea()
         self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        self.scrollArea.setStyleSheet("""background-color: rgba(0, 0, 0, 0.2)""")
+        self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
 
         self.container = QFrame()
         self.container.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
 
         self.parametersWidget = QFrame()
-        self.parametersWidget.setStyleSheet("""background-color: red;""")
         self.parametersWidget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
 
         self.valvesWidget = QFrame()
