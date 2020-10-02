@@ -15,6 +15,36 @@ stylesheet = """
        #MainToolbar {
             border-width: 0px 0px 1px 0px;
        }
+        QScrollArea {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+        QScrollBar {
+            background-color: rgba(255, 255, 255, 0);
+            width: 10px;
+        }
+        QScrollBar:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        QScrollBar::handle {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        QScrollBar::handle:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+        QScrollBar::add-page, QScrollBar::sub-page {
+            background: none;
+        }
+        QScrollBar::add-line, QScrollBar::sub-line {
+            border: none;
+            background: none;
+        }
+        QScrollBar::up-arrow, QScrollBar::down-arrow {
+            border: none;
+            background: none;
+            color: none;
+            width: 0;
+            height: 0;
+        } 
         QMenuBar::item:selected, QMenu::item:selected {
             background-color: rgba(0, 0, 0, 0.3);
             color: white;

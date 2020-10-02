@@ -21,9 +21,8 @@ class ChipValvesList(QFrame):
         self.label.setAlignment(Qt.AlignCenter)
 
         self.scrollArea = QScrollArea()
-        self.scrollArea.setStyleSheet("""background-color: rgba(0, 0, 0, 0.2)""")
         self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
 
         self.valvesContainer = QFrame()
         self.valvesContainer.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
