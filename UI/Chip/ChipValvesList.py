@@ -46,6 +46,8 @@ class ChipValvesList(QFrame):
 
         self.chipController: typing.Optional[ChipController] = None
 
+        self.setMinimumWidth(300)
+
     def CloseChipController(self):
         if self.chipController is not None:
             self.chipController.OnModified.Unregister(self.UpdateValvesList)
@@ -131,5 +133,5 @@ class ValveField(QFrame):
         self.valveBlock.solenoidNumberInput.SetDefaultData(data)
 
     def Update(self):
-        self.parameterSetting.Update("<b><u>" + self.valveBlock.GetName() + "</b></u> - Solenoid Number:",
+        self.parameterSetting.Update("<b><u>" + self.valveBlock.GetName() + "</b></u><br>Solenoid Number:",
                                      self.valveBlock.solenoidNumberInput.GetDefaultData())

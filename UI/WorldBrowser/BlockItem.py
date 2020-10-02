@@ -7,6 +7,7 @@ class BlockItem(QGraphicsProxyWidget, SelectableItem):
         super().__init__(*args, **kwargs)
 
         blockWidget = QFrame()
+        blockWidget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         blockWidget.setStyleSheet("""
                 * {
                 background-color: transparent;

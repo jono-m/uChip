@@ -1,4 +1,5 @@
 from LogicBlocks.LogicBlock import *
+import os
 
 
 class ScriptedBlock(LogicBlock):
@@ -11,6 +12,7 @@ class ScriptedBlock(LogicBlock):
                              'zip']
 
         self.scriptFilename = scriptFilename
+        self.lastModifiedTime = None
         self.code = ""
         self.codeLocals = {}
         self.codeGlobals = {}
@@ -18,24 +20,52 @@ class ScriptedBlock(LogicBlock):
         self.Reload()
 
     def Reload(self):
+        if not os.path.exists(self.scriptFilename):
+            print("Destroyed " + self.scriptFilename)
+            self.Destroy()
+            return
+        print("Reloaded " + self.scriptFilename)
         f = open(self.scriptFilename)
+        self.lastModifiedTime = os.path.getmtime(self.scriptFilename)
         self.code = f.read()
         f.close()
         self.codeGlobals = {'__builtins__': {k: __builtins__[k] for k in self.goodBuiltins}}
         self.codeLocals = {}
         exec(self.code, self.codeGlobals, self.codeLocals)
 
-        for inputPort in self.GetInputs():
-            self.RemoveInput(inputPort)
-        for outputPort in self.GetOutputs():
-            self.RemoveOutput(outputPort)
+        newInputs = self.codeLocals['Inputs']()
+        newOutputs = self.codeLocals['Outputs']()
 
-        inputs = self.codeLocals['Inputs']()
-        outputs = self.codeLocals['Outputs']()
-        for portName in inputs:
-            self.AddInput(portName, inputs[portName])
-        for portName in outputs:
-            self.AddOutput(portName, outputs[portName])
+        oldInputs = self.GetInputs()
+        oldOutputs = self.GetOutputs()
+
+        # Match reloaded ports to existing ports. Create new ones if no match was found
+        for newInputPortName in newInputs:
+            found = False
+            for oldInput in oldInputs:
+                if oldInput.name == newInputPortName and oldInput.dataType == newInputs[newInputPortName]:
+                    oldInputs.remove(oldInput)
+                    found = True
+                    break
+            if not found:
+                self.AddInput(newInputPortName, newInputs[newInputPortName])
+
+        for newOutputPortName in newOutputs:
+            found = False
+            for oldOutput in oldOutputs:
+                if oldOutput.name == newOutputPortName and oldOutput.dataType == newOutputs[newOutputPortName]:
+                    oldOutputs.remove(oldOutput)
+                    found = True
+                    break
+            if not found:
+                self.AddOutput(newOutputPortName, newOutputs[newOutputPortName])
+
+        # Remove any existing ports that were not matched to reloaded ports
+        for oldOutput in oldOutputs:
+            self.RemoveOutput(oldOutput)
+
+        for oldInput in oldInputs:
+            self.RemoveInput(oldInput)
 
     def GetName(self=None):
         if self is None:
@@ -44,6 +74,10 @@ class ScriptedBlock(LogicBlock):
             return self.codeLocals['blockName']
 
     def UpdateOutputs(self):
+        currentModifiedTime = os.path.getmtime(self.scriptFilename)
+        if currentModifiedTime != self.lastModifiedTime:
+            self.Reload()
+
         inputs = {}
         for inputPort in self.GetInputs():
             inputs[inputPort.name] = inputPort.GetData()
