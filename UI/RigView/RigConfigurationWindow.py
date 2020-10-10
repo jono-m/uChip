@@ -13,6 +13,8 @@ class RigConfigurationWindow(QDialog):
         self.setModal(True)
         self.rig = rig
 
+        self.rig.ReconnectAll()
+
         self.listDisplay = QListWidget()
         self.listDisplay.itemSelectionChanged.connect(self.OnSelectionChanged)
         self.listDisplay.setStyleSheet("""

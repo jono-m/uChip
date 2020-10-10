@@ -114,6 +114,10 @@ class BlockItem(QGraphicsProxyWidget, SelectableItem):
         self.ClearFocusAll(self.widget())
         super().mousePressEvent(event)
 
+    def mouseDoubleClickEvent(self, event:QGraphicsSceneMouseEvent):
+        self.OnDoubleClick()
+        super().mousePressEvent(event)
+
     def DoMove(self, currentPosition: QPointF, delta: QPointF):
         self.setPos(self.pos() + delta)
 
@@ -124,3 +128,6 @@ class BlockItem(QGraphicsProxyWidget, SelectableItem):
         if not self.IsChildFocused(self.widget()):
             return True
         return False
+
+    def OnDoubleClick(self):
+        pass

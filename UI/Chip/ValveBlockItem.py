@@ -19,42 +19,6 @@ class ValveBlockItem(LogicBlockItem):
 
         self.vb.OnOutputsUpdated.Register(self.ChangeColor, True)
 
-        self.container.layout().removeWidget(self.titleBar)
-        titleLayout = QHBoxLayout()
-        titleLayout.addWidget(self.titleBar, stretch=1)
-
-        self.minmaxButton = QPushButton("-")
-        self.minmaxButton.setStyleSheet("""
-        QPushButton {
-            background-color: rgba(0, 0, 0, 0);
-        }
-        QPushButton:hover {
-            background-color: rgba(0, 0, 0, 0.2);
-        }
-        QPushButton:pressed {
-            background-color: rgba(0, 0, 0, 0.3);
-        }
-        """)
-        self.minmaxButton.setFixedWidth(self.titleBar.height())
-        self.minmaxButton.clicked.connect(lambda checked=False: self.SetMinMax(not self.vb.minimized))
-        titleLayout.addWidget(self.minmaxButton, stretch=0)
-        self.container.layout().insertLayout(0, titleLayout)
-
-        self.SetMinMax(self.vb.minimized)
-
-    def SetMinMax(self, minimized):
-        self.vb.minimized = minimized
-        if minimized:
-            self.minmaxButton.setText("+")
-        else:
-            self.minmaxButton.setText("-")
-
-        self.inputsWidget.setVisible(not minimized)
-        self.outputsWidget.setVisible(not minimized)
-
-        self.container.adjustSize()
-        self.widget().adjustSize()
-
     def ChangeColor(self):
         lastStyle = self.container.property("valveState")
         if lastStyle != self.vb.IsOpen():

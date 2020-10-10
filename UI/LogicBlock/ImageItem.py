@@ -11,58 +11,37 @@ class ImageItem(BlockItem):
 
         self.image = image
 
-        self.pixmap: typing.Optional[QPixmap] = None
+        self.rawPixmap: typing.Optional[QPixmap] = None
+        self.scaledPixmap: typing.Optional[QPixmap] = None
 
         self.imageWidget = QLabel()
         self.container.layout().addWidget(self.imageWidget)
         self.container.setStyleSheet(self.container.styleSheet() + "*[roundedFrame=true] {border-radius: 0px;}")
         self.setZValue(-20)
 
-        self.scaleSlider = QFrame(self.imageWidget)
-        self.scaleSlider.setStyleSheet("""
-        * {
-        background-color: white;
-        color: black;
-        }
-        """)
-        self.scaleSliderLayout = QHBoxLayout()
-        self.scaleSlider.setLayout(self.scaleSliderLayout)
-        self.scaleSliderLayout.addWidget(QLabel("Scale: "))
-        self.spin = QDoubleSpinBox()
-        self.spin.setSingleStep(0.1)
-        self.spin.setValue(image.GetScale())
-        self.scaleSliderLayout.addWidget(self.spin)
-        self.spin.valueChanged.connect(self.image.SetScale)
-
-        self.image.OnScaleChanged.Register(self.ReloadImage, True)
+        self.image.OnScaleChanged.Register(self.RescaleImage, True)
         self.image.OnDestroyed.Register(self.Destroy, True)
 
         s.addItem(self)
         self.ReloadImage()
+        self.RescaleImage()
 
     def Destroy(self):
         self.image.OnScaleChanged.Unregister(self.ReloadImage)
         self.image.OnDestroyed.Unregister(self.Destroy)
         self.deleteLater()
 
-    def SetIsSelected(self, isSelected):
-        super().SetIsSelected(isSelected)
-        if isSelected:
-            self.scaleSlider.setVisible(True)
-        else:
-            self.scaleSlider.setVisible(False)
-
     def ReloadImage(self):
-        self.pixmap = QPixmap(self.image.filename)
-        self.pixmap = self.pixmap.scaledToWidth(self.pixmap.width() * self.image.GetScale())
-        self.imageWidget.setPixmap(self.pixmap)
-        self.widget().setFixedSize(self.pixmap.size())
-        self.scaleSlider.move(
-            self.widget().rect().center() - QPoint(self.scaleSlider.width(), self.scaleSlider.height()) * 0.5)
+        self.rawPixmap = QPixmap(self.image.filename)
+
+    def RescaleImage(self):
+        self.scaledPixmap = self.rawPixmap.scaledToWidth(self.rawPixmap.width() * self.image.GetScale())
+        self.imageWidget.setPixmap(self.scaledPixmap)
+        self.widget().setFixedSize(self.scaledPixmap.size())
         self.setPos(self.image.GetPosition() - self.MySize() * 0.5)
 
     def MySize(self):
-        return QPointF(self.pixmap.width(), self.pixmap.height())
+        return QPointF(self.scaledPixmap.width(), self.scaledPixmap.height())
 
     def MoveFinished(self):
         self.image.SetPosition(self.scenePos() + self.MySize() * 0.5)
@@ -72,3 +51,64 @@ class ImageItem(BlockItem):
             self.image.Destroy()
             return True
         return False
+
+    def OnDoubleClick(self):
+        super().OnDoubleClick()
+        newWindow = ImageSizeDialog(parent=self.scene().views()[0].topLevelWidget(), image=self.image)
+        newWindow.exec_()
+
+
+class ImageSizeDialog(QDialog):
+    def __init__(self, parent, image: Image):
+        super().__init__(parent=parent, f=Qt.WindowTitleHint | Qt.WindowCloseButtonHint)
+        self.setModal(True)
+
+        self.image = image
+
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+
+        self.setStyleSheet("""
+        #listPanel * {
+            background-color: transparent;
+        }
+        QFrame#listPanel{
+            background-color: rgba(255,255, 255, 0.2);
+        }
+        #listPanel QDoubleSpinBox {
+            background-color: rgba(255, 255, 255, 0.2);
+        }""")
+
+        namePanel = QFrame()
+        namePanel.setObjectName("listPanel")
+        nameLayout = QHBoxLayout()
+        nameLayout.addWidget(QLabel("File: "))
+        nameLayout.addWidget(QLabel(image.filename))
+        namePanel.setLayout(nameLayout)
+
+        scalePanel = QFrame()
+        scalePanel.setObjectName("listPanel")
+        scaleLayout = QHBoxLayout()
+        scaleLayout.addWidget(QLabel("Scale: "))
+        self.spin = QDoubleSpinBox()
+        self.spin.setSingleStep(0.1)
+        self.spin.setValue(image.GetScale())
+        self.spin.valueChanged.connect(self.image.SetScale)
+        scaleLayout.addWidget(self.spin, stretch=1)
+        scalePanel.setLayout(scaleLayout)
+
+        layout.addWidget(namePanel)
+        layout.addWidget(scalePanel)
+
+        ok = QPushButton("OK")
+        ok.clicked.connect(self.accept)
+        layout.addWidget(ok, alignment=Qt.AlignBottom)
+
+        self.setWindowTitle("Image Properties")
+
+        self.setMinimumWidth(200)
+
+        self.adjustSize()
+        self.show()
+
+        print(self.spin.objectName())

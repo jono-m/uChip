@@ -99,10 +99,10 @@ class MainToolbar(QFrame):
 
         self.chipSection = self.AddMenuSection("Chip Elements", 2, 2)
         self.chipSection.addWidget(self.AddButton("Assets/checkboxIcon.png", "YES/NO Parameter", color=color,
-                                                  delegate=lambda: self.OnAddLogicBlock.Invoke(InputLogicBlock(bool))),
+                                                  delegate=lambda: self.OnAddLogicBlock.Invoke(InputLogicBlock(bool, True))),
                                    0, 0)
         self.chipSection.addWidget(self.AddButton("Assets/numberIcon.png", "Number Parameter", color=color,
-                                                  delegate=lambda: self.OnAddLogicBlock.Invoke(InputLogicBlock(float))),
+                                                  delegate=lambda: self.OnAddLogicBlock.Invoke(InputLogicBlock(float, True))),
                                    1, 0)
         self.chipSection.addWidget(self.AddButton("Assets/valveIcon.png", "Valve", color=color, above=True,
                                                   delegate=lambda: self.OnAddLogicBlock.Invoke(ValveLogicBlock())), 0,
