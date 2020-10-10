@@ -2,23 +2,26 @@ from LogicBlocks.LogicBlock import *
 
 
 class InputLogicBlock(LogicBlock):
-    def __init__(self, dataType):
+    def __init__(self, dataType, isParameter=False):
         super().__init__()
         self.dataType = dataType
         self.blockInputPort: typing.Optional[InputPort] = None
         self.proxyBlock: typing.Optional[LogicBlock] = None
         self.currentValue: typing.Optional[InputPort] = None
 
-        self.output = self.AddOutput("Value", self.dataType)
         self.nameInput = self.AddInput("Name", str, False)
+        self.output = self.AddOutput("Value", self.dataType)
 
         initialStr = "New" + self.GetTypeAsStr()
         self.nameInput.SetDefaultData(initialStr)
 
+        self.isParameter = isParameter
+
     def SetupForProxy(self, proxyBlock: LogicBlock):
         self.blockInputPort = proxyBlock.AddInput(self.nameInput.GetDefaultData(), self.dataType)
+
         self.currentValue = self.blockInputPort
-        self._inputs.append(self.currentValue)
+        self._inputs.insert(0, self.currentValue)
 
         self.proxyBlock = proxyBlock
 
@@ -28,7 +31,10 @@ class InputLogicBlock(LogicBlock):
         return str(self.dataType).split('\'')[1].capitalize()
 
     def GetName(self=None):
-        return "Input: " + self.GetTypeAsStr()
+        if self.isParameter:
+            return self.nameInput.GetData() + " (" + self.GetTypeAsStr() + " Parameter)"
+        else:
+            return self.nameInput.GetData() + " (" + self.GetTypeAsStr() + " Input)"
 
     def UpdateOutputs(self):
         self.output.SetData(self.blockInputPort.GetData())
@@ -38,7 +44,7 @@ class InputLogicBlock(LogicBlock):
         super().UpdateOutputs()
 
     def Duplicate(self) -> 'LogicBlock':
-        newB = InputLogicBlock(self.dataType)
+        newB = InputLogicBlock(self.dataType, self.isParameter)
         newB.SetupForProxy(self.proxyBlock)
         self.OnDuplicated.Invoke(newB)
         return newB

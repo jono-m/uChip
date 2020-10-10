@@ -68,7 +68,7 @@ class RigViewWidget(QDialog):
         self.rig.OnFlush.Register(self.UpdateDisplay)
 
         self.Repopulate()
-        self.setModal(False)
+        self.setModal(True)
 
     def ShowDialog(self):
         newWindow = RigConfigurationWindow(self.rig, parent=self)

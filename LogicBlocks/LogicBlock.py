@@ -22,6 +22,7 @@ class LogicBlock:
         self.timer.start(33)
 
         self._position = QPointF(0, 0)
+        self.minimized = False
 
         self.isDestroyed = False
 

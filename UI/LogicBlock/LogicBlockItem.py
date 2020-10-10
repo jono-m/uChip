@@ -14,7 +14,28 @@ class LogicBlockItem(BlockItem):
         self.titleBar = QLabel(self.block.GetName())
         self.titleBar.setContentsMargins(10, 5, 10, 5)
 
-        self.container.layout().addWidget(self.titleBar)
+        titleLayout = QHBoxLayout()
+        titleLayout.addWidget(self.titleBar, stretch=1)
+
+        self.minMaxButton = QPushButton("-")
+        self.minMaxButton.setStyleSheet("""
+        QPushButton {
+            background-color: rgba(0, 0, 0, 0);
+            border: none;
+            border-radius: 0px 8px 0px 0px;
+        }
+        QPushButton:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        QPushButton:pressed {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        """)
+        self.minMaxButton.setFixedWidth(25)
+        self.minMaxButton.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
+        self.minMaxButton.clicked.connect(lambda checked=False: self.SetMinMax(not self.block.minimized))
+        titleLayout.addWidget(self.minMaxButton, stretch=0)
+        self.container.layout().addLayout(titleLayout)
 
         portsLayout = QHBoxLayout()
         portsLayout.setContentsMargins(0, 0, 0, 0)
@@ -58,6 +79,20 @@ class LogicBlockItem(BlockItem):
         self.block.OnMoved.Register(self.UpdatePos, True)
         self.block.OnOutputsUpdated.Register(self.UpdateName, True)
 
+        self.SetMinMax(self.block.minimized)
+
+    def SetMinMax(self, minimized):
+        self.block.minimized = minimized
+        if minimized:
+            self.minMaxButton.setText("+")
+        else:
+            self.minMaxButton.setText("-")
+
+        for inputItem in self.inputsWidget.children():
+            if isinstance(inputItem, InputWidget):
+                if not inputItem.inputPort.isConnectable:
+                    inputItem.setVisible(not minimized)
+
     def UpdatePos(self):
         self.setPos(self.block.GetPosition() - self.rect().center())
 
@@ -70,11 +105,20 @@ class LogicBlockItem(BlockItem):
 
     def UpdateName(self):
         self.titleBar.setText(self.block.GetName())
+        self.inputsWidget.adjustSize()
+        self.outputsWidget.adjustSize()
+        self.container.adjustSize()
+        self.widget().adjustSize()
+        self.adjustSize()
 
     def UpdatePorts(self):
+        hasNonConnectable = False
+
         inputPorts = [inputWidget.inputPort for inputWidget in self.inputsWidget.children() if
                       isinstance(inputWidget, InputWidget)]
         for inputPort in self.block.GetInputs():
+            if not inputPort.isConnectable:
+                hasNonConnectable = True
             if inputPort not in inputPorts:
                 inputWidget = InputWidget(inputPort, self)
                 self.inputsLayout.addWidget(inputWidget)
@@ -90,6 +134,8 @@ class LogicBlockItem(BlockItem):
         hasOutputs = len(self.block.GetOutputs()) > 0
         self.outputsWidget.setVisible(hasOutputs)
         self.inputsWidget.setVisible(hasInputs)
+
+        self.minMaxButton.setVisible(hasNonConnectable)
 
     def MoveFinished(self):
         self.block.SetPosition(self.scenePos() + self.rect().center())
@@ -110,6 +156,8 @@ class InputWidget(QFrame):
     def __init__(self, inputPort: InputPort, graphicsParent: QGraphicsProxyWidget):
         super().__init__()
 
+        self.graphicsParent = graphicsParent
+
         self.setProperty('isMe', True)
         self.setStyleSheet("*[isMe=true]{border: none; background-color: transparent;}")
 
@@ -120,7 +168,7 @@ class InputWidget(QFrame):
         layout.setAlignment(Qt.AlignLeft)
         self.setLayout(layout)
 
-        if self.inputPort.isConnectable:
+        if self.inputPort.isConnectable and not (isinstance(self.graphicsParent.block, InputLogicBlock) or isinstance(self.graphicsParent.block, OutputLogicBlock)):
             self.portHole = InputPortHole(self, graphicsParent)
             layout.addWidget(self.portHole)
 
@@ -158,7 +206,7 @@ class InputWidget(QFrame):
 
         self.parameterSetting.Update(self.inputPort.name, self.inputPort.GetDefaultData())
 
-        if self.inputPort.isConnectable:
+        if self.inputPort.isConnectable and not (isinstance(self.graphicsParent.block, InputLogicBlock) or isinstance(self.graphicsParent.block, OutputLogicBlock)):
             if self.inputPort.connectedOutput is not None:
                 self.portHole.SetIsFilled(True)
                 self.nameText.setVisible(True)

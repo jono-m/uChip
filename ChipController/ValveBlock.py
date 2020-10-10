@@ -14,7 +14,6 @@ class ValveLogicBlock(LogicBlock):
         self.solenoidNumberInput = self.AddInput("Solenoid Number", int, False)
         self.nicknameInput = self.AddInput("Nickname", str, False)
         self.nicknameInput.SetDefaultData("Valve")
-        self.minimized = False
 
     def GetSolenoidNumber(self):
         return self.solenoidNumberInput.GetData()
