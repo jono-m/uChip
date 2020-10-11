@@ -50,6 +50,9 @@ class PortHoleWidget(QLabel):
         for c in self.connections:
             c.UpdatePath()
 
+    def CanConnect(self, other: "PortHoleWidget"):
+        return False
+
     def GetPositionInScene(self):
         return self.graphicsParent.mapToScene(
             self.mapTo(self.graphicsParent.widget(), self.rect().center()))

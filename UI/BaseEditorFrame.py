@@ -19,7 +19,7 @@ class BaseEditorFrame(QFrame):
         self.nameFilters = None
 
     def UpdateForProcedureStatus(self, running):
-        self.editor.worldBrowser.actionsEnabled = not running
+        self.editor.worldBrowser._actionsEnabled = not running
         self.editor.worldBrowser.update()
 
     def ClearFocus(self):
