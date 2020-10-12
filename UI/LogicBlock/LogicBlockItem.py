@@ -1,8 +1,6 @@
 from UI.WorldBrowser.BlockItem import *
-from UI.WorldBrowser.PortHoles import *
-from LogicBlocks.LogicBlock import *
+from UI.LogicBlock.BlockConnection import *
 from Util import *
-import sys
 
 
 class LogicBlockItem(BlockItem):
@@ -168,8 +166,10 @@ class InputWidget(QFrame):
         layout.setAlignment(Qt.AlignLeft)
         self.setLayout(layout)
 
-        if self.inputPort.isConnectable and not (isinstance(self.graphicsParent.block, InputLogicBlock) or isinstance(self.graphicsParent.block, OutputLogicBlock)):
-            self.portHole = InputPortHole(self, graphicsParent)
+        if self.inputPort.isConnectable and not (
+                isinstance(self.graphicsParent.block, InputLogicBlock) or isinstance(self.graphicsParent.block,
+                                                                                     OutputLogicBlock)):
+            self.portHole = InputPortHole(inputPort, graphicsParent)
             layout.addWidget(self.portHole)
 
             self.nameText = QLabel()
@@ -206,7 +206,9 @@ class InputWidget(QFrame):
 
         self.parameterSetting.Update(self.inputPort.name, self.inputPort.GetDefaultData())
 
-        if self.inputPort.isConnectable and not (isinstance(self.graphicsParent.block, InputLogicBlock) or isinstance(self.graphicsParent.block, OutputLogicBlock)):
+        if self.inputPort.isConnectable and not (
+                isinstance(self.graphicsParent.block, InputLogicBlock) or isinstance(self.graphicsParent.block,
+                                                                                     OutputLogicBlock)):
             if self.inputPort.connectedOutput is not None:
                 self.portHole.SetIsFilled(True)
                 self.nameText.setVisible(True)
@@ -240,7 +242,7 @@ class OutputWidget(QFrame):
         self.nameText.setStyleSheet("*{background-color: transparent}")
         layout.addWidget(self.nameText)
 
-        self.portHole = OutputPortHole(self, graphicsParent)
+        self.portHole = OutputPortHole(outputPort, graphicsParent)
         layout.addWidget(self.portHole)
 
         self.Update()
@@ -344,15 +346,3 @@ class ParameterWidget(QFrame):
                 self.OnParameterChanged.Invoke(False)
         elif self.dataType == float or self.dataType == int or self.dataType == str or self.dataType is None:
             self.OnParameterChanged.Invoke(newParam)
-
-
-class InputPortHole(PortHoleWidget):
-    def __init__(self, portWidget: InputWidget, graphicsParent: QGraphicsProxyWidget):
-        super().__init__(graphicsParent)
-        self.portWidget = portWidget
-
-
-class OutputPortHole(PortHoleWidget):
-    def __init__(self, portWidget: OutputWidget, graphicsParent: QGraphicsProxyWidget):
-        super().__init__(graphicsParent)
-        self.portWidget = portWidget

@@ -32,9 +32,9 @@ class ProcedureEditor(LogicBlockEditor):
             for completedPort in stepItem.step.GetCompletedPorts():
                 # To each input
                 for beginPort in completedPort.connectedBegin:
-                    self.CreateConnectionItem(completedPort, beginPort)
-
-    def CreateConnectionItem(self, a, b):
+                    self.CreateConnectionItem((completedPort, beginPort))
+    
+    def CreateConnectionItem(self, ports: typing.Tuple[CompletedPort, BeginPort]):
         if not (isinstance(a, CompletedPort) and isinstance(b, BeginPort)):
             super().CreateConnectionItem(a, b)
             return
@@ -63,34 +63,6 @@ class ProcedureEditor(LogicBlockEditor):
 
         if foundBeginWidget is not None and foundCompletedWidget is not None:
             return StepConnection(self.worldBrowser.scene(), foundBeginWidget, foundCompletedWidget)
-
-    def CanConnectPorts(self, fromPortHole: PortHoleWidget, toPortHole: PortHoleWidget):
-        if not (isinstance(fromPortHole, CompletedPortHole) and isinstance(toPortHole, BeginPortHole)):
-            return super().CanConnectPorts(fromPortHole, toPortHole)
-
-        return Step.CanConnectSteps(fromPortHole.portWidget.completedPort, toPortHole.portWidget.beginPort)
-
-    def IsFromPort(self, port: PortHoleWidget):
-        if isinstance(port, CompletedPortHole):
-            return True
-        elif isinstance(port, BeginPortHole):
-            return False
-        else:
-            return super().IsFromPort(port)
-
-    def MakeConnection(self, fromPortHole: PortHoleWidget, toPortHole: PortHoleWidget):
-        if isinstance(fromPortHole, CompletedPortHole) and isinstance(toPortHole, BeginPortHole):
-            step = fromPortHole.portWidget.completedPort.step
-            step.ConnectToStep(fromPortHole.portWidget.completedPort, toPortHole.portWidget.beginPort)
-        else:
-            super().MakeConnection(fromPortHole, toPortHole)
-
-    def GetPath(self, startPt: QPointF, endPt: QPointF):
-        if isinstance(self.worldBrowser.anchorPort, BeginPortHole) or isinstance(self.worldBrowser.anchorPort,
-                                                                                 CompletedPortHole):
-            return StepConnection.GetPath(startPt, endPt)
-        else:
-            return BlockConnection.GetPath(startPt, endPt)
 
 
 class AddStepAction(QAction):

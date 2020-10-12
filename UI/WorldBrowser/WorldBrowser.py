@@ -4,12 +4,14 @@ from Util import Event
 import shiboken2
 from enum import Enum
 
+
 class State(Enum):
     IDLE = 0
     PANNING = 1
     MOVING = 2
     CONNECTING = 3
     SELECTING = 4
+
 
 class WorldBrowser(QGraphicsView):
     def __init__(self):
@@ -40,6 +42,10 @@ class WorldBrowser(QGraphicsView):
         self.anchorPort: typing.Optional[PortHoleWidget] = None
         self._hoveredPortHole: typing.Optional[PortHoleWidget] = None
 
+        self.selectionBox = self.scene().addRect(QRectF(), QPen(QBrush(QColor(52, 222, 235)), 2), QBrush(QColor(52, 222, 235, 50)))
+        self.selectionBox.setZValue(100)
+        self.selectionBox.setVisible(False)
+
         self.OnConnectionMade = Event()
 
         self.gridSpacing = QSize(30, 30)
@@ -51,7 +57,7 @@ class WorldBrowser(QGraphicsView):
 
     def Clear(self):
         for item in self.items():
-            if item == self.tempConnectionLine:
+            if item == self.tempConnectionLine or item == self.selectionBox:
                 continue
             else:
                 del item
@@ -110,33 +116,31 @@ class WorldBrowser(QGraphicsView):
         item.SetIsSelected(False)
         self._selectedItems.remove(item)
 
-    def SetHoveredItems(self, items: typing.List[SelectableItem]):
+    def UpdateHoveredItems(self):
+        items = self.GetHoveredSelectableItems()
         for item in items:
-            if item not in self.hoverItems:
+            if item not in self._hoveredItems:
                 item.SetIsHovered(True)
-        for item in self.hoverItems:
+        for item in self._hoveredItems:
             if item not in items:
                 item.SetIsHovered(False)
         self._hoveredItems = items
 
-    def ViewportToWorld(self, pos: QPointF) -> QPointF:
-        fromCenter = pos - QPointF(self.width(), self.height()) / 2
-        worldPos = fromCenter / (2 ** self._zoom) + self._offset
-        return worldPos
+    def GetSelectionRect(self) -> QRect:
+        selectionRect = QRect()
+        selectionRect.setSize(QSize(abs(self._boxSelectionRectAnchor.x() - self._currentCursorPosition.x()),
+                                    abs(self._boxSelectionRectAnchor.y() - self._currentCursorPosition.y())))
+        selectionRect.moveCenter((self._currentCursorPosition + self._boxSelectionRectAnchor) / 2.0)
+        return selectionRect
 
-    def CurrentMousePosition(self):
-        return self.mapToScene(self._currentCursorPosition.toPoint())
-
-    def GetHoveredSelectableItems(self):
-        if self._state != State.SELECTING:
-            return self.items(self._currentCursorPosition)
-        width = abs(self._boxSelectionRectAnchor.x() - self._currentCursorPosition.x())
-        height = abs(self._boxSelectionRectAnchor.y() - self._currentCursorPosition.y())
-        center = (self._boxSelectionRectCorner + self._boxSelectionRectAnchor) / 2.0
-        selectionRect = QRectF()
-        selectionRect.setSize(QSizeF(width, height))
-        selectionRect.moveCenter(center)
-        return [item for item in self.items(selectionRect) if isinstance(item, SelectableItem)]
+    def GetHoveredSelectableItems(self) -> typing.List[SelectableItem]:
+        if self._state == State.SELECTING:
+            return [item for item in self.items(self.GetSelectionRect()) if isinstance(item, SelectableItem)]
+        else:
+            for item in self.items(self._currentCursorPosition):
+                if isinstance(item, SelectableItem):
+                    return [item]
+            return []
 
     def UpdateView(self):
         matrix = QMatrix()
@@ -147,37 +151,31 @@ class WorldBrowser(QGraphicsView):
     def wheelEvent(self, event: QWheelEvent):
         numSteps = float(event.delta()) / 1000
 
-        oldWorldPos = self.ViewportToWorld(event.posF())
-
+        oldWorldPos = self.mapToScene(self._currentCursorPosition)
         self._zoom = min(self._zoom + numSteps, 0)
-
-        newWorldPos = self.ViewportToWorld(event.posF())
+        newWorldPos = self.mapToScene(self._currentCursorPosition)
 
         delta = newWorldPos - oldWorldPos
         self._offset -= delta
 
         self.UpdateView()
 
-        super().wheelEvent(event)
-
     def mousePressEvent(self, event):
         if self._state != State.IDLE:
             return
 
         if event.button() == Qt.RightButton:
-            # Pan with right mouse button
             self._state = State.PANNING
         elif event.button() == Qt.LeftButton and self._actionsEnabled:
-            # Chance that it is a porthole. Let's check
             if self._hoveredPortHole is not None:
                 self._state = State.CONNECTING
-
                 self.anchorPort = self._hoveredPortHole
-                self.
             else:
                 if len(self._hoveredItems) == 0:
                     self._state = State.SELECTING
                     self._boxSelectionRectAnchor = self._currentCursorPosition
+                    if not self.ShouldMultiSelect():
+                        self.ClearSelection()
                 else:
                     hoveredItem = self._hoveredItems[0]
                     if self.ShouldMultiSelect():
@@ -186,27 +184,35 @@ class WorldBrowser(QGraphicsView):
                         else:
                             self.AddToSelection(hoveredItem)
                     else:
-                        if hoveredItem not in self._selectedItems:
+                        if hoveredItem.IsMovableAtPoint(self.mapToScene(self._currentCursorPosition)) and \
+                                hoveredItem in self._selectedItems:
+                            if hoveredItem not in self._selectedItems:
+                                self.AddToSelection(hoveredItem)
+                            self._state = State.MOVING
+                        else:
                             self.ClearSelection()
                             self.AddToSelection(hoveredItem)
-                        if hoveredItem.IsMovableAtPoint(self.mapToScene(event.localPos().toPoint())):
-                            self._state = State.MOVING
 
-        if self._actionsEnabled:
-            super().mousePressEvent(event)
-        else:
-            event.ignore()
+        self.UpdateUI()
+
+        super().mousePressEvent(event)
 
     def ShouldMultiSelect(self):
         return QApplication.keyboardModifiers() == Qt.ShiftModifier
 
+    def UpdateUI(self):
+        self.UpdateHoveredItems()
+        self.UpdateHoveredPorthole()
+        self.UpdateConnectionLine()
+        self.UpdateSelectionBox()
+
     def mouseMoveEvent(self, event: QMouseEvent):
         # Update position movement
-        newCursorPosition = event.localPos()
+        newCursorPosition = event.localPos().toPoint()
         if self._currentCursorPosition is None:
             delta = QPointF()
         else:
-            delta = (newCursorPosition - self._currentCursorPosition) / (2 ** self._zoom)
+            delta = (self.mapToScene(newCursorPosition) - self.mapToScene(self._currentCursorPosition))
         self._currentCursorPosition = newCursorPosition
 
         if self._state == State.PANNING:
@@ -215,29 +221,17 @@ class WorldBrowser(QGraphicsView):
         elif self._state == State.MOVING:
             for selectedItem in self._selectedItems:
                 selectedItem.DoMove(self._currentCursorPosition, delta)
-        else:
-            self.SetHoveredItems(self.GetHoveredSelectableItems())
-            self.SetHoveredPortHole(self.GetHoveredPorthole())
-            self.UpdateConnectionLine()
 
-        if self._actionsEnabled:
-            super().mouseMoveEvent(event)
-        else:
-            event.ignore()
+        self.UpdateUI()
+
+        super().mouseMoveEvent(event)
 
     def SetActionsEnabled(self, actionsEnabled):
         self._actionsEnabled = actionsEnabled
         if not self._actionsEnabled:
-            self.SetHoveredItems([])
-            self.SetHoveredPortHole(None)
             self.ClearSelection()
-            self.SetConnectionLinePort(None)
         for x in [x for x in self.items() if isinstance(x, QGraphicsProxyWidget)]:
             x.setEnabled(actionsEnabled)
-
-    def UpdateSelectionHovers(self):
-        if not self._actionsEnabled:
-            return
 
     def GetHoveredPorthole(self) -> typing.Optional[PortHoleWidget]:
         for hoveredItem in self._hoveredItems:
@@ -247,44 +241,47 @@ class WorldBrowser(QGraphicsView):
                 if isinstance(w, PortHoleWidget):
                     return w
 
-    def SetHoveredPortHole(self, portHole: typing.Optional[PortHoleWidget]):
+    def UpdateHoveredPorthole(self):
+        if self._state == State.CONNECTING or self._state == State.IDLE:
+            portHole = self.GetHoveredPorthole()
+        else:
+            portHole = None
+
         if portHole != self._hoveredPortHole:
             if self._hoveredPortHole is not None:
                 self._hoveredPortHole.SetHighlighted(False)
 
             self._hoveredPortHole = portHole
-            if self._isConnecting:
+            if self._state == State.CONNECTING:
                 if not self.anchorPort.CanConnect(self._hoveredPortHole):
                     self._hoveredPortHole = None
 
             if self._hoveredPortHole is not None:
                 self._hoveredPortHole.SetHighlighted(True)
 
-    def SetConnectionLinePort(self, port: typing.Optional[PortHoleWidget]):
-        if port is None:
-            self.tempConnectionLine.SetFromPort(None)
-            self.tempConnectionLine.SetToPort(None)
-            self.tempConnectionLine.setVisible(False)
-        else:
-            self.tempConnectionLine.setVisible(True)
-
-            if self.anchorPort is None:
-                refPort = port
-            else:
-                refPort = self.anchorPort
-            if self.IsFromPortFunc(refPort):
-                self.tempConnectionLine.SetFromPort(port)
-            else:
-                self.tempConnectionLine.SetToPort(port)
-
     def UpdateConnectionLine(self):
-        if self._state != State.CONNECTING:
-            self.SetConnectionLinePort(None)
-        else:
+        if self._state == State.CONNECTING:
+            self.tempConnectionLine.setVisible(True)
+            self.anchorPort.SetHighlighted(True)
             self.tempConnectionLine.overridePos = self.mapToScene(self._currentCursorPosition)
             self.tempConnectionLine.UpdatePath()
+            self.tempConnectionLine.SetPortHoleA(self.anchorPort)
+            self.tempConnectionLine.SetPortHoleB(self._hoveredPortHole)
+        else:
+            if self.anchorPort is not None:
+                self.anchorPort.SetHighlighted(False)
+            self.anchorPort = None
+            self.tempConnectionLine.SetPortHoleA(None)
+            self.tempConnectionLine.SetPortHoleB(None)
+            self.tempConnectionLine.setVisible(False)
 
-            self.SetConnectionLinePort(self._hoveredPortHole)
+    def UpdateSelectionBox(self):
+        if self._state == State.SELECTING:
+            self.selectionBox.setVisible(True)
+            self.selectionBox.prepareGeometryChange()
+            self.selectionBox.setRect(self.mapToScene(self.GetSelectionRect()).boundingRect())
+        else:
+            self.selectionBox.setVisible(False)
 
     def mouseReleaseEvent(self, event: QMouseEvent):
         super().mouseReleaseEvent(event)
@@ -296,26 +293,23 @@ class WorldBrowser(QGraphicsView):
                 for selectedItem in self._selectedItems:
                     selectedItem.MoveFinished()
                 self._state = State.IDLE
-            if self.state == State.CONNECTING:
+            if self._state == State.CONNECTING:
                 self._state = State.IDLE
-                self.anchorPort.SetHighlighted(False)
-                if self.tempConnectionLine.GetFromPort() is not None and self.tempConnectionLine.GetToPort() is not None:
-                    self.OnMakeConnectionFunc(self.tempConnectionLine.GetFromPort(),
-                                              self.tempConnectionLine.GetToPort())
+                if self.anchorPort.CanConnect(self._hoveredPortHole):
+                    self.anchorPort.DoConnect(self._hoveredPortHole)
+            if self._state == State.SELECTING:
+                self._state = State.IDLE
+                if not self.ShouldMultiSelect():
+                    self.ClearSelection()
+                for item in self._hoveredItems:
+                    self.AddToSelection(item)
 
-        self.tempConnectionLine.SetFromPort(None)
-        self.tempConnectionLine.SetToPort(None)
-        self.anchorPort = None
+        self.UpdateUI()
 
-        self.UpdateSelectionHovers(event.localPos())
-
-        if self._actionsEnabled:
-            super().mouseReleaseEvent(event)
-        else:
-            event.ignore()
+        super().mouseReleaseEvent(event)
 
     def keyReleaseEvent(self, event: QKeyEvent):
-        if not self._actionsEnabled:
+        if not self._actionsEnabled or self._state != State.IDLE:
             event.ignore()
             return
 

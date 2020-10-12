@@ -19,6 +19,8 @@ class PortHoleWidget(QLabel):
         self.setProperty("PreventMove", True)
         self.setAttribute(Qt.WA_Hover, True)
 
+        self.connectionClass: typing.Type[ConnectionItem] = ConnectionItem
+
         self.connections: typing.List[ConnectionItem] = []
 
     def IsHighlighted(self):
@@ -28,12 +30,14 @@ class PortHoleWidget(QLabel):
         return self._IsFilled
 
     def SetHighlighted(self, highlighted):
-        self._IsHighlighted = highlighted
-        self.update()
+        if self._IsHighlighted != highlighted:
+            self._IsHighlighted = highlighted
+            self.update()
 
     def SetIsFilled(self, filled):
-        self._IsFilled = filled
-        self.update()
+        if self._IsFilled != filled:
+            self._IsFilled = filled
+            self.update()
 
     def paintEvent(self, event: QPaintEvent):
         painter = QPainter(self)
@@ -50,24 +54,35 @@ class PortHoleWidget(QLabel):
         for c in self.connections:
             c.UpdatePath()
 
-    def CanConnect(self, other: "PortHoleWidget"):
+    def CanConnect(self, other: "PortHoleWidget") -> bool:
         return False
 
-    def GetPositionInScene(self):
-        return self.graphicsParent.mapToScene(
-            self.mapTo(self.graphicsParent.widget(), self.rect().center()))
+    def DoConnect(self, other: "PortHoleWidget"):
+        return
+
+    def GetPositionInScene(self) -> QPointF:
+        if not self.isVisible():
+            return self.graphicsParent.mapToScene(self.graphicsParent.rect().center())
+        else:
+            return self.graphicsParent.mapToScene(
+                self.mapTo(self.graphicsParent.widget(), self.rect().center()))
 
 
 class ConnectionItem(QGraphicsPathItem, SelectableItem):
-    def __init__(self, s: QGraphicsScene, fromPort: typing.Optional[PortHoleWidget],
-                 toPort: typing.Optional[PortHoleWidget]):
+    def __init__(self, s: QGraphicsScene, portHoleA: typing.Optional[PortHoleWidget],
+                 portHoleB: typing.Optional[PortHoleWidget]):
         super().__init__()
 
-        self._fromPort = None
-        self._toPort = None
+        self.arrowSpacing = 80
+        self.arrowSize = 25
+        self.hoverWidth = 8
+        self.lineWidth = 5
 
-        self.SetFromPort(fromPort)
-        self.SetToPort(toPort)
+        self._portHoleA = None
+        self._portHoleB = None
+
+        self.SetPortHoleA(portHoleA)
+        self.SetPortHoleB(portHoleB)
 
         self.setPos(QPointF(0, 0))
         self.setZValue(-10)
@@ -77,34 +92,31 @@ class ConnectionItem(QGraphicsPathItem, SelectableItem):
 
         self.overridePos = QPointF(0, 0)
 
+        self.selectedColor = QColor(52, 222, 235)
+
         self.myPath = None
 
         s.addItem(self)
 
         self.UpdatePath()
 
-    def SetFromPort(self, fromPort: typing.Optional[PortHoleWidget]):
-        if self._fromPort is not None:
-            self._fromPort.connections.remove(self)
-        self._fromPort = fromPort
-        if self._fromPort is not None:
-            self._fromPort.connections.append(self)
+    def SetPortHoleA(self, port: typing.Optional[PortHoleWidget]):
+        if self._portHoleA is not None:
+            self._portHoleA.connections.remove(self)
+        self._portHoleA = port
+        if self._portHoleA is not None:
+            self._portHoleA.connections.append(self)
 
-    def SetToPort(self, toPort: typing.Optional[PortHoleWidget]):
-        if self._toPort is not None:
-            self._toPort.connections.remove(self)
-        self._toPort = toPort
-        if self._toPort is not None:
-            self._toPort.connections.append(self)
+    def SetPortHoleB(self, port: typing.Optional[PortHoleWidget]):
+        if self._portHoleB is not None:
+            self._portHoleB.connections.remove(self)
+        self._portHoleB = port
+        if self._portHoleB is not None:
+            self._portHoleB.connections.append(self)
 
-    def GetFromPort(self):
-        return self._fromPort
-
-    def GetToPort(self):
-        return self._toPort
-
-    @staticmethod
-    def GetPath(fromCenter: QPointF, toCenter: QPointF):
+    def GetPath(self):
+        fromCenter = self.GetFromCenter()
+        toCenter = self.GetToCenter()
         offset = QPointF(80, 0)
         path = QPainterPath(fromCenter)
         path.lineTo(fromCenter + offset)
@@ -112,23 +124,35 @@ class ConnectionItem(QGraphicsPathItem, SelectableItem):
         path.lineTo(toCenter)
         return path
 
-    def UpdatePath(self):
-        if self._fromPort is None:
-            aCenter = self.overridePos
-        else:
-            if not self._toPort.isVisible():
-                aCenter = self._fromPort.graphicsParent.mapToScene(self._fromPort.graphicsParent.rect().center())
-            else:
-                aCenter = self._fromPort.GetPositionInScene()
+    def GetFromPortHole(self):
+        return self._portHoleA
 
-        if self._toPort is None:
-            bCenter = self.overridePos
+    def GetToPortHole(self):
+        return self._portHoleB
+
+    def GetConnectionClass(self) -> typing.Type["ConnectionItem"]:
+        if self._portHoleA is not None:
+            return self._portHoleA.connectionClass
+        if self._portHoleB is not None:
+            return self._portHoleB.connectionClass
+        return ConnectionItem
+
+    def GetFromCenter(self):
+        if self.GetConnectionClass().GetFromPortHole(self) is None:
+            fromCenter = self.overridePos
         else:
-            if not self._toPort.isVisible():
-                bCenter = self._toPort.graphicsParent.mapToScene(self._toPort.graphicsParent.rect().center())
-            else:
-                bCenter = self._toPort.GetPositionInScene()
-        myPath = self.GetPath(aCenter, bCenter)
+            fromCenter = self.GetConnectionClass().GetFromPortHole(self).GetPositionInScene()
+        return fromCenter
+
+    def GetToCenter(self):
+        if self.GetConnectionClass().GetToPortHole(self) is None:
+            toCenter = self.overridePos
+        else:
+            toCenter = self.GetConnectionClass().GetToPortHole(self).GetPositionInScene()
+        return toCenter
+
+    def UpdatePath(self):
+        myPath = self.GetConnectionClass().GetPath(self)
         self.myPath = myPath
 
         dummyPath = QPainterPath()
@@ -137,22 +161,22 @@ class ConnectionItem(QGraphicsPathItem, SelectableItem):
         self.setPath(dummyPath)
 
     def paint(self, painter, option, widget, PySide2_QtWidgets_QWidget=None, NoneType=None, *args, **kwargs):
-        if self._fromPort is None and self._toPort is None:
+        if self._portHoleA is None and self._portHoleB is None:
             return
 
         pen = QPen()
         if self.IsSelected:
-            pen.setColor(QColor(52, 222, 235))
+            pen.setColor(self.selectedColor)
         else:
-            if self._fromPort is not None:
-                pen.setColor(self._fromPort.Color)
-            elif self._toPort is not None:
-                pen.setColor(self._toPort.Color)
+            if self._portHoleA is not None:
+                pen.setColor(self._portHoleA.Color)
+            elif self._portHoleB is not None:
+                pen.setColor(self._portHoleB.Color)
 
         if self.IsHovered:
-            pen.setWidth(8)
+            pen.setWidth(self.hoverWidth)
         else:
-            pen.setWidth(5)
+            pen.setWidth(self.lineWidth)
 
         myPath = self.myPath
         painter.setPen(pen)
@@ -160,7 +184,6 @@ class ConnectionItem(QGraphicsPathItem, SelectableItem):
 
         painter.setBrush(QBrush(pen.color()))
         painter.setPen(Qt.NoPen)
-        arrowSize = 25
         for pathIndex in range(1, myPath.elementCount()):
             b = QPointF(myPath.elementAt(pathIndex).x, myPath.elementAt(pathIndex).y)
             a = QPointF(myPath.elementAt(pathIndex - 1).x, myPath.elementAt(pathIndex - 1).y)
@@ -168,26 +191,27 @@ class ConnectionItem(QGraphicsPathItem, SelectableItem):
             magnitude = ((delta.x() ** 2 + delta.y() ** 2) ** 0.5)
             unit = delta * (1 / magnitude)
 
-            spacing = 80
-            progress = spacing
+            progress = self.arrowSpacing
             while progress < magnitude:
                 midPoint = a + unit * progress
-                base = midPoint - unit * (arrowSize / 2)
-                tip = midPoint + unit * (arrowSize / 2)
-                left = base + QPointF(unit.y(), -unit.x()) * (arrowSize / 2)
-                right = base + QPointF(-unit.y(), unit.x()) * (arrowSize / 2)
+                base = midPoint - unit * (self.arrowSize / 2)
+                tip = midPoint + unit * (self.arrowSize / 2)
+                left = base + QPointF(unit.y(), -unit.x()) * (self.arrowSize / 2)
+                right = base + QPointF(-unit.y(), unit.x()) * (self.arrowSize / 2)
                 painter.drawPolygon(QPolygonF([tip, left, right]))
-                progress += spacing
+                progress += self.arrowSpacing
 
         dummyPen = QPen()
-        dummyPen.setWidth(arrowSize)
+        dummyPen.setWidth(self.arrowSize)
         self.setBrush(Qt.red)
         self.setPen(dummyPen)
 
     def SetIsHovered(self, hoverOn):
-        self.IsHovered = hoverOn
-        self.update()
+        if self.IsHovered != hoverOn:
+            self.IsHovered = hoverOn
+            self.update()
 
     def SetIsSelected(self, isSelected):
-        self.IsSelected = isSelected
-        self.update()
+        if self.IsSelected != isSelected:
+            self.IsSelected = isSelected
+            self.update()

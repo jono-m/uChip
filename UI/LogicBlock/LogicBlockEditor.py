@@ -1,6 +1,6 @@
 from UI.WorldBrowser.WorldBrowser import *
 from LogicBlocks.CompoundLogicBlock import *
-from UI.LogicBlock.BlockConnection import *
+from UI.LogicBlock.LogicBlockItem import *
 from UI.LogicBlock.ImageItem import *
 
 
@@ -15,10 +15,6 @@ class LogicBlockEditor(QFrame):
 
         self.currentBlock: typing.Optional[CompoundLogicBlock] = None
 
-        self.worldBrowser.CanMakeConnectionFunc = self.CanConnectPorts
-        self.worldBrowser.IsFromPortFunc = self.IsFromPort
-        self.worldBrowser.OnMakeConnectionFunc = self.MakeConnection
-
         self.viewMapping: typing.List[typing.Tuple[typing.Type[LogicBlock], typing.Type[LogicBlockItem]]] = [
             (LogicBlock, LogicBlockItem)]
 
@@ -27,7 +23,7 @@ class LogicBlockEditor(QFrame):
     def Clear(self):
         if self.currentBlock is not None:
             self.currentBlock.OnBlockAdded.Unregister(self.CreateBlockItem)
-            self.currentBlock.OnSubBlockConnected.Unregister(self.CreateConnectionTuple)
+            self.currentBlock.OnSubBlockConnected.Unregister(self.CreateConnectionItem)
             self.currentBlock.OnImageAdded.Unregister(self.CreateImageItem)
             self.currentBlock.OnClosed.Unregister(self.Clear)
         self.currentBlock = None
@@ -50,14 +46,14 @@ class LogicBlockEditor(QFrame):
             for outputPort in blockItem.block.GetOutputs():
                 # To each input
                 for inputPort in outputPort.connectedInputs:
-                    self.CreateConnectionItem(outputPort, inputPort)
+                    self.CreateConnectionItem((outputPort, inputPort))
 
         for imageItem in self.currentBlock.GetImages():
             self.CreateImageItem(imageItem)
 
         self.worldBrowser.FrameItems()
         self.currentBlock.OnBlockAdded.Register(self.CreateBlockItem, True)
-        self.currentBlock.OnSubBlockConnected.Register(self.CreateConnectionTuple, True)
+        self.currentBlock.OnSubBlockConnected.Register(self.CreateConnectionItem, True)
         self.currentBlock.OnImageAdded.Register(self.CreateImageItem, True)
         self.currentBlock.OnClosed.Register(self.Clear, True)
 
@@ -71,10 +67,7 @@ class LogicBlockEditor(QFrame):
     def CreateImageItem(self, image: Image):
         return ImageItem(self.worldBrowser.scene(), image)
 
-    def CreateConnectionTuple(self, t: typing.Tuple[OutputPort, InputPort]):
-        return self.CreateConnectionItem(t[0], t[1])
-
-    def CreateConnectionItem(self, outputPort: OutputPort, inputPort: InputPort):
+    def CreateConnectionItem(self, t: typing.Tuple[OutputPort, InputPort]):
         blockItems = [blockItem for blockItem in self.worldBrowser.scene().items() if
                       isinstance(blockItem, LogicBlockItem)]
 
@@ -83,37 +76,23 @@ class LogicBlockEditor(QFrame):
         foundInputWidget: typing.Optional[InputWidget] = None
 
         for blockItem in blockItems:
-            if foundOutputWidget is None and blockItem.block == outputPort.block:
+            if foundOutputWidget is None and blockItem.block == t[0].block:
                 outputWidgets = [x for x in blockItem.outputsWidget.children() if isinstance(x, OutputWidget)]
                 for outputWidget in outputWidgets:
-                    if outputWidget.outputPort == outputPort:
+                    if outputWidget.outputPort == t[0]:
                         foundOutputWidget = outputWidget
                         break
-            if foundInputWidget is None and blockItem.block == inputPort.block:
+            if foundInputWidget is None and blockItem.block == t[1].block:
                 inputWidgets = [x for x in blockItem.inputsWidget.children() if isinstance(x, InputWidget)]
                 for inputWidget in inputWidgets:
-                    if inputWidget.inputPort == inputPort:
+                    if inputWidget.inputPort == t[1]:
                         foundInputWidget = inputWidget
                         break
 
         if foundOutputWidget is not None and foundInputWidget is not None:
-            newConnection = BlockConnection(self.worldBrowser.scene(), foundOutputWidget, foundInputWidget)
+            newConnection = BlockConnection(self.worldBrowser.scene(), foundOutputWidget.portHole,
+                                            foundInputWidget.portHole)
             return newConnection
-
-    def CanConnectPorts(self, fromPortHole: PortHoleWidget, toPortHole: PortHoleWidget):
-        if not (isinstance(fromPortHole, OutputPortHole) and isinstance(toPortHole, InputPortHole)):
-            return False
-
-        return LogicBlock.CanConnect(fromPortHole.portWidget.outputPort, toPortHole.portWidget.inputPort)
-
-    def IsFromPort(self, port: PortHoleWidget):
-        if isinstance(port, OutputPortHole):
-            return True
-        return False
-
-    def MakeConnection(self, fromPortHole: OutputPortHole, toPortHole: InputPortHole):
-        block = fromPortHole.portWidget.outputPort.block
-        block.Connect(fromPortHole.portWidget.outputPort, toPortHole.portWidget.inputPort)
 
     def UpdateFromSave(self):
         if self.currentBlock is None:
