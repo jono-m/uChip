@@ -1,4 +1,3 @@
-from LogicBlocks.LogicBlock import *
 from UI.WorldBrowser.PortHoles import *
 
 

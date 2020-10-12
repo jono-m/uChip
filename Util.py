@@ -29,18 +29,18 @@ class Event:
         self._listeners = []
 
     def Unregister(self, func: typing.Callable):
-        for l in self._listeners:
-            if l.func == func:
-                self._listeners.remove(l)
+        for listener in self._listeners:
+            if listener.func == func:
+                self._listeners.remove(listener)
                 return
 
     def Invoke(self, data: typing.Any = None):
-        for l in self._listeners.copy():
-            sig = signature(l.func)
+        for listener in self._listeners.copy():
+            sig = signature(listener.func)
             if len(sig.parameters) == 0:
-                l.func()
+                listener.func()
             else:
-                l.func(data)
+                listener.func(data)
 
     def __getstate__(self):
         state = self.__dict__.copy()

@@ -1,7 +1,7 @@
 import time
-from Procedures.Step import *
-from LogicBlocks.IOBlocks import *
+
 from ChipController.ValveBlock import *
+from Procedures.Step import *
 
 
 class ChipSettingStep(Step):

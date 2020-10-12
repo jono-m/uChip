@@ -1,6 +1,3 @@
-from Util import *
-from PySide2.QtWidgets import *
-from PySide2.QtGui import *
 from UI.LogicBlock.LogicBlockEditor import *
 
 
@@ -19,8 +16,7 @@ class BaseEditorFrame(QFrame):
         self.nameFilters = None
 
     def UpdateForProcedureStatus(self, running):
-        self.editor.worldBrowser._actionsEnabled = not running
-        self.editor.worldBrowser.update()
+        self.editor.worldBrowser.SetActionsEnabled(not running)
 
     def ClearFocus(self):
         self.editor.worldBrowser.ClearSelection()

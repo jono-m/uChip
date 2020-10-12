@@ -34,9 +34,9 @@ class CustomLogicBlockEditorFrame(BaseEditorFrame):
     def AddLogicBlock(self, lb: LogicBlock):
         lb.SetPosition(self.editor.worldBrowser.GetCenterPoint())
         if isinstance(lb, CompoundLogicBlock) and self.logicBlock.CreatesLoop(lb):
-            QMessageBox.warning(self, "Element addition failed",
-                                "The current logic block is used in the logic block that you are trying to "
-                                "add. This would create a never-ending loop! Cannot add.")
+            QMessageBox.warning(parent=self, title="Element addition failed",
+                                text="The current logic block is used in the logic block that you are trying to "
+                                     "add. This would create a never-ending loop! Cannot add.")
         else:
             self.logicBlock.AddSubBlock(lb)
 

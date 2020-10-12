@@ -9,7 +9,7 @@ class LogicBlock:
 
         self.OnOutputsUpdated = Event()  # Called when the logic block computes new outputs
         self.OnConnectionsChanged = Event()  # Called when the logic block gains or loses a connection
-        self.OnOutputConnected = Event()  # Called when an output of this block becomes connected
+        self.OnRefresh = Event()  # Called when an output of this block becomes connected
         self.OnPortsChanged = Event()  # Called when an input or output port is added or removed from the logic block
         self.OnDefaultChanged = Event()  # Called when a default value is changed
         self.OnDestroyed = Event()  # Called when this block is destroyed
@@ -107,10 +107,10 @@ class LogicBlock:
             inputPort.connectedOutput = outputPort
             outputPort.block.OnConnectionsChanged.Invoke()
             inputPort.block.OnConnectionsChanged.Invoke()
-            outputPort.block.OnOutputConnected.Invoke((outputPort, inputPort))
+            outputPort.block.OnRefresh.Invoke((outputPort, inputPort))
 
     @staticmethod
-    def Disconnect(outputPort: 'OutputPort', inputPort: 'InputPort', suppressMessages = False):
+    def Disconnect(outputPort: 'OutputPort', inputPort: 'InputPort', suppressMessages=False):
         if inputPort is not None and outputPort is not None:
             outputPort.connectedInputs.remove(inputPort)
             inputPort.connectedOutput = None
@@ -128,29 +128,14 @@ class LogicBlock:
             return False
         return True
 
-    def DisconnectAll(self, suppressMessages = False):
-        changed = []
+    def DisconnectAll(self):
         for inputPort in self._inputs:
             connectedOutput = inputPort.connectedOutput
             if connectedOutput is not None:
                 self.Disconnect(connectedOutput, inputPort, True)
-                if inputPort.block not in changed:
-                    changed.append(inputPort.block)
-                if connectedOutput.block not in changed:
-                    changed.append(connectedOutput.block)
         for outputPort in self._outputs:
             for connectedInput in outputPort.connectedInputs[:]:
                 self.Disconnect(outputPort, connectedInput, True)
-                if outputPort.block not in changed:
-                    changed.append(outputPort.block)
-                if connectedInput.block not in changed:
-                    changed.append(connectedInput.block)
-
-        if not suppressMessages:
-            for block in changed:
-                block.OnConnectionsChanged.Invoke()
-
-        return changed
 
     @staticmethod
     def GetName(self=None) -> str:
@@ -191,12 +176,17 @@ class LogicBlock:
         return True
 
 
-# One input port can connect to one output port. Or, it can be disconnected, in which case a default value
-# is used.
-class InputPort:
-    def __init__(self, block: LogicBlock, name: str, dataType: typing.Type, isConnectable=True):
+class Port:
+    def __init__(self, block: LogicBlock, name: str):
         self.name: str = name
         self.block: LogicBlock = block
+
+
+# One input port can connect to one output port. Or, it can be disconnected, in which case a default value
+# is used.
+class InputPort(Port):
+    def __init__(self, block: LogicBlock, name: str, dataType: typing.Type, isConnectable=True):
+        super().__init__(block, name)
         self.dataType = dataType
         if self.dataType is None:
             self._defaultData = 0
@@ -226,10 +216,9 @@ class InputPort:
 
 
 # One output port can connect to many input ports.
-class OutputPort:
+class OutputPort(Port):
     def __init__(self, block: LogicBlock, name: str, dataType: typing.Type):
-        self.block: LogicBlock = block
-        self.name: str = name
+        super().__init__(block, name)
         if dataType is None:
             self._outputData = None
         else:

@@ -1,7 +1,5 @@
-from ChipController.ValveBlock import *
-from Rig.Rig import Rig
 from Procedures.Procedure import *
-from LogicBlocks.CompoundLogicBlock import *
+from Rig.Rig import Rig
 
 
 class ChipController:

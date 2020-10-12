@@ -1,10 +1,4 @@
-from PySide2.QtGui import *
-from PySide2.QtWidgets import *
-from PySide2.QtCore import *
-
 from UI.WorldBrowser.SelectableItem import *
-
-import typing
 
 
 class PortHoleWidget(QLabel):
@@ -32,12 +26,10 @@ class PortHoleWidget(QLabel):
     def SetHighlighted(self, highlighted):
         if self._IsHighlighted != highlighted:
             self._IsHighlighted = highlighted
-            self.update()
 
     def SetIsFilled(self, filled):
         if self._IsFilled != filled:
             self._IsFilled = filled
-            self.update()
 
     def paintEvent(self, event: QPaintEvent):
         painter = QPainter(self)
@@ -160,7 +152,7 @@ class ConnectionItem(QGraphicsPathItem, SelectableItem):
         dummyPath.addPath(myPath.toReversed())
         self.setPath(dummyPath)
 
-    def paint(self, painter, option, widget, PySide2_QtWidgets_QWidget=None, NoneType=None, *args, **kwargs):
+    def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget: typing.Optional[QWidget] = ...):
         if self._portHoleA is None and self._portHoleB is None:
             return
 
@@ -209,9 +201,7 @@ class ConnectionItem(QGraphicsPathItem, SelectableItem):
     def SetIsHovered(self, hoverOn):
         if self.IsHovered != hoverOn:
             self.IsHovered = hoverOn
-            self.update()
 
     def SetIsSelected(self, isSelected):
         if self.IsSelected != isSelected:
             self.IsSelected = isSelected
-            self.update()

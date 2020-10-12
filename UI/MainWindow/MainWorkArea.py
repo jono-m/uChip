@@ -5,6 +5,7 @@ from UI.MainWindow.MainToolbar import *
 from UI.RigView.RigViewWidget import *
 from Procedures.ProcedureRunner import *
 from UI.ProceduresDialog import *
+from UI.Chip.ChipParametersList import *
 
 
 class MainWorkArea(QFrame):
@@ -214,7 +215,6 @@ class MainWorkArea(QFrame):
 
     def ShowRig(self):
         self.rigViewWidget.show()
-        self.rigViewWidget.update()
 
 
 class OpenDialog(QFileDialog):

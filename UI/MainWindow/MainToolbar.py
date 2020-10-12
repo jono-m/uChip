@@ -1,14 +1,9 @@
-from PySide2.QtWidgets import *
-from Util import *
-from LogicBlocks.NumberBlocks import *
 from LogicBlocks.BooleanBlocks import *
 from LogicBlocks.ConditionalBlocks import *
+from LogicBlocks.NumberBlocks import *
 from LogicBlocks.ScriptedBlock import *
-from UI.Procedure.ProceduresBox import *
-from LogicBlocks.IOBlocks import *
-from PySide2.QtGui import *
 from UI.Procedure.ProcedureMenu import *
-from ChipController.ChipController import *
+from UI.Procedure.ProceduresBox import *
 
 
 class MainToolbar(QFrame):
@@ -39,7 +34,7 @@ class MainToolbar(QFrame):
         self.OnAddLogicBlock = Event()
         self.OnAddImage = Event()
 
-        self.fileMenuSection = self.AddMenuSection("File", 2, 3)
+        self.fileMenuSection = MainToolbar.PrepareMenuSection("File", 2, 3)
         self.fileMenuSection.addWidget(self.AddButton("Assets/chipIconPlus.png", "New Chip", self.OnNewChip.Invoke), 0,
                                        0)
         self.fileMenuSection.addWidget(self.AddButton("Assets/LBIconPlus.png", "New Logic Block", self.OnNewLB.Invoke),
@@ -83,7 +78,7 @@ class MainToolbar(QFrame):
         testMenu.addAction("test")
 
         color = QColor(230, 230, 230)
-        self.logicBlocksSection = self.AddMenuSection("Control Elements", 2, 3)
+        self.logicBlocksSection = MainToolbar.PrepareMenuSection("Control Elements", 2, 3)
         self.logicBlocksSection.addWidget(self.AddButton("Assets/mathIcon.png", "Math", menu=mathMenu, color=color), 0,
                                           0)
         self.logicBlocksSection.addWidget(self.AddButton("Assets/logicIcon.png", "Logic", menu=logicMenu, color=color),
@@ -97,19 +92,21 @@ class MainToolbar(QFrame):
         self.logicBlocksSection.addWidget(
             self.AddButton("Assets/LBIcon.png", "Custom...", delegate=self.BrowseForBlock, above=True), 0, 2, 2, 1)
 
-        self.chipSection = self.AddMenuSection("Chip Elements", 2, 2)
+        self.chipSection = MainToolbar.PrepareMenuSection("Chip Elements", 2, 2)
         self.chipSection.addWidget(self.AddButton("Assets/checkboxIcon.png", "YES/NO Parameter", color=color,
-                                                  delegate=lambda: self.OnAddLogicBlock.Invoke(InputLogicBlock(bool, True))),
+                                                  delegate=lambda: self.OnAddLogicBlock.Invoke(
+                                                      InputLogicBlock(bool, True))),
                                    0, 0)
         self.chipSection.addWidget(self.AddButton("Assets/numberIcon.png", "Number Parameter", color=color,
-                                                  delegate=lambda: self.OnAddLogicBlock.Invoke(InputLogicBlock(float, True))),
+                                                  delegate=lambda: self.OnAddLogicBlock.Invoke(
+                                                      InputLogicBlock(float, True))),
                                    1, 0)
         self.chipSection.addWidget(self.AddButton("Assets/valveIcon.png", "Valve", color=color, above=True,
                                                   delegate=lambda: self.OnAddLogicBlock.Invoke(ValveLogicBlock())), 0,
                                    1, 2, 1)
 
-        self.procedureElementsSection = self.AddMenuSection("Procedure Elements",
-                                                            2, 3)
+        self.procedureElementsSection = MainToolbar.PrepareMenuSection("Procedure Elements",
+                                                                       2, 3)
         self.procedureElementsSection.addWidget(self.AddButton("Assets/timeIcon.png", "Wait Step", color=color,
                                                                delegate=lambda: self.OnAddLogicBlock.Invoke(
                                                                    WaitStep())), 0, 0)
@@ -127,7 +124,7 @@ class MainToolbar(QFrame):
                                                 1)
         self.procedureElementsSection.addWidget(self.AddButton(None, "Set Parameter", menu=self.setMenu), 1, 1)
 
-        self.ioSection = self.AddMenuSection("Input/Output", 2, 2)
+        self.ioSection = MainToolbar.PrepareMenuSection("Input/Output", 2, 2)
         self.ioSection.addWidget(self.AddButton("Assets/checkboxIcon.png", "YES/NO Input", color=color,
                                                 delegate=lambda: self.OnAddLogicBlock.Invoke(InputLogicBlock(bool))), 0,
                                  0)
@@ -141,12 +138,12 @@ class MainToolbar(QFrame):
                                                 delegate=lambda: self.OnAddLogicBlock.Invoke(OutputLogicBlock(float))),
                                  1, 1)
 
-        self.annotationSection = self.AddMenuSection("Other", 1, 1)
+        self.annotationSection = MainToolbar.PrepareMenuSection("Other", 1, 1)
         self.annotationSection.addWidget(
             self.AddButton("Assets/imageIcon.png", "Image", above=True, delegate=self.BrowseForImage, color=color), 0,
             0)
 
-        self.proceduresSection = self.AddMenuSection("Procedures", 2, 1)
+        self.proceduresSection = MainToolbar.PrepareMenuSection("Procedures", 2, 1)
 
         t = QFrame()
         t.setLayout(QHBoxLayout())
@@ -177,7 +174,7 @@ class MainToolbar(QFrame):
         self.rigButton = self.AddButton("Assets/solenoidsIcon.png", "Open Rig...", above=True,
                                         delegate=self.OnOpenRig.Invoke,
                                         color=color)
-        self.solenoidsSection = self.AddMenuSection("Rig", 1, 1)
+        self.solenoidsSection = MainToolbar.PrepareMenuSection("Rig", 1, 1)
         self.solenoidsSection.addWidget(self.rigButton, 0, 0)
 
         layout.addLayout(self.fileMenuSection)
@@ -221,8 +218,6 @@ class MainToolbar(QFrame):
         for on in onChildren:
             on.setVisible(True)
 
-        self.updateGeometry()
-
     def UpdateForProcedureStatus(self, isRunning):
         self.proceduresBox.setEnabled(not isRunning)
 
@@ -261,7 +256,8 @@ class MainToolbar(QFrame):
 
         return b
 
-    def AddMenuSection(self, name, r, c):
+    @staticmethod
+    def PrepareMenuSection(name, r, c):
         layout = QGridLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
@@ -316,7 +312,7 @@ class MainToolbar(QFrame):
         self.proceduresBox.SetChipController(chipController)
 
     def PromptNewProcedure(self):
-        (text, ok) = QInputDialog.getText(self, "New Procedure", "Procedure Name:")
+        (text, ok) = QInputDialog.getText(parent=self, title="New Procedure", label="Procedure Name:")
 
         if ok and text:
             newProcedure = Procedure()

@@ -6,15 +6,6 @@ class ChipValvesList(QFrame):
     def __init__(self):
         super().__init__()
 
-        self.setStyleSheet("""
-        QLabel {
-        background-color: rgba(255, 255, 255, 0.05);
-        text-align: center;
-        font-weight: bold;
-        padding: 5px 20px 5px 20px;
-        }
-        """)
-
         self.setObjectName("valvesList")
 
         self.label = QLabel("Valve Mappings")
@@ -85,23 +76,6 @@ class ValveField(QFrame):
     def __init__(self, valveBlock: ValveLogicBlock):
         super().__init__()
         self.valveBlock = valveBlock
-
-        self.setStyleSheet("""
-        * {
-        background-color: rgba(255, 255, 255, 0.05);
-        padding: 2px;
-        }
-        QLabel {
-        background-color: rgba(255, 255, 255, 0.1);
-        }
-        QSpinBox, QDoubleSpinBox, QCheckBox {
-        margin: 5px;
-        border: 1px solid white;
-        background-color: transparent;
-        }
-        QCheckBox {
-        border: none;
-        }""")
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)

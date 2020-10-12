@@ -1,7 +1,6 @@
-from UI.WorldBrowser.WorldBrowser import *
-from LogicBlocks.CompoundLogicBlock import *
-from UI.LogicBlock.LogicBlockItem import *
 from UI.LogicBlock.ImageItem import *
+from UI.LogicBlock.LogicBlockItem import *
+from UI.WorldBrowser.WorldBrowser import *
 
 
 class LogicBlockEditor(QFrame):
@@ -67,23 +66,23 @@ class LogicBlockEditor(QFrame):
     def CreateImageItem(self, image: Image):
         return ImageItem(self.worldBrowser.scene(), image)
 
-    def CreateConnectionItem(self, t: typing.Tuple[OutputPort, InputPort]):
+    def CreateConnectionItem(self, t: typing.Tuple[Port, Port]):
         blockItems = [blockItem for blockItem in self.worldBrowser.scene().items() if
                       isinstance(blockItem, LogicBlockItem)]
 
-        foundOutputWidget: typing.Optional[OutputWidget] = None
+        foundOutputWidget: typing.Optional[OutputPortWidget] = None
 
-        foundInputWidget: typing.Optional[InputWidget] = None
+        foundInputWidget: typing.Optional[InputPortWidget] = None
 
         for blockItem in blockItems:
             if foundOutputWidget is None and blockItem.block == t[0].block:
-                outputWidgets = [x for x in blockItem.outputsWidget.children() if isinstance(x, OutputWidget)]
+                outputWidgets = [x for x in blockItem.outputPortsListWidget.children() if isinstance(x, OutputPortWidget)]
                 for outputWidget in outputWidgets:
                     if outputWidget.outputPort == t[0]:
                         foundOutputWidget = outputWidget
                         break
             if foundInputWidget is None and blockItem.block == t[1].block:
-                inputWidgets = [x for x in blockItem.inputsWidget.children() if isinstance(x, InputWidget)]
+                inputWidgets = [x for x in blockItem.inputPortsListWidget.children() if isinstance(x, InputPortWidget)]
                 for inputWidget in inputWidgets:
                     if inputWidget.inputPort == t[1]:
                         foundInputWidget = inputWidget

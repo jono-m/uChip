@@ -52,16 +52,13 @@ class Step(LogicBlock):
             completedPort.connectedBegin.append(beginPort)
             beginPort.step.OnConnectionsChanged.Invoke()
             completedPort.step.OnConnectionsChanged.Invoke()
-            completedPort.step.OnOutputConnected.Invoke((completedPort, beginPort))
+            completedPort.step.OnRefresh.Invoke((completedPort, beginPort))
 
     @staticmethod
-    def DisconnectSteps(completedPort: 'CompletedPort', beginPort: 'BeginPort', suppressMessages=False):
+    def DisconnectSteps(completedPort: 'CompletedPort', beginPort: 'BeginPort'):
         if beginPort is not None and completedPort is not None:
             beginPort.connectedCompleted.remove(completedPort)
             completedPort.connectedBegin.remove(beginPort)
-            if not suppressMessages:
-                beginPort.step.OnConnectionsChanged.Invoke()
-                completedPort.step.OnConnectionsChanged.Invoke()
 
     @staticmethod
     def AreStepsConnected(completedPort: 'CompletedPort', beginPort: 'BeginPort'):
@@ -84,28 +81,19 @@ class Step(LogicBlock):
 
         return True
 
-    def DisconnectAll(self, suppressMessages=False):
+    def DisconnectAll(self):
         changed = []
 
         for beginPort in self.GetBeginPorts():
             for completedPort in beginPort.connectedCompleted[:]:
-                self.DisconnectSteps(completedPort, beginPort, True)
-                if completedPort.step not in changed:
-                    changed.append(completedPort.step)
-                if beginPort.step not in changed:
-                    changed.append(beginPort.step)
+                self.DisconnectSteps(completedPort, beginPort)
         for completedPort in self.GetCompletedPorts():
             for beginPort in completedPort.connectedBegin[:]:
-                self.DisconnectSteps(completedPort, beginPort, True)
+                self.DisconnectSteps(completedPort, beginPort)
                 if completedPort.step not in changed:
                     changed.append(completedPort.step)
                 if beginPort.step not in changed:
                     changed.append(beginPort.step)
-
-        changed += super().DisconnectAll(True)
-
-        for block in changed:
-            block.OnConnectionsChanged.Invoke()
 
     def BeginProcedure(self):
         self._hasRun = False
@@ -135,17 +123,17 @@ class Step(LogicBlock):
         return "Unnamed Step"
 
 
-class BeginPort:
+class BeginPort(Port):
     def __init__(self, step: Step, name="Begin"):
+        super().__init__(step, name)
         self.step = step
-        self.name = name
         self.connectedCompleted: typing.List[CompletedPort] = []
 
 
-class CompletedPort:
+class CompletedPort(Port):
     def __init__(self, step: Step, name="Completed"):
+        super().__init__(step, name)
         self.step = step
-        self.name = name
         self.connectedBegin: typing.List[BeginPort] = []
 
     def GetSteps(self) -> typing.List[Step]:
