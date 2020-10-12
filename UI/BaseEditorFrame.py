@@ -23,7 +23,7 @@ class BaseEditorFrame(QFrame):
         self.editor.worldBrowser.update()
 
     def ClearFocus(self):
-        self.editor.worldBrowser.SelectItem(None)
+        self.editor.worldBrowser.ClearSelection()
 
     def DoSave(self, filename=None):
         pass

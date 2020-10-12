@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="SCOPE_TYPE" value="8" />
+    <option name="CUSTOM_SCOPE_NAME" value="NoBuild" />
+  </component>
   <component name="BranchesTreeState">
     <expand>
       <path>
@@ -20,8 +24,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="99850780-df20-4af2-831c-10fab045648b" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/BaseEditorFrame.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/BaseEditorFrame.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/LogicBlock/BlockConnection.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/LogicBlock/BlockConnection.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/LogicBlock/LogicBlockEditor.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/LogicBlock/LogicBlockEditor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/LogicBlock/LogicBlockItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/LogicBlock/LogicBlockItem.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/Procedure/ProcedureEditor.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Procedure/ProcedureEditor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/Procedure/StepBlockItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Procedure/StepBlockItem.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/Procedure/StepConnection.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Procedure/StepConnection.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/WorldBrowser/BlockItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/WorldBrowser/BlockItem.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/WorldBrowser/PortHoles.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/WorldBrowser/PortHoles.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/WorldBrowser/WorldBrowser.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/WorldBrowser/WorldBrowser.py" afterDir="false" />
     </list>
@@ -40,6 +53,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="NamedScopeManager">
+    <scope name="NoBuild" pattern="file[uChip]:*/&amp;&amp;!file[uChip]:build//*&amp;&amp;!file[uChip]:.idea//*" />
+  </component>
   <component name="ProjectId" id="1cuOmrgug4l6Eixe1FT2QnQmHbY" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -51,6 +67,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="restartRequiresConfirmation" value="false" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="PyConsoleOptionsProvider">
@@ -114,6 +131,10 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="724" y="276" key="#Inspections" timestamp="1602454864922">
+      <screen x="0" y="0" width="2194" height="1194" />
+    </state>
+    <state x="724" y="276" key="#Inspections/0.0.2194.1194@0.0.2194.1194" timestamp="1602454864922" />
     <state x="286" y="399" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1601328447025">
       <screen x="0" y="0" width="2194" height="1194" />
     </state>
@@ -126,29 +147,33 @@
       <screen x="0" y="0" width="2194" height="1194" />
     </state>
     <state x="835" y="504" key="#com.jetbrains.python.refactoring.move.PyMakeFunctionTopLevelDialog/0.0.2194.1194@0.0.2194.1194" timestamp="1601561757980" />
+    <state x="845" y="452" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1602454922411">
+      <screen x="0" y="0" width="2194" height="1194" />
+    </state>
+    <state x="845" y="452" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.0.2194.1194@0.0.2194.1194" timestamp="1602454922411" />
     <state x="329" y="352" key="FileChooserDialogImpl" timestamp="1601328827688">
       <screen x="0" y="0" width="2194" height="1194" />
     </state>
     <state x="329" y="352" key="FileChooserDialogImpl/0.0.2194.1194@0.0.2194.1194" timestamp="1601328827688" />
-    <state width="1954" height="487" key="GridCell.Tab.0.bottom" timestamp="1601848313541">
-      <screen x="0" y="0" width="3440" height="1400" />
+    <state width="1075" height="369" key="GridCell.Tab.0.bottom" timestamp="1602515868765">
+      <screen x="0" y="0" width="2194" height="1194" />
     </state>
-    <state width="2173" height="406" key="GridCell.Tab.0.bottom/0.0.2194.1194@0.0.2194.1194" timestamp="1601665109334" />
+    <state width="1075" height="369" key="GridCell.Tab.0.bottom/0.0.2194.1194@0.0.2194.1194" timestamp="1602515868765" />
     <state width="1954" height="487" key="GridCell.Tab.0.bottom/0.0.3440.1400@0.0.3440.1400" timestamp="1601848313541" />
-    <state width="1954" height="487" key="GridCell.Tab.0.center" timestamp="1601848313541">
-      <screen x="0" y="0" width="3440" height="1400" />
+    <state width="1075" height="369" key="GridCell.Tab.0.center" timestamp="1602515868764">
+      <screen x="0" y="0" width="2194" height="1194" />
     </state>
-    <state width="2173" height="406" key="GridCell.Tab.0.center/0.0.2194.1194@0.0.2194.1194" timestamp="1601665109333" />
+    <state width="1075" height="369" key="GridCell.Tab.0.center/0.0.2194.1194@0.0.2194.1194" timestamp="1602515868764" />
     <state width="1954" height="487" key="GridCell.Tab.0.center/0.0.3440.1400@0.0.3440.1400" timestamp="1601848313541" />
-    <state width="1954" height="487" key="GridCell.Tab.0.left" timestamp="1601848313541">
-      <screen x="0" y="0" width="3440" height="1400" />
+    <state width="1075" height="369" key="GridCell.Tab.0.left" timestamp="1602515868764">
+      <screen x="0" y="0" width="2194" height="1194" />
     </state>
-    <state width="2173" height="406" key="GridCell.Tab.0.left/0.0.2194.1194@0.0.2194.1194" timestamp="1601665109333" />
+    <state width="1075" height="369" key="GridCell.Tab.0.left/0.0.2194.1194@0.0.2194.1194" timestamp="1602515868764" />
     <state width="1954" height="487" key="GridCell.Tab.0.left/0.0.3440.1400@0.0.3440.1400" timestamp="1601848313541" />
-    <state width="1954" height="487" key="GridCell.Tab.0.right" timestamp="1601848313541">
-      <screen x="0" y="0" width="3440" height="1400" />
+    <state width="1075" height="369" key="GridCell.Tab.0.right" timestamp="1602515868765">
+      <screen x="0" y="0" width="2194" height="1194" />
     </state>
-    <state width="2173" height="406" key="GridCell.Tab.0.right/0.0.2194.1194@0.0.2194.1194" timestamp="1601665109333" />
+    <state width="1075" height="369" key="GridCell.Tab.0.right/0.0.2194.1194@0.0.2194.1194" timestamp="1602515868765" />
     <state width="1954" height="487" key="GridCell.Tab.0.right/0.0.3440.1400@0.0.3440.1400" timestamp="1601848313541" />
     <state width="1954" height="487" key="GridCell.Tab.1.bottom" timestamp="1601848313541">
       <screen x="0" y="0" width="3440" height="1400" />
@@ -178,11 +203,15 @@
       <screen x="0" y="0" width="3440" height="1400" />
     </state>
     <state x="1284" y="429" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.0.3440.1400@0.0.3440.1400" timestamp="1601582444276" />
-    <state x="1268" y="387" width="904" height="627" key="find.popup" timestamp="1602366119919">
-      <screen x="0" y="0" width="3440" height="1400" />
+    <state x="809" y="330" width="576" height="534" key="find.popup" timestamp="1602475016413">
+      <screen x="0" y="0" width="2194" height="1194" />
     </state>
-    <state x="809" y="330" width="576" height="534" key="find.popup/0.0.2194.1194@0.0.2194.1194" timestamp="1601600573147" />
+    <state x="809" y="330" width="576" height="534" key="find.popup/0.0.2194.1194@0.0.2194.1194" timestamp="1602475016413" />
     <state x="1268" y="387" width="904" height="627" key="find.popup/0.0.3440.1400@0.0.3440.1400" timestamp="1602366119919" />
+    <state x="889" y="455" width="489" height="395" key="scopes" timestamp="1602454919248">
+      <screen x="0" y="0" width="2194" height="1194" />
+    </state>
+    <state x="889" y="455" width="489" height="395" key="scopes/0.0.2194.1194@0.0.2194.1194" timestamp="1602454919248" />
     <state x="760" y="264" width="672" height="678" key="search.everywhere.popup" timestamp="1601653927157">
       <screen x="0" y="0" width="2194" height="1194" />
     </state>
@@ -203,7 +232,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/UI/Chip/ValveBlockItem.py</url>
-          <line>22</line>
+          <line>21</line>
           <option name="timeStamp" value="23" />
         </line-breakpoint>
       </breakpoints>

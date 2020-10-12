@@ -1,6 +1,6 @@
 from UI.LogicBlock.LogicBlockItem import *
-from Procedures.BasicSteps import *
 from UI.Procedure.StepProgressBar import *
+from UI.Procedure.StepConnection import *
 
 
 class StepBlockItem(LogicBlockItem):
@@ -127,7 +127,7 @@ class BeginPortWidget(QFrame):
 
         self.beginPort = port
 
-        self.portHole = BeginPortHole(self, graphicsParent)
+        self.portHole = BeginPortHole(port, graphicsParent)
         self.portHole.Color = QColor(235, 195, 52)
 
         self.nameLabel = QLabel()
@@ -163,7 +163,7 @@ class CompletedPortWidget(QFrame):
     def __init__(self, port: CompletedPort, graphicsParent: QGraphicsProxyWidget):
         super().__init__()
         self.completedPort = port
-        self.portHole = CompletedPortHole(self, graphicsParent)
+        self.portHole = CompletedPortHole(port, graphicsParent)
 
         self.portHole.Color = QColor(235, 195, 52)
         self.nameLabel = QLabel()
@@ -194,17 +194,3 @@ class CompletedPortWidget(QFrame):
         self.portHole.SetIsFilled(len(self.completedPort.connectedBegin) > 0)
 
         self.nameLabel.setText(self.completedPort.name)
-
-
-class BeginPortHole(PortHoleWidget):
-    def __init__(self, portWidget: BeginPortWidget,
-                 graphicsParent: QGraphicsProxyWidget):
-        super().__init__(graphicsParent)
-        self.portWidget = portWidget
-
-
-class CompletedPortHole(PortHoleWidget):
-    def __init__(self, portWidget: CompletedPortWidget,
-                 graphicsParent: QGraphicsProxyWidget):
-        super().__init__(graphicsParent)
-        self.portWidget = portWidget

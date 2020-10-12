@@ -1,29 +1,77 @@
 from UI.Procedure.StepBlockItem import *
+from Procedures.BasicSteps import *
+
+
+class BeginPortHole(PortHoleWidget):
+    def __init__(self, port: BeginPort,
+                 graphicsParent: QGraphicsProxyWidget):
+        super().__init__(graphicsParent)
+        self.beginPort = port
+        self.connectionClass = StepConnection
+
+    def CanConnect(self, other: "PortHoleWidget") -> bool:
+        if other is None or not isinstance(other, CompletedPortHole):
+            return False
+        else:
+            return Step.CanConnectSteps(other.completedPort, self.beginPort)
+
+    def DoConnect(self, other: "PortHoleWidget"):
+        if isinstance(other, CompletedPortHole):
+            Step.ConnectToStep(other.completedPort, self.beginPort)
+
+
+class CompletedPortHole(PortHoleWidget):
+    def __init__(self, port: CompletedPort,
+                 graphicsParent: QGraphicsProxyWidget):
+        super().__init__(graphicsParent)
+        self.completedPort = port
+        self.connectionClass = StepConnection
+
+    def CanConnect(self, other: "PortHoleWidget") -> bool:
+        if other is None or not isinstance(other, BeginPortHole):
+            return False
+        else:
+            return Step.CanConnectSteps(self.completedPort, other.beginPort)
+
+    def DoConnect(self, other: "PortHoleWidget"):
+        if isinstance(other, BeginPortHole):
+            Step.ConnectToStep(self.completedPort, other.beginPort)
 
 
 class StepConnection(ConnectionItem):
-    def __init__(self, s: QGraphicsScene, beginWidget: BeginPortWidget, completedWidget: CompletedPortWidget):
-        super().__init__(s, completedWidget.portHole, beginWidget.portHole)
+    def __init__(self, s: QGraphicsScene, beginPortHole: BeginPortHole, completedPortHole: CompletedPortHole):
+        super().__init__(s, beginPortHole, completedPortHole)
 
-        self.beginWidget = beginWidget
-        self.completedWidget = completedWidget
-
-        self.beginWidget.beginPort.step.OnConnectionsChanged.Register(self.CheckExistence, True)
-        self.completedWidget.completedPort.step.OnConnectionsChanged.Register(self.CheckExistence, True)
+        self.GetToPortHole().step.OnConnectionsChanged.Register(self.CheckExistence, True)
+        self.GetFromPortHole().step.OnConnectionsChanged.Register(self.CheckExistence, True)
 
     def Destroy(self):
-        self.SetFromPort(None)
-        self.SetToPort(None)
-        self.beginWidget.beginPort.step.OnConnectionsChanged.Unregister(self.CheckExistence)
-        self.completedWidget.completedPort.step.OnConnectionsChanged.Unregister(self.CheckExistence)
+        self.SetPortHoleA(None)
+        self.SetPortHoleB(None)
+        self.GetFromPortHole().step.OnConnectionsChanged.Unregister(self.CheckExistence)
+        self.GetToPortHole().step.OnConnectionsChanged.Unregister(self.CheckExistence)
         del self
 
     def CheckExistence(self):
-        if not Step.AreStepsConnected(self.completedWidget.completedPort, self.beginWidget.beginPort):
+        if not Step.AreStepsConnected(self.completedWidget.completedPortHole, self.beginWidget.beginPortHole):
             self.Destroy()
 
-    @staticmethod
-    def GetPath(fromCenter: QPointF, toCenter: QPointF):
+    def GetFromPortHole(self):
+        if isinstance(self._portHoleA, CompletedPortHole):
+            return self._portHoleA
+        if isinstance(self._portHoleB, CompletedPortHole):
+            return self._portHoleB
+
+    def GetToPortHole(self):
+        if isinstance(self._portHoleA, BeginPortHole):
+            return self._portHoleA
+        if isinstance(self._portHoleB, BeginPortHole):
+            return self._portHoleB
+
+    def GetPath(self):
+        fromCenter = self.GetFromCenter()
+        toCenter = self.GetToCenter()
+
         path = QPainterPath(fromCenter)
 
         wide = 200
@@ -52,5 +100,5 @@ class StepConnection(ConnectionItem):
         return path
 
     def TryDelete(self) -> bool:
-        Step.DisconnectSteps(self.completedWidget.completedPort, self.beginWidget.beginPort)
+        Step.DisconnectSteps(self.completedWidget.completedPortHole, self.beginWidget.beginPortHole)
         return True

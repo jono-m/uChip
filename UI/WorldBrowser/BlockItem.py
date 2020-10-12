@@ -88,12 +88,14 @@ class BlockItem(QGraphicsProxyWidget, SelectableItem):
                 BlockItem.ClearFocusAll(child)
 
     def SetIsHovered(self, hoverOn):
-        self.displayHovered = hoverOn
-        self.UpdateStyle()
+        if self.displayHovered != hoverOn:
+            self.displayHovered = hoverOn
+            self.UpdateStyle()
 
     def SetIsSelected(self, isSelected):
-        self.displaySelected = isSelected
-        self.UpdateStyle()
+        if self.displaySelected != isSelected:
+            self.displaySelected = isSelected
+            self.UpdateStyle()
 
     def UpdateStyle(self):
         oldProperty = self.container.property('state')
