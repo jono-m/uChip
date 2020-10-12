@@ -16,19 +16,7 @@ class LogicBlockItem(BlockItem):
         titleLayout.addWidget(self.titleBar, stretch=1)
 
         self.minMaxButton = QPushButton("-")
-        self.minMaxButton.setStyleSheet("""
-        QPushButton {
-            background-color: rgba(0, 0, 0, 0);
-            border: none;
-            border-radius: 0px 8px 0px 0px;
-        }
-        QPushButton:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-        QPushButton:pressed {
-            background-color: rgba(255, 255, 255, 0.3);
-        }
-        """)
+        self.minMaxButton.setObjectName("minMaxButton")
         self.minMaxButton.setFixedWidth(25)
         self.minMaxButton.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
         self.minMaxButton.clicked.connect(lambda checked=False: self.SetMinMax(not self.block.minimized))
@@ -39,38 +27,21 @@ class LogicBlockItem(BlockItem):
         portsLayout.setContentsMargins(0, 0, 0, 0)
         portsLayout.setSpacing(0)
         self.container.layout().addLayout(portsLayout)
-        self.inputsWidget = QFrame()
-        self.inputsWidget.setProperty('iWid', True)
-        self.inputsWidget.setStyleSheet("""
-        *[iWid=true] {
-        border: 1px solid rgba(0, 0, 0, 0.2);
-        border-width: 1px 0px 1px 0px;
-        }""")
+        self.inputPortsListWidget = QFrame()
+        self.inputPortsListWidget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
         self.inputsLayout = QVBoxLayout()
         self.inputsLayout.setAlignment(Qt.AlignTop)
-        self.inputsWidget.setLayout(self.inputsLayout)
-        portsLayout.addWidget(self.inputsWidget)
-        for inputPort in self.block.GetInputs():
-            inputWidget = InputWidget(inputPort, self)
-            self.inputsLayout.addWidget(inputWidget)
-        self.outputsWidget = QFrame()
-        self.outputsWidget.setStyleSheet("""
-        * {
-        background-color: rgba(0, 0, 0, 0.2);
-        }
-        """)
+        self.inputPortsListWidget.setLayout(self.inputsLayout)
+        portsLayout.addWidget(self.inputPortsListWidget)
+
+        self.outputPortsListWidget = QFrame()
+        self.outputPortsListWidget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
         self.outputsLayout = QVBoxLayout()
         self.outputsLayout.setAlignment(Qt.AlignTop)
-        self.outputsWidget.setLayout(self.outputsLayout)
-
-        for outputPort in self.block.GetOutputs():
-            outputWidget = OutputWidget(outputPort, self)
-            self.outputsLayout.addWidget(outputWidget)
-        portsLayout.addWidget(self.outputsWidget)
+        self.outputPortsListWidget.setLayout(self.outputsLayout)
+        portsLayout.addWidget(self.outputPortsListWidget)
 
         scene.addItem(self)
-        QApplication.processEvents()
-        self.UpdatePos()
 
         self.block.OnPortsChanged.Register(self.UpdatePorts, True)
         self.block.OnDestroyed.Register(self.Destroy, True)
@@ -78,6 +49,10 @@ class LogicBlockItem(BlockItem):
         self.block.OnOutputsUpdated.Register(self.UpdateName, True)
 
         self.SetMinMax(self.block.minimized)
+        self.UpdatePorts()
+
+        QApplication.processEvents()
+        self.UpdatePos()
 
     def SetMinMax(self, minimized):
         self.block.minimized = minimized
@@ -86,8 +61,8 @@ class LogicBlockItem(BlockItem):
         else:
             self.minMaxButton.setText("-")
 
-        for inputItem in self.inputsWidget.children():
-            if isinstance(inputItem, InputWidget):
+        for inputItem in self.inputPortsListWidget.children():
+            if isinstance(inputItem, InputPortWidget):
                 if not inputItem.inputPort.isConnectable:
                     inputItem.setVisible(not minimized)
 
@@ -103,35 +78,30 @@ class LogicBlockItem(BlockItem):
 
     def UpdateName(self):
         self.titleBar.setText(self.block.GetName())
-        self.inputsWidget.adjustSize()
-        self.outputsWidget.adjustSize()
-        self.container.adjustSize()
-        self.widget().adjustSize()
-        self.adjustSize()
 
     def UpdatePorts(self):
         hasNonConnectable = False
 
-        inputPorts = [inputWidget.inputPort for inputWidget in self.inputsWidget.children() if
-                      isinstance(inputWidget, InputWidget)]
+        inputPorts = [inputWidget.inputPort for inputWidget in self.inputPortsListWidget.children() if
+                      isinstance(inputWidget, InputPortWidget)]
         for inputPort in self.block.GetInputs():
             if not inputPort.isConnectable:
                 hasNonConnectable = True
             if inputPort not in inputPorts:
-                inputWidget = InputWidget(inputPort, self)
-                self.inputsLayout.addWidget(inputWidget)
+                inputPortWidget = InputPortWidget(inputPort, self)
+                self.inputsLayout.addWidget(inputPortWidget)
 
-        outputPorts = [outputWidget.outputPort for outputWidget in self.outputsWidget.children() if
-                       isinstance(outputWidget, OutputWidget)]
+        outputPorts = [outputWidget.outputPort for outputWidget in self.outputPortsListWidget.children() if
+                       isinstance(outputWidget, OutputPortWidget)]
         for outputPort in self.block.GetOutputs():
             if outputPort not in outputPorts:
-                outputWidget = OutputWidget(outputPort, self)
-                self.inputsLayout.addWidget(outputWidget)
+                outputPortWidget = OutputPortWidget(outputPort, self)
+                self.outputsLayout.addWidget(outputPortWidget)
 
         hasInputs = len(self.block.GetInputs()) > 0
         hasOutputs = len(self.block.GetOutputs()) > 0
-        self.outputsWidget.setVisible(hasOutputs)
-        self.inputsWidget.setVisible(hasInputs)
+        self.outputPortsListWidget.setVisible(hasOutputs)
+        self.inputPortsListWidget.setVisible(hasInputs)
 
         self.minMaxButton.setVisible(hasNonConnectable)
 
@@ -150,14 +120,11 @@ class LogicBlockItem(BlockItem):
         copyBlock.SetPosition(self.block.GetPosition() + QPointF(30, 30))
 
 
-class InputWidget(QFrame):
+class InputPortWidget(QFrame):
     def __init__(self, inputPort: InputPort, graphicsParent: QGraphicsProxyWidget):
         super().__init__()
 
         self.graphicsParent = graphicsParent
-
-        self.setProperty('isMe', True)
-        self.setStyleSheet("*[isMe=true]{border: none; background-color: transparent;}")
 
         self.inputPort = inputPort
 
@@ -166,15 +133,14 @@ class InputWidget(QFrame):
         layout.setAlignment(Qt.AlignLeft)
         self.setLayout(layout)
 
-        if self.inputPort.isConnectable and not (
-                isinstance(self.graphicsParent.block, InputLogicBlock) or isinstance(self.graphicsParent.block,
-                                                                                     OutputLogicBlock)):
+        isIOBlock = isinstance(self.graphicsParent.block, InputLogicBlock) or isinstance(self.graphicsParent.block,
+                                                                                         OutputLogicBlock)
+        if self.inputPort.isConnectable and not isIOBlock:
             self.portHole = InputPortHole(inputPort, graphicsParent)
-            layout.addWidget(self.portHole)
+            layout.addWidget(self.portHole, stretch=0)
 
             self.nameText = QLabel()
-            self.nameText.setStyleSheet("*{background-color: transparent}")
-            layout.addWidget(self.nameText)
+            layout.addWidget(self.nameText, stretch=1)
 
         self.parameterSetting = ParameterWidget(self.inputPort.dataType)
         self.parameterSetting.OnParameterChanged.Register(self.OnParameterChanged, True)
@@ -224,12 +190,9 @@ class InputWidget(QFrame):
             self.nameText.setText(self.inputPort.name + "<br>" + dataText)
 
 
-class OutputWidget(QFrame):
+class OutputPortWidget(QFrame):
     def __init__(self, outputPort: OutputPort, graphicsParent: QGraphicsProxyWidget):
         super().__init__()
-
-        self.setProperty('isMe', True)
-        self.setStyleSheet("*[isMe=true]{border: none; background-color: transparent;}")
 
         self.outputPort = outputPort
 
@@ -239,7 +202,6 @@ class OutputWidget(QFrame):
         self.setLayout(layout)
 
         self.nameText = QLabel()
-        self.nameText.setStyleSheet("*{background-color: transparent}")
         layout.addWidget(self.nameText)
 
         self.portHole = OutputPortHole(outputPort, graphicsParent)
@@ -287,11 +249,12 @@ class ParameterWidget(QFrame):
         self.OnParameterChanged = Event()
 
         layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(20, 0, 0, 0)
         self.setLayout(layout)
 
         self.nameLabel = QLabel()
         layout.addWidget(self.nameLabel)
+
         if self.dataType == bool:
             self.control = QCheckBox()
             self.control.stateChanged.connect(self.ParameterChanged)

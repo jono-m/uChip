@@ -1,31 +1,10 @@
 from UI.RigView.RigConfigurationWindow import *
-import typing
 from Util import *
 
 
 class RigViewWidget(QDialog):
     def __init__(self, rig: Rig, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.setStyleSheet("""
-        QPushButton {
-            background-color: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            border-radius: 5px;
-            text-align: center;
-        }
-        QPushButton:checked {
-            background-color: rgba(0, 150, 0, 1);
-            image: none;
-        }
-        QPushButton:hover:!checked {
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-        QPushButton:hover:checked {
-            background-color: rgba(0, 150, 0, 0.5);
-        }
-        QPushButton:disabled {
-            image: url(Assets/locked.png);
-        }""")
         self.setWindowFlags(Qt.WindowTitleHint | Qt.WindowCloseButtonHint | Qt.Dialog | Qt.MSWindowsFixedSizeDialogHint)
 
         self.setWindowTitle("Rig Solenoids")
@@ -104,10 +83,6 @@ class RigViewWidget(QDialog):
                 lambda checked=False, es=eightSet: self.EightSetButtonPressed(es, False))
             self.layout.addWidget(onButton, rowNumber, 0)
             self.layout.addWidget(offButton, rowNumber, 1)
-
-        self.solenoidsContainer.adjustSize()
-        self.solenoidsScrollArea.setMinimumWidth(self.solenoidsContainer.width())
-        self.adjustSize()
 
     def EightSetButtonPressed(self, eightSet, isOn):
         for solenoidNumber in eightSet:

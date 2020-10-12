@@ -1,5 +1,5 @@
-from PySide2.QtGui import *
 from ChipController.ChipController import *
+from UI.STYLESHEET import *
 
 
 class ProceduresDialog(QDialog):
@@ -8,17 +8,8 @@ class ProceduresDialog(QDialog):
 
         self.setWindowTitle("Procedures Manager")
 
-        self.setStyleSheet("""
-        QPushButton {
-         border-radius: 5px;
-         border: 1px solid white;
-         background-color:rgba(60, 60, 100, 1);
-         text-align:center;
-        }
-        QToolButton {
-        border: none;
-        }
-        """)
+        self.setStyleSheet(stylesheet)
+
         self.chipController = chipController
 
         self.listBox = QListWidget()
@@ -78,12 +69,12 @@ class ProceduresDialog(QDialog):
         currentItem: QListWidgetItem = self.listBox.currentItem()
 
         if currentItem is not None:
-            return currentItem.data(Qt.ItemDataRole.UserRole)
+            return currentItem.data(typing.cast(int, Qt.ItemDataRole.UserRole))
         else:
             return None
 
     def OnRenameClicked(self):
-        (text, ok) = QInputDialog.getText(self, "Rename Procedure", "Procedure Name:")
+        (text, ok) = QInputDialog.getText(parent=self, title="Rename Procedure", label="Procedure Name:")
 
         if ok and text:
             current = self.GetSelectedProcedure()

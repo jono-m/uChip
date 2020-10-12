@@ -1,8 +1,6 @@
-from PySide2.QtWidgets import *
-from PySide2.QtCore import *
-from PySide2.QtGui import *
-from UI.WorldBrowser.BlockItem import *
 from LogicBlocks.CompoundLogicBlock import *
+from UI.WorldBrowser.BlockItem import *
+from UI.STYLESHEET import *
 
 
 class ImageItem(BlockItem):
@@ -16,7 +14,6 @@ class ImageItem(BlockItem):
 
         self.imageWidget = QLabel()
         self.container.layout().addWidget(self.imageWidget)
-        self.container.setStyleSheet(self.container.styleSheet() + "*[roundedFrame=true] {border-radius: 0px;}")
         self.setZValue(-20)
 
         self.image.OnScaleChanged.Register(self.RescaleImage, True)
@@ -68,16 +65,7 @@ class ImageSizeDialog(QDialog):
         layout = QVBoxLayout()
         self.setLayout(layout)
 
-        self.setStyleSheet("""
-        #listPanel * {
-            background-color: transparent;
-        }
-        QFrame#listPanel{
-            background-color: rgba(255,255, 255, 0.2);
-        }
-        #listPanel QDoubleSpinBox {
-            background-color: rgba(255, 255, 255, 0.2);
-        }""")
+        self.setStyleSheet(stylesheet)
 
         namePanel = QFrame()
         namePanel.setObjectName("listPanel")
@@ -105,10 +93,6 @@ class ImageSizeDialog(QDialog):
         layout.addWidget(ok, alignment=Qt.AlignBottom)
 
         self.setWindowTitle("Image Properties")
-
-        self.setMinimumWidth(200)
-
-        self.adjustSize()
         self.show()
 
         print(self.spin.objectName())

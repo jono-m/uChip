@@ -1,5 +1,5 @@
-from PySide2.QtWidgets import *
 from UI.WorldBrowser.SelectableItem import *
+from UI.STYLESHEET import *
 
 
 class BlockItem(QGraphicsProxyWidget, SelectableItem):
@@ -8,11 +8,7 @@ class BlockItem(QGraphicsProxyWidget, SelectableItem):
 
         blockWidget = QFrame()
         blockWidget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
-        blockWidget.setStyleSheet("""
-                * {
-                background-color: transparent;
-                }
-                """)
+        blockWidget.setStyleSheet(stylesheet)
 
         self.blockLayout = QVBoxLayout()
         self.blockLayout.setContentsMargins(0, 0, 0, 0)
@@ -26,30 +22,6 @@ class BlockItem(QGraphicsProxyWidget, SelectableItem):
 
         self.displayHovered = False
         self.displaySelected = False
-        self.container.setStyleSheet("""
-                *[state='HoverAndSelect'] {
-                    border: 4px solid rgba(52, 222, 235, 1);
-                    margin: 2px;
-                }
-                *[state='Select'] {
-                    border: 2px solid rgba(52, 222, 235, 1);
-                    margin: 4px;
-                }
-                *[state='Hover'] {
-                    border: 2px solid rgba(35, 159, 168, 1);
-                    margin: 4px;
-                }
-                *[state='None'] {
-                    border: 1px solid rgba(30, 30, 30, 1);
-                    margin: 5px;
-                }
-                *{
-                    color: white;
-                }
-                *[roundedFrame=true] {
-                    background-color: rgba(30, 30, 30, 1);
-                    border-radius: """ + str(8) + """
-                }""")
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -116,7 +88,7 @@ class BlockItem(QGraphicsProxyWidget, SelectableItem):
         self.ClearFocusAll(self.widget())
         super().mousePressEvent(event)
 
-    def mouseDoubleClickEvent(self, event:QGraphicsSceneMouseEvent):
+    def mouseDoubleClickEvent(self, event: QGraphicsSceneMouseEvent):
         self.OnDoubleClick()
         super().mousePressEvent(event)
 

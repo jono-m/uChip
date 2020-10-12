@@ -1,4 +1,3 @@
-from PySide2.QtCore import *
 from LogicBlocks.IOBlocks import *
 
 

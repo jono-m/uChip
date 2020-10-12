@@ -1,5 +1,6 @@
 from UI.Procedure.StepBlockItem import *
 from Procedures.BasicSteps import *
+from UI.WorldBrowser.PortHoles import *
 
 
 class BeginPortHole(PortHoleWidget):
@@ -42,14 +43,14 @@ class StepConnection(ConnectionItem):
     def __init__(self, s: QGraphicsScene, beginPortHole: BeginPortHole, completedPortHole: CompletedPortHole):
         super().__init__(s, beginPortHole, completedPortHole)
 
-        self.GetToPortHole().step.OnConnectionsChanged.Register(self.CheckExistence, True)
-        self.GetFromPortHole().step.OnConnectionsChanged.Register(self.CheckExistence, True)
+        self.GetToPortHole().beginPort.step.OnConnectionsChanged.Register(self.CheckExistence, True)
+        self.GetFromPortHole().completedPort.step.OnConnectionsChanged.Register(self.CheckExistence, True)
 
     def Destroy(self):
         self.SetPortHoleA(None)
         self.SetPortHoleB(None)
-        self.GetFromPortHole().step.OnConnectionsChanged.Unregister(self.CheckExistence)
-        self.GetToPortHole().step.OnConnectionsChanged.Unregister(self.CheckExistence)
+        self.GetFromPortHole().beginPort.step.OnConnectionsChanged.Unregister(self.CheckExistence)
+        self.GetToPortHole().completedPort.step.OnConnectionsChanged.Unregister(self.CheckExistence)
         del self
 
     def CheckExistence(self):

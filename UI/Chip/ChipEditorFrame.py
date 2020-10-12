@@ -1,6 +1,5 @@
 from UI.BaseEditorFrame import *
 from UI.Chip.ChipEditor import *
-from UI.Chip.ChipParametersList import *
 from UI.Chip.ChipValvesList import *
 
 

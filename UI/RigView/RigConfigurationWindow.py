@@ -3,6 +3,7 @@ from PySide2.QtWidgets import *
 from PySide2.QtCore import *
 from Rig.Rig import Rig
 from Rig.Device import Device
+from UI.STYLESHEET import *
 import typing
 
 
@@ -17,16 +18,7 @@ class RigConfigurationWindow(QDialog):
 
         self.listDisplay = QListWidget()
         self.listDisplay.itemSelectionChanged.connect(self.OnSelectionChanged)
-        self.listDisplay.setStyleSheet("""
-        QListWidget:item:!focus, QListWidget:item:focus {
-            color: rgba(200, 200, 200, 1);
-            border: none;
-        }
-        QListWidget::item:selected {
-            color: white;
-            border: 2px solid white;
-        }
-        """)
+        self.listDisplay.setStyleSheet(stylesheet)
 
         upButton = QPushButton("Move Up \u25B2")
         downButton = QPushButton("Move Down \u25BC")
@@ -59,11 +51,11 @@ class RigConfigurationWindow(QDialog):
         listLayout.addWidget(self.listDisplay)
         listLayout.addLayout(buttonsLayout)
 
-        l = QVBoxLayout()
+        layout = QVBoxLayout()
 
         mainLayout = QHBoxLayout()
 
-        l.addLayout(mainLayout)
+        layout.addLayout(mainLayout)
 
         mainLayout.addLayout(listLayout)
         mainLayout.addLayout(buttonsLayout)
@@ -73,9 +65,9 @@ class RigConfigurationWindow(QDialog):
 
         ok = QPushButton("OK")
         ok.clicked.connect(self.accept)
-        l.addWidget(ok, alignment=Qt.AlignBottom)
+        layout.addWidget(ok, alignment=Qt.AlignBottom)
 
-        self.setLayout(l)
+        self.setLayout(layout)
         self.setWindowTitle("Rig configuration")
 
         # Remember the selected serial number during ordering changes etc

@@ -3,12 +3,14 @@ import serial.tools.list_ports
 import typing
 from serial.tools.list_ports_common import ListPortInfo
 
+
 class DummyPort:
     def __init__(self, name):
-        self.serial_number=name
+        self.serial_number = name
+
 
 class Device:
-    def __init__(self, portInfo = None):
+    def __init__(self, portInfo=None):
         super().__init__()
 
         self.isDummy = False
