@@ -5,39 +5,23 @@ from ChipController.ChipController import *
 class ChipValvesList(QFrame):
     def __init__(self):
         super().__init__()
-
-        self.setObjectName("valvesList")
-
-        self.label = QLabel("Valve Mappings")
+        self.label = QLabel(text="Valve Mappings")
         self.label.setAlignment(Qt.AlignCenter)
 
         self.scrollArea = QScrollArea()
-        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-
         self.valvesContainer = QFrame()
-        self.valvesContainer.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
 
         layout = QVBoxLayout()
-        layout.setAlignment(Qt.AlignTop)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
         layout.addWidget(self.label)
-        layout.addWidget(self.scrollArea, stretch=1)
+        layout.addWidget(self.scrollArea)
         self.setLayout(layout)
 
         valvesLayout = QVBoxLayout()
-        valvesLayout.setContentsMargins(0, 0, 0, 0)
-        valvesLayout.setSpacing(10)
-        valvesLayout.setAlignment(Qt.AlignTop)
         self.valvesContainer.setLayout(valvesLayout)
 
-        self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setWidget(self.valvesContainer)
 
         self.chipController: typing.Optional[ChipController] = None
-
-        self.setMinimumWidth(300)
 
     def CloseChipController(self):
         if self.chipController is not None:
@@ -78,15 +62,10 @@ class ValveField(QFrame):
         self.valveBlock = valveBlock
 
         layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
         self.setLayout(layout)
 
         self.parameterSetting = ParameterWidget(valveBlock.solenoidNumberInput.dataType)
         self.parameterSetting.OnParameterChanged.Register(self.OnParameterChanged, True)
-        self.parameterSetting.nameLabel.setAlignment(Qt.AlignLeft)
-        self.parameterSetting.nameLabel.setVisible(True)
-        self.parameterSetting.layout().setSpacing(0)
         layout.addWidget(self.parameterSetting)
 
         self.valveBlock.OnConnectionsChanged.Register(self.Update, True)

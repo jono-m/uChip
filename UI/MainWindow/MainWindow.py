@@ -40,10 +40,6 @@ class MainWindow(QMainWindow):
 
         self.setMenuWidget(self.menuBarWidget)
 
-        r = QApplication.primaryScreen().geometry()
-        self.move(QPoint(r.center().x(), 0))
-        self.resize(QSize(int(r.width() / 2), r.height() - 300))
-
         self.setFocusPolicy(Qt.StrongFocus)
 
         self.workArea.RequestChipOpen()
@@ -52,9 +48,7 @@ class MainWindow(QMainWindow):
         self.threadPool.start(self.updateWorker)
 
         layout = QHBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
-        layout.addWidget(self.workArea, stretch=1)
+        layout.addWidget(self.workArea)
         container.setLayout(layout)
 
         self.procedureRunner.StopProcedure()

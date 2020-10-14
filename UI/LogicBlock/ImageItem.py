@@ -82,7 +82,7 @@ class ImageSizeDialog(QDialog):
         self.spin.setSingleStep(0.1)
         self.spin.setValue(image.GetScale())
         self.spin.valueChanged.connect(self.image.SetScale)
-        scaleLayout.addWidget(self.spin, stretch=1)
+        scaleLayout.addWidget(self.spin)
         scalePanel.setLayout(scaleLayout)
 
         layout.addWidget(namePanel)
@@ -90,7 +90,7 @@ class ImageSizeDialog(QDialog):
 
         ok = QPushButton("OK")
         ok.clicked.connect(self.accept)
-        layout.addWidget(ok, alignment=Qt.AlignBottom)
+        layout.addWidget(ok)
 
         self.setWindowTitle("Image Properties")
         self.show()

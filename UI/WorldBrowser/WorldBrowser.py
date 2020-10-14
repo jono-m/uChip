@@ -75,7 +75,7 @@ class WorldBrowser(QGraphicsView):
 
         self.UpdateView()
 
-    def GetCenterPoint(self):
+    def GetCenterPoint(self) -> QPointF:
         return self.mapToScene(self.rect().center())
 
     def drawBackground(self, painter: QPainter, rect: QRectF):

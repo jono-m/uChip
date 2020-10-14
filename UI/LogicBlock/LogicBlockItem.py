@@ -10,34 +10,25 @@ class LogicBlockItem(BlockItem):
         self.block = b
 
         self.titleBar = QLabel(self.block.GetName())
-        self.titleBar.setContentsMargins(10, 5, 10, 5)
 
         titleLayout = QHBoxLayout()
-        titleLayout.addWidget(self.titleBar, stretch=1)
+        titleLayout.addWidget(self.titleBar)
 
         self.minMaxButton = QPushButton("-")
         self.minMaxButton.setObjectName("minMaxButton")
-        self.minMaxButton.setFixedWidth(25)
-        self.minMaxButton.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
         self.minMaxButton.clicked.connect(lambda checked=False: self.SetMinMax(not self.block.minimized))
-        titleLayout.addWidget(self.minMaxButton, stretch=0)
+        titleLayout.addWidget(self.minMaxButton)
         self.container.layout().addLayout(titleLayout)
 
         portsLayout = QHBoxLayout()
-        portsLayout.setContentsMargins(0, 0, 0, 0)
-        portsLayout.setSpacing(0)
         self.container.layout().addLayout(portsLayout)
         self.inputPortsListWidget = QFrame()
-        self.inputPortsListWidget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
         self.inputsLayout = QVBoxLayout()
-        self.inputsLayout.setAlignment(Qt.AlignTop)
         self.inputPortsListWidget.setLayout(self.inputsLayout)
         portsLayout.addWidget(self.inputPortsListWidget)
 
         self.outputPortsListWidget = QFrame()
-        self.outputPortsListWidget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
         self.outputsLayout = QVBoxLayout()
-        self.outputsLayout.setAlignment(Qt.AlignTop)
         self.outputPortsListWidget.setLayout(self.outputsLayout)
         portsLayout.addWidget(self.outputPortsListWidget)
 
@@ -129,18 +120,16 @@ class InputPortWidget(QFrame):
         self.inputPort = inputPort
 
         layout = QHBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setAlignment(Qt.AlignLeft)
         self.setLayout(layout)
 
         isIOBlock = isinstance(self.graphicsParent.block, InputLogicBlock) or isinstance(self.graphicsParent.block,
                                                                                          OutputLogicBlock)
         if self.inputPort.isConnectable and not isIOBlock:
             self.portHole = InputPortHole(inputPort, graphicsParent)
-            layout.addWidget(self.portHole, stretch=0)
+            layout.addWidget(self.portHole)
 
             self.nameText = QLabel()
-            layout.addWidget(self.nameText, stretch=1)
+            layout.addWidget(self.nameText)
 
         self.parameterSetting = ParameterWidget(self.inputPort.dataType)
         self.parameterSetting.OnParameterChanged.Register(self.OnParameterChanged, True)
@@ -197,8 +186,6 @@ class OutputPortWidget(QFrame):
         self.outputPort = outputPort
 
         layout = QHBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setAlignment(Qt.AlignLeft)
         self.setLayout(layout)
 
         self.nameText = QLabel()
@@ -249,7 +236,6 @@ class ParameterWidget(QFrame):
         self.OnParameterChanged = Event()
 
         layout = QVBoxLayout()
-        layout.setContentsMargins(20, 0, 0, 0)
         self.setLayout(layout)
 
         self.nameLabel = QLabel()

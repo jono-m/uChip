@@ -34,8 +34,6 @@ class RigConfigurationWindow(QDialog):
         self.invertThree.stateChanged.connect(self.OnInversionChanged)
 
         settingsPanel = QFrame()
-        settingsPanel.setFrameShape(QFrame.Box)
-        settingsPanel.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         settingsLayout = QVBoxLayout()
         settingsLayout.addWidget(self.serialNumberDisplay)
         settingsLayout.addWidget(self.invertOne)
@@ -59,13 +57,11 @@ class RigConfigurationWindow(QDialog):
 
         mainLayout.addLayout(listLayout)
         mainLayout.addLayout(buttonsLayout)
-        mainLayout.setAlignment(buttonsLayout, Qt.AlignTop)
         mainLayout.addWidget(settingsPanel)
-        mainLayout.setAlignment(settingsPanel, Qt.AlignTop)
 
         ok = QPushButton("OK")
         ok.clicked.connect(self.accept)
-        layout.addWidget(ok, alignment=Qt.AlignBottom)
+        layout.addWidget(ok)
 
         self.setLayout(layout)
         self.setWindowTitle("Rig configuration")

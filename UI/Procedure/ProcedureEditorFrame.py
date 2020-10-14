@@ -8,15 +8,13 @@ class ProcedureEditorFrame(BaseEditorFrame):
         super().__init__()
 
         layout = QHBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
         self.setLayout(layout)
 
         self.currentProcedure: typing.Optional[Procedure] = None
 
         self.editor = ProcedureEditor()
 
-        layout.addWidget(self.editor, stretch=1)
+        layout.addWidget(self.editor)
 
     def GetFrameTitle(self):
         if self.currentProcedure is None:

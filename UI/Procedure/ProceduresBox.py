@@ -5,8 +5,6 @@ class ProceduresBox(QComboBox):
     def __init__(self):
         super().__init__()
         self.OnProcedureSelected = Event()
-        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Ignored)
-        self.setFixedWidth(200)
         self.setView(QListView())
 
         self.chipController: typing.Optional[ChipController] = None

@@ -7,17 +7,14 @@ class ChipEditorFrame(BaseEditorFrame):
     def __init__(self, rig: Rig):
         super().__init__()
 
-        self.hLayout = QHBoxLayout()
-        self.hLayout.setContentsMargins(0, 0, 0, 0)
-        self.hLayout.setSpacing(0)
-        self.setLayout(self.hLayout)
-
         self.chipController: typing.Optional[ChipController] = None
 
         self.editor = ChipEditor()
         self.nameFilters = "μChip Chip Controller (*.ucc)"
 
-        self.hLayout.addWidget(self.editor, stretch=1)
+        self.hLayout = QHBoxLayout()
+        self.setLayout(self.hLayout)
+        self.hLayout.addWidget(self.editor)
 
         self.rig = rig
 

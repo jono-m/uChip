@@ -10,30 +10,21 @@ class StepBlockItem(LogicBlockItem):
         procedureLayout = QVBoxLayout()
         self.beginPortsWidget = QFrame()
         self.beginPortsWidget.setLayout(QHBoxLayout())
-        self.beginPortsWidget.layout().setContentsMargins(0, 0, 0, 0)
-        self.beginPortsWidget.layout().setSpacing(0)
         self.beginPortsWidget.setProperty("roundedFrame", True)
         procedureLayout.addWidget(self.beginPortsWidget)
 
         self.completedPortsWidget = QFrame()
         self.completedPortsWidget.setLayout(QHBoxLayout())
-        self.completedPortsWidget.layout().setContentsMargins(0, 0, 0, 0)
-        self.completedPortsWidget.layout().setSpacing(0)
         self.completedPortsWidget.setProperty("roundedFrame", True)
         procedureLayout.addWidget(self.completedPortsWidget)
 
         super().__init__(s, step)
-
-        self.setMinimumWidth(100)
 
         temp = QWidget()
         temp.setLayout(self.container.layout())
 
         swapLayout = QHBoxLayout()
         swapLayout.addWidget(temp)
-
-        swapLayout.setSpacing(0)
-        swapLayout.setContentsMargins(0, 0, 0, 0)
 
         self.container.setLayout(swapLayout)
 

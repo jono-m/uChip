@@ -14,9 +14,6 @@ class MainToolbar(QFrame):
         self.setObjectName("MainToolbar")
 
         layout = QHBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setAlignment(Qt.AlignLeft)
-        layout.setSpacing(0)
         self.setLayout(layout)
 
         self.OnNewProcedure = Event()
@@ -145,10 +142,8 @@ class MainToolbar(QFrame):
 
         self.proceduresSection = MainToolbar.PrepareMenuSection("Procedures", 2, 1)
 
-        t = QFrame()
-        t.setLayout(QHBoxLayout())
-        t.layout().setContentsMargins(0, 0, 0, 0)
-        t.layout().setSpacing(0)
+        proceduresWidget = QFrame()
+        proceduresWidgetLayout = QHBoxLayout()
         self.proceduresBox = ProceduresBox()
         self.proceduresBox.OnProcedureSelected.Register(self.OnProcedureSelected.Invoke)
         self.playButton = self.AddButton("Assets/playIcon.png", "Run Procedure", color=QColor(0, 255, 0),
@@ -160,12 +155,13 @@ class MainToolbar(QFrame):
         self.addButton = self.AddButton("Assets/plusIcon.png", "New Procedure", color=color, showText=False,
                                         delegate=self.PromptNewProcedure)
 
-        t.layout().addWidget(self.playButton)
-        t.layout().addWidget(self.stopButton)
-        t.layout().addWidget(self.proceduresBox)
-        t.layout().addWidget(self.addButton)
+        proceduresWidgetLayout.addWidget(self.playButton)
+        proceduresWidgetLayout.addWidget(self.stopButton)
+        proceduresWidgetLayout.addWidget(self.proceduresBox)
+        proceduresWidgetLayout.addWidget(self.addButton)
+        proceduresWidget.setLayout(proceduresWidgetLayout)
 
-        self.proceduresSection.addWidget(t, 0, 0)
+        self.proceduresSection.addWidget(proceduresWidget, 0, 0)
 
         self.proceduresSection.addWidget(
             self.AddButton("Assets/listIcon.png", "Manage...", color=color, delegate=self.OnManageProcedures.Invoke), 1,
@@ -259,18 +255,10 @@ class MainToolbar(QFrame):
     @staticmethod
     def PrepareMenuSection(name, r, c):
         layout = QGridLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
         label = QLabel(name)
-        label.setAlignment(Qt.AlignCenter)
-        label.setObjectName("SectionTitle")
         layout.addWidget(label, r, 0, 1, c)
 
         stretch = QFrame()
-        stretch.setContentsMargins(0, 0, 0, 0)
-        stretch.setFixedWidth(1)
-        stretch.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
-        stretch.setObjectName("SectionSpacer")
         layout.addWidget(stretch, 0, c, r + 1, 1)
 
         return layout

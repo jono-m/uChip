@@ -7,25 +7,18 @@ class BlockItem(QGraphicsProxyWidget, SelectableItem):
         super().__init__(*args, **kwargs)
 
         blockWidget = QFrame()
-        blockWidget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         blockWidget.setStyleSheet(stylesheet)
 
         self.blockLayout = QVBoxLayout()
-        self.blockLayout.setContentsMargins(0, 0, 0, 0)
         blockWidget.setLayout(self.blockLayout)
 
         self.container = QFrame()
         self.blockLayout.addWidget(self.container)
 
-        self.container.setProperty('roundedFrame', True)
-        self.container.setProperty('state', 'none')
-
         self.displayHovered = False
         self.displaySelected = False
 
         layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
         self.container.setLayout(layout)
 
         self.setWidget(blockWidget)
@@ -81,7 +74,7 @@ class BlockItem(QGraphicsProxyWidget, SelectableItem):
                 self.container.setProperty('state', 'Hover')
             else:
                 self.container.setProperty('state', 'None')
-        if oldProperty != self.container.property('state'):
+        if oldProperty.isValid() and oldProperty != self.container.property('state'):
             self.setStyle(self.style())
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
