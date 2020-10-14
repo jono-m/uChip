@@ -10,8 +10,6 @@ class PortHoleWidget(QLabel):
         self.Color = QColor(245, 215, 66)
         self._IsHighlighted = False
         self.graphicsParent = graphicsParent
-        self.setProperty("PreventMove", True)
-        self.setAttribute(Qt.WA_Hover, True)
 
         self.connectionClass: typing.Type[ConnectionItem] = ConnectionItem
 

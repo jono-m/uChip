@@ -35,13 +35,7 @@ class MenuBar(QFrame):
         fileMenu.addAction(saveAction)
         fileMenu.addAction(saveAsAction)
 
-        self.setContentsMargins(0, 0, 0, 0)
-
         layout = QHBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(10)
-
-        layout.setAlignment(Qt.AlignLeft)
         self.setLayout(layout)
         layout.addWidget(self.menuBar, alignment=Qt.AlignCenter)
 

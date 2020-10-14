@@ -5,15 +5,13 @@ class CustomLogicBlockEditorFrame(BaseEditorFrame):
     def __init__(self, logicBlock: CompoundLogicBlock):
         super().__init__()
 
-        layout = QHBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(layout)
-
         self.logicBlock = logicBlock
 
         self.editor = LogicBlockEditor()
         self.nameFilters = "μChip Logic Block (*.ulb)"
 
+        layout = QHBoxLayout()
+        self.setLayout(layout)
         layout.addWidget(self.editor)
 
         self.logicBlock.OnModified.Register(self.FileModified, True)

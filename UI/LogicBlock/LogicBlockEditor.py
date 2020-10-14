@@ -7,15 +7,10 @@ class LogicBlockEditor(QFrame):
     def __init__(self):
         super().__init__()
         layout = QHBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-
         self.worldBrowser = WorldBrowser()
         layout.addWidget(self.worldBrowser)
 
         self.currentBlock: typing.Optional[CompoundLogicBlock] = None
-
-        self.viewMapping: typing.List[typing.Tuple[typing.Type[LogicBlock], typing.Type[LogicBlockItem]]] = [
-            (LogicBlock, LogicBlockItem)]
 
         self.setLayout(layout)
 
@@ -57,11 +52,8 @@ class LogicBlockEditor(QFrame):
         self.currentBlock.OnClosed.Register(self.Clear, True)
 
     def CreateBlockItem(self, newBlock: LogicBlock):
-        for blockType, viewType in self.viewMapping:
-            if isinstance(newBlock, blockType):
-                newBlock = viewType(self.worldBrowser.scene(), newBlock)
-                QApplication.processEvents()
-                return newBlock
+        if isinstance(newBlock, LogicBlock):
+            return LogicBlockItem(self.worldBrowser.scene(), newBlock)
 
     def CreateImageItem(self, image: Image):
         return ImageItem(self.worldBrowser.scene(), image)
@@ -97,13 +89,3 @@ class LogicBlockEditor(QFrame):
         if self.currentBlock is None:
             return
         self.currentBlock.ReloadFileSubBlocks()
-
-
-class BrowseForCustomDialog(QFileDialog):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.setWindowTitle("Open a logic block")
-        self.setFileMode(QFileDialog.ExistingFile)
-        self.setAcceptMode(QFileDialog.AcceptOpen)
-        self.setNameFilters(["μChip Logic Block (*.ulb)"])

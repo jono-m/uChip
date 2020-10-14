@@ -7,50 +7,31 @@ class ChipParametersList(QFrame):
         super().__init__()
 
         self.label = QLabel("Chip Parameters")
-        self.label.setAlignment(Qt.AlignCenter)
 
         self.scrollArea = QScrollArea()
-        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
 
         self.container = QFrame()
-        self.container.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
 
         self.parametersWidget = QFrame()
-        self.parametersWidget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
 
         self.valvesWidget = QFrame()
-        self.valvesWidget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
 
         layout = QVBoxLayout()
-        layout.setAlignment(Qt.AlignTop)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
         layout.addWidget(self.label)
-        layout.addWidget(self.scrollArea, stretch=1)
+        layout.addWidget(self.scrollArea)
         self.setLayout(layout)
 
         containerLayout = QVBoxLayout()
-        containerLayout.setAlignment(Qt.AlignTop)
-        containerLayout.setContentsMargins(0, 0, 0, 0)
-        containerLayout.setSpacing(0)
         self.container.setLayout(containerLayout)
 
         parametersLayout = QVBoxLayout()
-        parametersLayout.setContentsMargins(0, 0, 0, 0)
-        parametersLayout.setSpacing(10)
-        parametersLayout.setAlignment(Qt.AlignTop)
         self.parametersWidget.setLayout(parametersLayout)
         containerLayout.addWidget(self.parametersWidget)
 
         valvesLayout = QVBoxLayout()
-        valvesLayout.setContentsMargins(0, 0, 0, 0)
-        valvesLayout.setSpacing(10)
-        valvesLayout.setAlignment(Qt.AlignTop)
         self.valvesWidget.setLayout(valvesLayout)
         containerLayout.addWidget(self.valvesWidget)
 
-        self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setWidget(self.container)
 
         self.chipController: typing.Optional[ChipController] = None
@@ -86,7 +67,6 @@ class ChipParametersList(QFrame):
             if inputPort not in inputPorts:
                 newField = ChipParameterField(inputPort)
                 self.parametersWidget.layout().addWidget(newField)
-                newField.setVisible(True)
 
         valves = [valvesField.valveBlock for valvesField in self.valvesWidget.children() if
                   isinstance(valvesField, UnboundValveField)]
@@ -96,10 +76,6 @@ class ChipParametersList(QFrame):
                 if valveBlock.openInput.connectedOutput is None:
                     newValveBlock = UnboundValveField(valveBlock)
                     self.valvesWidget.layout().addWidget(newValveBlock)
-                    newValveBlock.setVisible(True)
-
-        maxWidth = max(self.valvesWidget.sizeHint().width(), self.parametersWidget.sizeHint().width())
-        self.scrollArea.setMinimumWidth(maxWidth + self.scrollArea.horizontalScrollBar().sizeHint().width())
 
 
 class ChipParameterField(QFrame):
@@ -108,15 +84,10 @@ class ChipParameterField(QFrame):
         self.inputPort = inputPort
 
         layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
         self.setLayout(layout)
 
         self.parameterSetting = ParameterWidget(inputPort.dataType)
         self.parameterSetting.OnParameterChanged.Register(self.OnParameterChanged, True)
-        self.parameterSetting.nameLabel.setAlignment(Qt.AlignLeft)
-        self.parameterSetting.nameLabel.setVisible(True)
-        self.parameterSetting.layout().setSpacing(0)
         layout.addWidget(self.parameterSetting)
 
         self.inputPort.block.OnConnectionsChanged.Register(self.Update, True)
@@ -150,15 +121,10 @@ class UnboundValveField(QFrame):
         self.valveBlock = valveBlock
 
         layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
         self.setLayout(layout)
 
         self.parameterSetting = ParameterWidget(valveBlock.openInput.dataType)
         self.parameterSetting.OnParameterChanged.Register(self.OnParameterChanged, True)
-        self.parameterSetting.nameLabel.setAlignment(Qt.AlignLeft)
-        self.parameterSetting.nameLabel.setVisible(True)
-        self.parameterSetting.layout().setSpacing(0)
         layout.addWidget(self.parameterSetting)
 
         self.valveBlock.OnConnectionsChanged.Register(self.Update, True)

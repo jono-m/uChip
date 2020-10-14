@@ -56,19 +56,16 @@ class MainWorkArea(QFrame):
         self.tabArea.tabCloseRequested.connect(self.OnTabCloseRequest)
 
         layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
         sidebarLayout = QVBoxLayout()
-        sidebarLayout.setContentsMargins(0, 0, 0, 0)
         sidebarLayout.addWidget(self.chipParametersList)
         sidebarLayout.addWidget(self.valvesList)
         layout.addWidget(self.toolBar)
 
         innerLayout = QHBoxLayout()
         innerLayout.addLayout(sidebarLayout)
-        innerLayout.addWidget(self.tabArea, stretch=1)
+        innerLayout.addWidget(self.tabArea)
 
-        layout.addLayout(innerLayout, stretch=1)
+        layout.addLayout(innerLayout)
         self.setLayout(layout)
 
         self.currentEditorFrame: typing.Optional[BaseEditorFrame] = None
