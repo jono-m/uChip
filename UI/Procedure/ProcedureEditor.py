@@ -8,7 +8,6 @@ class ProcedureEditor(LogicBlockEditor):
     def __init__(self):
         super().__init__()
 
-        self.viewMapping.insert(0, (Step, StepBlockItem))
         self.procedure: typing.Optional[Procedure] = None
 
         self.worldBrowser.tempConnectionLine.GetPath = lambda a, b: self.GetPath(a, b)
@@ -18,6 +17,11 @@ class ProcedureEditor(LogicBlockEditor):
     def Clear(self):
         self.procedure = None
         super().Clear()
+
+    def CreateBlockItem(self, newBlock: LogicBlock):
+        if isinstance(newBlock, Step):
+            return StepBlockItem(self.worldBrowser.scene(), newBlock)
+        return super().CreateBlockItem(newBlock)
 
     def LoadProcedure(self, procedure: Procedure):
         super().LoadBlock(procedure)
@@ -61,10 +65,3 @@ class ProcedureEditor(LogicBlockEditor):
 
         if foundBeginWidget is not None and foundCompletedWidget is not None:
             return StepConnection(self.worldBrowser.scene(), foundBeginWidget.portHole, foundCompletedWidget.portHole)
-
-
-class AddStepAction(QAction):
-    def __init__(self, stepType: typing.Type[Step], *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.stepType = stepType
-        self.setText(stepType.GetName())

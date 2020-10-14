@@ -74,7 +74,7 @@ class BlockItem(QGraphicsProxyWidget, SelectableItem):
                 self.container.setProperty('state', 'Hover')
             else:
                 self.container.setProperty('state', 'None')
-        if oldProperty.isValid() and oldProperty != self.container.property('state'):
+        if oldProperty is None or oldProperty != self.container.property('state'):
             self.setStyle(self.style())
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
