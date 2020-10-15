@@ -10,6 +10,8 @@ class RigViewWidget(QDialog):
         self.setWindowTitle("Rig Solenoids")
 
         self.mainLayout = QVBoxLayout()
+        self.mainLayout.setContentsMargins(0, 0, 0, 0)
+        self.mainLayout.setSpacing(0)
         self.setLayout(self.mainLayout)
 
         self.solenoidButtons: typing.List[SolenoidButton] = []
@@ -30,6 +32,8 @@ class RigViewWidget(QDialog):
         self.solenoidsScrollArea.setWidget(self.solenoidsContainer)
 
         self.layout = QGridLayout()
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setSpacing(0)
 
         self.solenoidsContainer.setLayout(self.layout)
 

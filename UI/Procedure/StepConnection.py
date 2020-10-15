@@ -1,4 +1,3 @@
-from UI.Procedure.StepBlockItem import *
 from Procedures.BasicSteps import *
 from UI.WorldBrowser.PortHoles import *
 

@@ -17,18 +17,26 @@ class ChipParametersList(QFrame):
         self.valvesWidget = QFrame()
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         layout.addWidget(self.label)
         layout.addWidget(self.scrollArea)
         self.setLayout(layout)
 
         containerLayout = QVBoxLayout()
+        containerLayout.setContentsMargins(0, 0, 0, 0)
+        containerLayout.setSpacing(0)
         self.container.setLayout(containerLayout)
 
         parametersLayout = QVBoxLayout()
+        parametersLayout.setContentsMargins(0, 0, 0, 0)
+        parametersLayout.setSpacing(0)
         self.parametersWidget.setLayout(parametersLayout)
         containerLayout.addWidget(self.parametersWidget)
 
         valvesLayout = QVBoxLayout()
+        valvesLayout.setContentsMargins(0, 0, 0, 0)
+        valvesLayout.setSpacing(0)
         self.valvesWidget.setLayout(valvesLayout)
         containerLayout.addWidget(self.valvesWidget)
 
@@ -84,6 +92,8 @@ class ChipParameterField(QFrame):
         self.inputPort = inputPort
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         self.setLayout(layout)
 
         self.parameterSetting = ParameterWidget(inputPort.dataType)
@@ -121,6 +131,8 @@ class UnboundValveField(QFrame):
         self.valveBlock = valveBlock
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         self.setLayout(layout)
 
         self.parameterSetting = ParameterWidget(valveBlock.openInput.dataType)

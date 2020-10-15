@@ -11,7 +11,7 @@ class Procedure(CompoundLogicBlock):
 
     def __init__(self):
         super().__init__()
-        self._name = "New Procedure"
+        self._name = "Procedure 1"
         self._currentActiveSteps: typing.List[Step] = []
         self._firstStep = StartStep()
         self.AddSubBlock(self._firstStep)

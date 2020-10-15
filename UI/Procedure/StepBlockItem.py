@@ -8,6 +8,8 @@ class StepBlockItem(LogicBlockItem):
         self.step = step
 
         procedureLayout = QVBoxLayout()
+        procedureLayout.setContentsMargins(0, 0, 0, 0)
+        procedureLayout.setSpacing(0)
         self.beginPortsWidget = QFrame()
         self.beginPortsWidget.setLayout(QHBoxLayout())
         self.beginPortsWidget.setProperty("roundedFrame", True)
@@ -24,6 +26,8 @@ class StepBlockItem(LogicBlockItem):
         temp.setLayout(self.container.layout())
 
         swapLayout = QHBoxLayout()
+        swapLayout.setContentsMargins(0, 0, 0, 0)
+        swapLayout.setSpacing(0)
         swapLayout.addWidget(temp)
 
         self.container.setLayout(swapLayout)
@@ -100,9 +104,11 @@ class BeginPortWidget(QFrame):
         self.nameLabel = QLabel()
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         self.setLayout(layout)
-        layout.addWidget(self.portHole, alignment=Qt.AlignCenter)
-        layout.addWidget(self.nameLabel, alignment=Qt.AlignCenter)
+        layout.addWidget(self.portHole)
+        layout.addWidget(self.nameLabel)
 
         self.beginPort.step.OnConnectionsChanged.Register(self.Update, True)
         self.beginPort.step.OnPortsChanged.Register(self.Update, True)
@@ -135,9 +141,11 @@ class CompletedPortWidget(QFrame):
         self.nameLabel = QLabel()
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         self.setLayout(layout)
-        layout.addWidget(self.portHole, alignment=Qt.AlignCenter)
-        layout.addWidget(self.nameLabel, alignment=Qt.AlignCenter)
+        layout.addWidget(self.portHole)
+        layout.addWidget(self.nameLabel)
 
         self.completedPort.step.OnConnectionsChanged.Register(self.Update, True)
         self.completedPort.step.OnPortsChanged.Register(self.Update, True)

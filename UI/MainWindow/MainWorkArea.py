@@ -56,12 +56,18 @@ class MainWorkArea(QFrame):
         self.tabArea.tabCloseRequested.connect(self.OnTabCloseRequest)
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         sidebarLayout = QVBoxLayout()
+        sidebarLayout.setContentsMargins(0, 0, 0, 0)
+        sidebarLayout.setSpacing(0)
         sidebarLayout.addWidget(self.chipParametersList)
         sidebarLayout.addWidget(self.valvesList)
         layout.addWidget(self.toolBar)
 
         innerLayout = QHBoxLayout()
+        innerLayout.setContentsMargins(0, 0, 0, 0)
+        innerLayout.setSpacing(0)
         innerLayout.addLayout(sidebarLayout)
         innerLayout.addWidget(self.tabArea)
 
@@ -106,7 +112,7 @@ class MainWorkArea(QFrame):
         self.currentEditorFrame.AddImage(image)
 
     def AddProcedure(self, p: Procedure):
-        self.procedureFrame.chipController.AddProcedure(p)
+        self.chipFrame.chipController.AddProcedure(p)
         self.SelectProcedure(p)
 
     def SelectProcedure(self, p: Procedure):
@@ -202,7 +208,7 @@ class MainWorkArea(QFrame):
                     self.editorFrame.OpenLogicBlock(filename[0])
 
     def ShowProceduresDialog(self):
-        d = ProceduresDialog(self.editorFrame.chipFrame.chipController, parent=self)
+        d = ProceduresDialog(self.chipFrame.chipController, parent=self)
         d.finished.connect(self.OnProcedureDialogFinished)
         d.exec_()
 

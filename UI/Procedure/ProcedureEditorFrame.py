@@ -8,6 +8,8 @@ class ProcedureEditorFrame(BaseEditorFrame):
         super().__init__()
 
         layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         self.setLayout(layout)
 
         self.currentProcedure: typing.Optional[Procedure] = None
@@ -33,6 +35,7 @@ class ProcedureEditorFrame(BaseEditorFrame):
 
     def CloseProcedure(self):
         if self.currentProcedure is not None:
+            self.currentProcedure.OnClosed()
             self.currentProcedure.OnClosed.Unregister(self.CloseProcedure)
         self.currentProcedure = None
         self.editor.Clear()
@@ -40,6 +43,6 @@ class ProcedureEditorFrame(BaseEditorFrame):
     def OpenProcedure(self, procedure: Procedure):
         self.CloseProcedure()
         self.currentProcedure = procedure
-        self.currentProcedure.OnDestroyed.Register(self.CloseProcedure, True)
+        self.currentProcedure.OnClosed.Register(self.CloseProcedure, True)
         self.editor.LoadProcedure(self.currentProcedure)
         self.OnTitleUpdated.Invoke()

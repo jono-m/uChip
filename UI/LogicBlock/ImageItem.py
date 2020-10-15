@@ -1,6 +1,6 @@
 from LogicBlocks.CompoundLogicBlock import *
 from UI.WorldBrowser.BlockItem import *
-from UI.STYLESHEET import *
+from UI.StylesheetLoader import *
 
 
 class ImageItem(BlockItem):
@@ -63,13 +63,17 @@ class ImageSizeDialog(QDialog):
         self.image = image
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         self.setLayout(layout)
 
-        self.setStyleSheet(stylesheet)
+        StylesheetLoader.GetInstance().RegisterWidget(self)
 
         namePanel = QFrame()
         namePanel.setObjectName("listPanel")
         nameLayout = QHBoxLayout()
+        nameLayout.setContentsMargins(0, 0, 0, 0)
+        nameLayout.setSpacing(0)
         nameLayout.addWidget(QLabel("File: "))
         nameLayout.addWidget(QLabel(image.filename))
         namePanel.setLayout(nameLayout)
@@ -77,6 +81,8 @@ class ImageSizeDialog(QDialog):
         scalePanel = QFrame()
         scalePanel.setObjectName("listPanel")
         scaleLayout = QHBoxLayout()
+        scaleLayout.setContentsMargins(0, 0, 0, 0)
+        scaleLayout.setSpacing(0)
         scaleLayout.addWidget(QLabel("Scale: "))
         self.spin = QDoubleSpinBox()
         self.spin.setSingleStep(0.1)

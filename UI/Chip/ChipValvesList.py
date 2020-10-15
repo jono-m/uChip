@@ -6,17 +6,20 @@ class ChipValvesList(QFrame):
     def __init__(self):
         super().__init__()
         self.label = QLabel(text="Valve Mappings")
-        self.label.setAlignment(Qt.AlignCenter)
 
         self.scrollArea = QScrollArea()
         self.valvesContainer = QFrame()
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         layout.addWidget(self.label)
         layout.addWidget(self.scrollArea)
         self.setLayout(layout)
 
         valvesLayout = QVBoxLayout()
+        valvesLayout.setContentsMargins(0, 0, 0, 0)
+        valvesLayout.setSpacing(0)
         self.valvesContainer.setLayout(valvesLayout)
 
         self.scrollArea.setWidget(self.valvesContainer)
@@ -62,6 +65,8 @@ class ValveField(QFrame):
         self.valveBlock = valveBlock
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         self.setLayout(layout)
 
         self.parameterSetting = ParameterWidget(valveBlock.solenoidNumberInput.dataType)
