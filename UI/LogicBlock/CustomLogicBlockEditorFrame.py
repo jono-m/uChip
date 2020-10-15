@@ -11,6 +11,8 @@ class CustomLogicBlockEditorFrame(BaseEditorFrame):
         self.nameFilters = "μChip Logic Block (*.ulb)"
 
         layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         self.setLayout(layout)
         layout.addWidget(self.editor)
 

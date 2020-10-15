@@ -1,9 +1,7 @@
 from PySide2.QtGui import *
-from PySide2.QtWidgets import *
-from PySide2.QtCore import *
 from Rig.Rig import Rig
 from Rig.Device import Device
-from UI.STYLESHEET import *
+from UI.StylesheetLoader import *
 import typing
 
 
@@ -18,7 +16,7 @@ class RigConfigurationWindow(QDialog):
 
         self.listDisplay = QListWidget()
         self.listDisplay.itemSelectionChanged.connect(self.OnSelectionChanged)
-        self.listDisplay.setStyleSheet(stylesheet)
+        StylesheetLoader.GetInstance().RegisterWidget(self)
 
         upButton = QPushButton("Move Up \u25B2")
         downButton = QPushButton("Move Down \u25BC")
@@ -35,6 +33,8 @@ class RigConfigurationWindow(QDialog):
 
         settingsPanel = QFrame()
         settingsLayout = QVBoxLayout()
+        settingsLayout.setContentsMargins(0, 0, 0, 0)
+        settingsLayout.setSpacing(0)
         settingsLayout.addWidget(self.serialNumberDisplay)
         settingsLayout.addWidget(self.invertOne)
         settingsLayout.addWidget(self.invertTwo)
@@ -42,16 +42,24 @@ class RigConfigurationWindow(QDialog):
         settingsPanel.setLayout(settingsLayout)
 
         buttonsLayout = QHBoxLayout()
+        buttonsLayout.setContentsMargins(0, 0, 0, 0)
+        buttonsLayout.setSpacing(0)
         buttonsLayout.addWidget(upButton)
         buttonsLayout.addWidget(downButton)
 
         listLayout = QVBoxLayout()
+        listLayout.setContentsMargins(0, 0, 0, 0)
+        listLayout.setSpacing(0)
         listLayout.addWidget(self.listDisplay)
         listLayout.addLayout(buttonsLayout)
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
 
         mainLayout = QHBoxLayout()
+        mainLayout.setContentsMargins(0, 0, 0, 0)
+        mainLayout.setSpacing(0)
 
         layout.addLayout(mainLayout)
 

@@ -35,7 +35,7 @@ class ProcedureEditor(LogicBlockEditor):
                 # To each input
                 for beginPort in completedPort.connectedBegin:
                     self.CreateConnectionItem((completedPort, beginPort))
-    
+
     def CreateConnectionItem(self, ports: typing.Tuple[Port, Port]):
         if not (isinstance(ports[0], CompletedPort) and isinstance(ports[1], BeginPort)):
             super().CreateConnectionItem(ports)

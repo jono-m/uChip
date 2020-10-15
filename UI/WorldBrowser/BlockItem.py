@@ -1,5 +1,5 @@
 from UI.WorldBrowser.SelectableItem import *
-from UI.STYLESHEET import *
+from UI.StylesheetLoader import *
 
 
 class BlockItem(QGraphicsProxyWidget, SelectableItem):
@@ -7,9 +7,11 @@ class BlockItem(QGraphicsProxyWidget, SelectableItem):
         super().__init__(*args, **kwargs)
 
         blockWidget = QFrame()
-        blockWidget.setStyleSheet(stylesheet)
+        StylesheetLoader.GetInstance().RegisterWidget(blockWidget)
 
         self.blockLayout = QVBoxLayout()
+        self.blockLayout.setContentsMargins(0, 0, 0, 0)
+        self.blockLayout.setSpacing(0)
         blockWidget.setLayout(self.blockLayout)
 
         self.container = QFrame()
@@ -19,6 +21,8 @@ class BlockItem(QGraphicsProxyWidget, SelectableItem):
         self.displaySelected = False
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         self.container.setLayout(layout)
 
         self.setWidget(blockWidget)

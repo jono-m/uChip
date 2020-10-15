@@ -13,6 +13,8 @@ class ChipEditorFrame(BaseEditorFrame):
         self.nameFilters = "μChip Chip Controller (*.ucc)"
 
         self.hLayout = QHBoxLayout()
+        self.hLayout.setContentsMargins(0, 0, 0, 0)
+        self.hLayout.setSpacing(0)
         self.setLayout(self.hLayout)
         self.hLayout.addWidget(self.editor)
 

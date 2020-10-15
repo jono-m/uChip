@@ -14,6 +14,8 @@ class MainToolbar(QFrame):
         self.setObjectName("MainToolbar")
 
         layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         self.setLayout(layout)
 
         self.OnNewProcedure = Event()
@@ -142,8 +144,9 @@ class MainToolbar(QFrame):
 
         self.proceduresSection = MainToolbar.PrepareMenuSection("Procedures", 2, 1)
 
-        proceduresWidget = QFrame()
         proceduresWidgetLayout = QHBoxLayout()
+        proceduresWidgetLayout.setContentsMargins(0, 0, 0, 0)
+        proceduresWidgetLayout.setSpacing(0)
         self.proceduresBox = ProceduresBox()
         self.proceduresBox.OnProcedureSelected.Register(self.OnProcedureSelected.Invoke)
         self.playButton = self.AddButton("Assets/playIcon.png", "Run Procedure", color=QColor(0, 255, 0),
@@ -159,9 +162,8 @@ class MainToolbar(QFrame):
         proceduresWidgetLayout.addWidget(self.stopButton)
         proceduresWidgetLayout.addWidget(self.proceduresBox)
         proceduresWidgetLayout.addWidget(self.addButton)
-        proceduresWidget.setLayout(proceduresWidgetLayout)
 
-        self.proceduresSection.addWidget(proceduresWidget, 0, 0)
+        self.proceduresSection.addLayout(proceduresWidgetLayout, 0, 0)
 
         self.proceduresSection.addWidget(
             self.AddButton("Assets/listIcon.png", "Manage...", color=color, delegate=self.OnManageProcedures.Invoke), 1,
@@ -173,6 +175,7 @@ class MainToolbar(QFrame):
         self.solenoidsSection = MainToolbar.PrepareMenuSection("Rig", 1, 1)
         self.solenoidsSection.addWidget(self.rigButton, 0, 0)
 
+        layout.setAlignment(Qt.AlignLeft)
         layout.addLayout(self.fileMenuSection)
         layout.addLayout(self.logicBlocksSection)
         layout.addLayout(self.chipSection)
@@ -255,11 +258,13 @@ class MainToolbar(QFrame):
     @staticmethod
     def PrepareMenuSection(name, r, c):
         layout = QGridLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         label = QLabel(name)
-        layout.addWidget(label, r, 0, 1, c)
+        layout.addWidget(label, r, 0, 1, c+1)
 
         stretch = QFrame()
-        layout.addWidget(stretch, 0, c, r + 1, 1)
+        layout.addWidget(stretch, 0, c, r, 1)
 
         return layout
 
@@ -300,7 +305,7 @@ class MainToolbar(QFrame):
         self.proceduresBox.SetChipController(chipController)
 
     def PromptNewProcedure(self):
-        (text, ok) = QInputDialog.getText(parent=self, title="New Procedure", label="Procedure Name:")
+        (text, ok) = QInputDialog.getText(self, "New Procedure", "Procedure Name:")
 
         if ok and text:
             newProcedure = Procedure()

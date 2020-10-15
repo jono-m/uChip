@@ -36,8 +36,10 @@ class MenuBar(QFrame):
         fileMenu.addAction(saveAsAction)
 
         layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         self.setLayout(layout)
-        layout.addWidget(self.menuBar, alignment=Qt.AlignCenter)
+        layout.addWidget(self.menuBar)
 
     def UpdateForProcedureStatus(self, isRunning):
         self.setEnabled(not isRunning)

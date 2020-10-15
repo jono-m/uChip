@@ -12,6 +12,8 @@ class LogicBlockItem(BlockItem):
         self.titleBar = QLabel(self.block.GetName())
 
         titleLayout = QHBoxLayout()
+        titleLayout.setContentsMargins(0, 0, 0, 0)
+        titleLayout.setSpacing(0)
         titleLayout.addWidget(self.titleBar)
 
         self.minMaxButton = QPushButton("-")
@@ -21,14 +23,20 @@ class LogicBlockItem(BlockItem):
         self.container.layout().addLayout(titleLayout)
 
         portsLayout = QHBoxLayout()
+        portsLayout.setContentsMargins(0, 0, 0, 0)
+        portsLayout.setSpacing(0)
         self.container.layout().addLayout(portsLayout)
         self.inputPortsListWidget = QFrame()
         self.inputsLayout = QVBoxLayout()
+        self.inputsLayout.setContentsMargins(0, 0, 0, 0)
+        self.inputsLayout.setSpacing(0)
         self.inputPortsListWidget.setLayout(self.inputsLayout)
         portsLayout.addWidget(self.inputPortsListWidget)
 
         self.outputPortsListWidget = QFrame()
         self.outputsLayout = QVBoxLayout()
+        self.outputsLayout.setContentsMargins(0, 0, 0, 0)
+        self.outputsLayout.setSpacing(0)
         self.outputPortsListWidget.setLayout(self.outputsLayout)
         portsLayout.addWidget(self.outputPortsListWidget)
 
@@ -120,6 +128,8 @@ class InputPortWidget(QFrame):
         self.inputPort = inputPort
 
         layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         self.setLayout(layout)
 
         isIOBlock = isinstance(self.graphicsParent.block, InputLogicBlock) or isinstance(self.graphicsParent.block,
@@ -186,6 +196,8 @@ class OutputPortWidget(QFrame):
         self.outputPort = outputPort
 
         layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         self.setLayout(layout)
 
         self.nameText = QLabel()
@@ -236,6 +248,8 @@ class ParameterWidget(QFrame):
         self.OnParameterChanged = Event()
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         self.setLayout(layout)
 
         self.nameLabel = QLabel()

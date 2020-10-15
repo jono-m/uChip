@@ -7,6 +7,8 @@ class LogicBlockEditor(QFrame):
     def __init__(self):
         super().__init__()
         layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         self.worldBrowser = WorldBrowser()
         layout.addWidget(self.worldBrowser)
 
@@ -68,7 +70,8 @@ class LogicBlockEditor(QFrame):
 
         for blockItem in blockItems:
             if foundOutputWidget is None and blockItem.block == t[0].block:
-                outputWidgets = [x for x in blockItem.outputPortsListWidget.children() if isinstance(x, OutputPortWidget)]
+                outputWidgets = [x for x in blockItem.outputPortsListWidget.children() if
+                                 isinstance(x, OutputPortWidget)]
                 for outputWidget in outputWidgets:
                     if outputWidget.outputPort == t[0]:
                         foundOutputWidget = outputWidget

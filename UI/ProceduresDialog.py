@@ -1,5 +1,5 @@
 from ChipController.ChipController import *
-from UI.STYLESHEET import *
+from UI.StylesheetLoader import *
 
 
 class ProceduresDialog(QDialog):
@@ -8,7 +8,7 @@ class ProceduresDialog(QDialog):
 
         self.setWindowTitle("Procedures Manager")
 
-        self.setStyleSheet(stylesheet)
+        StylesheetLoader.GetInstance().RegisterWidget(self)
 
         self.chipController = chipController
 
@@ -29,18 +29,23 @@ class ProceduresDialog(QDialog):
         self.setMinimumWidth(500)
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         layout2 = QHBoxLayout()
+        layout2.setContentsMargins(0, 0, 0, 0)
+        layout2.setSpacing(0)
 
         layout.addLayout(layout2)
 
         layout2.addWidget(self.listBox)
         layout3 = QVBoxLayout()
+        layout3.setContentsMargins(0, 0, 0, 0)
+        layout3.setSpacing(0)
         layout2.addLayout(layout3)
-        layout3.setAlignment(Qt.AlignTop)
         layout3.addWidget(self.renameButton)
         layout3.addWidget(self.deleteProcedureButton)
 
-        layout.addWidget(self.okButton, Qt.AlignRight)
+        layout.addWidget(self.okButton)
         self.okButton.setFixedWidth(150)
 
         self.setLayout(layout)
@@ -74,7 +79,7 @@ class ProceduresDialog(QDialog):
             return None
 
     def OnRenameClicked(self):
-        (text, ok) = QInputDialog.getText(parent=self, title="Rename Procedure", label="Procedure Name:")
+        (text, ok) = QInputDialog.getText(self, "Rename Procedure", "Procedure Name:")
 
         if ok and text:
             current = self.GetSelectedProcedure()
