@@ -35,7 +35,7 @@ class WorldBrowser(QGraphicsView):
         self._state = State.IDLE
 
         self._boxSelectionRectAnchor = QPointF()
-        self._currentCursorPosition = None
+        self._currentCursorPosition = QPoint()
 
         self.tempConnectionLine = ConnectionItem(self.scene(), None, None)
         self.tempConnectionLine.setVisible(False)
@@ -116,7 +116,7 @@ class WorldBrowser(QGraphicsView):
         self._selectedItems.remove(item)
 
     def UpdateHoveredItems(self):
-        if self._actionsEnabled and self._state != State.MOVING and self._state != State.CONNECTING:
+        if self._actionsEnabled and self._state != State.MOVING:
             items = self.GetHoveredSelectableItems()
         else:
             items = []

@@ -2,18 +2,16 @@ from UI.WorldBrowser.SelectableItem import *
 from UI.StylesheetLoader import *
 
 
-class BlockItem(QGraphicsProxyWidget, SelectableItem):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+class BlockItem(QFrame, SelectableItem):
+    def __init__(self):
+        super().__init__()
 
-        blockWidget = QFrame()
-        blockWidget.setObjectName("BlockItem")
-        StylesheetLoader.GetInstance().RegisterWidget(blockWidget)
+        StylesheetLoader.GetInstance().RegisterWidget(self)
 
         self.blockLayout = QVBoxLayout()
         self.blockLayout.setContentsMargins(0, 0, 0, 0)
         self.blockLayout.setSpacing(0)
-        blockWidget.setLayout(self.blockLayout)
+        self.setLayout(self.blockLayout)
 
         self.container = QFrame()
         self.blockLayout.addWidget(self.container)
@@ -26,36 +24,19 @@ class BlockItem(QGraphicsProxyWidget, SelectableItem):
         layout.setSpacing(0)
         self.container.setLayout(layout)
 
-        self.setWidget(blockWidget)
+        self.OnPosChange = Event()
+        self.OnStyleUpdate = Event()
+
+        self._scenePos = QPointF()
+
         self.UpdateStyle()
 
-    def IsContainerSelected(self, scenePos):
-        childAt = self.widget().childAt(self.mapFromScene(scenePos).toPoint())
-        if childAt is None:
-            return True
-        else:
-            if childAt.property("PreventMove") is not None:
-                return False
-            else:
-                if isinstance(childAt, QLabel) or isinstance(childAt, QFrame):
-                    return True
-                else:
-                    return False
+    def scenePos(self):
+        return self._scenePos
 
-    @staticmethod
-    def IsChildFocused(widget: QWidget):
-        for child in widget.children():
-            if isinstance(child, QWidget):
-                if child.hasFocus() or BlockItem.IsChildFocused(child):
-                    return True
-        return False
-
-    @staticmethod
-    def ClearFocusAll(widget):
-        widget.clearFocus()
-        for child in widget.children():
-            if isinstance(child, QWidget):
-                BlockItem.ClearFocusAll(child)
+    def setPos(self, point: QPointF):
+        self._scenePos = point
+        self.OnPosChange.Invoke(self._scenePos)
 
     def SetIsHovered(self, hoverOn):
         if self.displayHovered != hoverOn:
@@ -80,10 +61,44 @@ class BlockItem(QGraphicsProxyWidget, SelectableItem):
             else:
                 self.container.setProperty('state', 'None')
         if oldProperty is None or oldProperty != self.container.property('state'):
-            self.setStyle(self.style())
+            self.OnStyleUpdate.Invoke()
+
+
+class BlockItemGraphicsWidget(QGraphicsProxyWidget, SelectableItem):
+    def __init__(self, scene: QGraphicsScene, blockWidget: BlockItem, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.blockWidget = blockWidget
+        self.blockWidget.OnPosChange.Register(lambda point: self.setPos(point))
+        self.blockWidget.OnStyleUpdate.Register(lambda: self.setStyle(self.style()))
+        self.setWidget(self.blockWidget)
+        scene.addItem(self)
+        self.setPos(self.blockWidget.scenePos())
+
+    def IsContainerSelected(self, scenePos):
+        childAt = self.blockWidget.childAt(self.mapFromScene(scenePos).toPoint())
+        if childAt is None or isinstance(childAt, QLabel) or isinstance(childAt, QFrame):
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def IsChildFocused(widget: QWidget):
+        for child in widget.children():
+            if isinstance(child, QWidget):
+                if child.hasFocus() or BlockItemGraphicsWidget.IsChildFocused(child):
+                    return True
+        return False
+
+    @staticmethod
+    def ClearFocusAll(widget):
+        widget.clearFocus()
+        for child in widget.children():
+            if isinstance(child, QWidget):
+                BlockItemGraphicsWidget.ClearFocusAll(child)
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
-        self.ClearFocusAll(self.widget())
+        self.ClearFocusAll(self.blockWidget)
         super().mousePressEvent(event)
 
     def mouseDoubleClickEvent(self, event: QGraphicsSceneMouseEvent):
@@ -91,15 +106,30 @@ class BlockItem(QGraphicsProxyWidget, SelectableItem):
         super().mousePressEvent(event)
 
     def DoMove(self, currentPosition: QPointF, delta: QPointF):
-        self.setPos(self.pos() + delta)
+        self.blockWidget.setPos(self.pos() + delta)
 
     def IsMovableAtPoint(self, scenePoint: QPointF):
         return self.IsContainerSelected(scenePoint)
 
     def TryDelete(self) -> bool:
         if not self.IsChildFocused(self.widget()):
-            return True
+            return self.blockWidget.TryDelete()
         return False
+
+    def SetIsHovered(self, hoverOn):
+        self.blockWidget.SetIsHovered(hoverOn)
+
+    def SetIsSelected(self, isSelected):
+        self.blockWidget.SetIsSelected(isSelected)
+
+    def TryDuplicate(self):
+        return self.blockWidget.TryDuplicate()
+
+    def IsSelectable(self) -> bool:
+        return self.blockWidget.IsSelectable()
+
+    def MoveFinished(self):
+        self.blockWidget.MoveFinished()
 
     def OnDoubleClick(self):
         pass

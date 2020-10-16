@@ -4,7 +4,7 @@ from UI.Procedure.StepProgressBar import *
 
 
 class StepBlockItem(LogicBlockItem):
-    def __init__(self, s: QGraphicsScene, step: Step):
+    def __init__(self, step: Step):
         self.step = step
 
         procedureLayout = QVBoxLayout()
@@ -18,7 +18,7 @@ class StepBlockItem(LogicBlockItem):
         self.completedPortsWidget.setLayout(QHBoxLayout())
         procedureLayout.addWidget(self.completedPortsWidget)
 
-        super().__init__(s, step)
+        super().__init__(step)
 
         temp = QWidget()
         temp.setLayout(self.container.layout())

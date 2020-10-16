@@ -23,10 +23,12 @@ class PortHoleWidget(QLabel):
     def SetHighlighted(self, highlighted):
         if self._IsHighlighted != highlighted:
             self._IsHighlighted = highlighted
+            self.update()
 
     def SetIsFilled(self, filled):
         if self._IsFilled != filled:
             self._IsFilled = filled
+            self.update()
 
     def paintEvent(self, event: QPaintEvent):
         painter = QPainter(self)
