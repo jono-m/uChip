@@ -92,8 +92,6 @@ class MainWorkArea(QFrame):
 
         self.tabArea.setCurrentIndex(tabIndex)
 
-        print(self.chipParametersList.sizeHint())
-
     def UpdateForProcedureStatus(self, isRunning):
         self.chipFrame.UpdateForProcedureStatus(isRunning)
         self.procedureFrame.UpdateForProcedureStatus(isRunning)
@@ -120,7 +118,7 @@ class MainWorkArea(QFrame):
     def SelectProcedure(self, p: Procedure):
         self.procedureFrame.OpenProcedure(p)
         self.procedureRunner.SetProcedure(p)
-        self.toolBar.proceduresBox.SelectProcedure(p)
+        self.toolBar.procedureSelectionBox.SelectProcedure(p)
         self.SwitchTabs(1)
 
     def UpdateTabNames(self):
@@ -217,7 +215,7 @@ class MainWorkArea(QFrame):
 
     def OnProcedureDialogFinished(self):
         self.UpdateTabNames()
-        self.toolBar.proceduresBox.UpdateProceduresList()
+        self.toolBar.procedureSelectionBox.UpdateProceduresList()
 
     def ShowRig(self):
         self.rigViewWidget.show()

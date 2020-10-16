@@ -21,10 +21,8 @@ class ScriptedBlock(LogicBlock):
 
     def Reload(self):
         if not os.path.exists(self.scriptFilename):
-            print("Destroyed " + self.scriptFilename)
             self.Destroy()
             return
-        print("Reloaded " + self.scriptFilename)
         f = open(self.scriptFilename)
         self.lastModifiedTime = os.path.getmtime(self.scriptFilename)
         self.code = f.read()

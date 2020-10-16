@@ -100,5 +100,3 @@ class ImageSizeDialog(QDialog):
 
         self.setWindowTitle("Image Properties")
         self.show()
-
-        print(self.spin.objectName())

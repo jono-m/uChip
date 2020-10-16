@@ -11,8 +11,8 @@
 	qproperty-alignment: AlignCenter;
 }
 
-MainWindow * {
-	min-height: 0;
+MainWindow {
+	min-height: 400;
 }
 
 /* Menu Bar */
@@ -29,7 +29,7 @@ MainToolbar {
     border-width: 0px 0px 1px 0px;
     background-color: rgba(0, 0, 0, 0.2);
 }
-MainToolbar > QFrame {
+MainToolbar > Spacer {
 	border-right-width: 1px;
 	min-width: 0px;
 }
@@ -39,16 +39,15 @@ MainToolbar QLabel {
 MainToolbar QPushButton, MainToolbar QToolButton {
 	text-align: left;
 	padding: 5px;
-	qproperty-iconSize: 20px;
+	qproperty-iconSize: 32px;
 }
 
 /* Drop-down */
-QComboBox {
+QComboBox{
     min-height: 31px;
     min-width: 80px;
-    border-width: 0 1px 1px 1px;
+    border-width: 2px;
     padding: 0 15px 0 15px;
-    background-color: rgba(255, 255, 255, 0.1);
 }
 QComboBox::hover {
 	background-color: rgba(255, 255, 255, 0);
@@ -99,12 +98,62 @@ QTabBar::close-button {
 WorldBrowser {
     border: 5px inset rgba(30, 30, 30, 1);
 }
-#BlockItem * {
+BlockItem, BlockItem * {
+    background-color: transparent;
+}
+#BlockTitle {
+    border-bottom-width: 1px;
+}
+#BlockTitle QLabel {
+    padding: 10px;
+    qproperty-alignment: AlignLeft;
+}
+#minMaxButton {
+    background-color: transparent;
+    min-width: 40px;
+    max-width: 40px;
+    font-size: 20px;
+    border-top-right-radius: 8px;
+}
+#minMaxButton:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+#minMaxButton:pressed {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+BlockItem > QFrame {
     background-color: rgba(30, 30, 30, 1);
     border-radius: 8px;
+}
+BlockItem QFrame[state='HoverAndSelect'] {
+    border: 4px solid rgba(52, 222, 235, 1);
+    margin: 2px;
+}
+BlockItem QFrame[state='Select'] {
+    border: 2px solid rgba(52, 222, 235, 1);
+    margin: 4px;
+}
+BlockItem QFrame[state='Hover'] {
+    border: 2px solid rgba(35, 159, 168, 1);
+    margin: 4px;
+}
+BlockItem QFrame[state='None'] {
+    border: 1px solid rgba(100, 100, 100, 1);
+    margin: 5px;
+}
+BlockItem QFrame[valveState=true] {
+    background-color: rgba(160, 191, 101, 1);
+}
+BlockItem QFrame[valveState=false] {
+    background-color: rgba(191, 99, 103, 1);
+}
+PortHoleWidget {
+    min-width: 32px;
+    max-width: 32px;
+    min-height: 32px;
+    max-height: 32px;
 }
 ChipParametersList, ChipValvesList{
 	max-width: 300px;
 	min-width: 200px;
-	min-height: 200px;
 }

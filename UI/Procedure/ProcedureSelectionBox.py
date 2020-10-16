@@ -1,7 +1,7 @@
 from ChipController.ChipController import *
 
 
-class ProceduresBox(QComboBox):
+class ProcedureSelectionBox(QComboBox):
     def __init__(self):
         super().__init__()
         self.OnProcedureSelected = Event()

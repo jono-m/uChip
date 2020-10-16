@@ -4,28 +4,32 @@ from Util import *
 
 
 class LogicBlockItem(BlockItem):
-    def __init__(self, scene: QGraphicsScene, b: LogicBlock, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, b: LogicBlock):
+        super().__init__()
 
         self.block = b
 
+        self.titleBarWidget = QFrame()
+        self.titleBarWidget.setObjectName("BlockTitle")
         self.titleBar = QLabel(self.block.GetName())
 
         titleLayout = QHBoxLayout()
         titleLayout.setContentsMargins(0, 0, 0, 0)
         titleLayout.setSpacing(0)
         titleLayout.addWidget(self.titleBar)
+        self.titleBarWidget.setLayout(titleLayout)
 
-        self.minMaxButton = QPushButton("-")
+        self.minMaxButton = QPushButton()
+        self.minMaxButton.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Ignored)
         self.minMaxButton.setObjectName("minMaxButton")
         self.minMaxButton.clicked.connect(lambda checked=False: self.SetMinMax(not self.block.minimized))
         titleLayout.addWidget(self.minMaxButton)
-        self.container.layout().addLayout(titleLayout)
+        self.container.layout().addWidget(self.titleBarWidget, stretch=0)
 
         portsLayout = QHBoxLayout()
         portsLayout.setContentsMargins(0, 0, 0, 0)
         portsLayout.setSpacing(0)
-        self.container.layout().addLayout(portsLayout)
+        self.container.layout().addLayout(portsLayout, stretch=1)
         self.inputPortsListWidget = QFrame()
         self.inputsLayout = QVBoxLayout()
         self.inputsLayout.setContentsMargins(0, 0, 0, 0)
@@ -39,8 +43,6 @@ class LogicBlockItem(BlockItem):
         self.outputsLayout.setSpacing(0)
         self.outputPortsListWidget.setLayout(self.outputsLayout)
         portsLayout.addWidget(self.outputPortsListWidget)
-
-        scene.addItem(self)
 
         self.block.OnPortsChanged.Register(self.UpdatePorts, True)
         self.block.OnDestroyed.Register(self.Destroy, True)
@@ -58,12 +60,14 @@ class LogicBlockItem(BlockItem):
         if minimized:
             self.minMaxButton.setText("+")
         else:
-            self.minMaxButton.setText("-")
+            self.minMaxButton.setText(u'\u2014')
 
         for inputItem in self.inputPortsListWidget.children():
             if isinstance(inputItem, InputPortWidget):
                 if not inputItem.inputPort.isConnectable:
                     inputItem.setVisible(not minimized)
+
+        QApplication.processEvents()
 
     def UpdatePos(self):
         self.setPos(self.block.GetPosition() - self.rect().center())
@@ -77,6 +81,9 @@ class LogicBlockItem(BlockItem):
 
     def UpdateName(self):
         self.titleBar.setText(self.block.GetName())
+
+        if self.sizeHint() != self.size():
+            self.adjustSize()
 
     def UpdatePorts(self):
         hasNonConnectable = False
@@ -109,10 +116,8 @@ class LogicBlockItem(BlockItem):
         super().MoveFinished()
 
     def TryDelete(self):
-        if super().TryDelete():
-            self.block.Destroy()
-            return True
-        return False
+        self.block.Destroy()
+        return True
 
     def TryDuplicate(self):
         copyBlock = self.block.Duplicate()
