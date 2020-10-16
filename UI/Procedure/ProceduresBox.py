@@ -41,6 +41,10 @@ class ProceduresBox(QComboBox):
             self.setCurrentIndex(0)
         self.blockSignals(False)
 
+    def SelectProcedure(self, procedure: Procedure):
+        self.currentProcedure = procedure
+        self.UpdateProceduresList()
+
     def HandleProcedureSelection(self):
         self.currentProcedure = self.currentData()
         self.OnProcedureSelected.Invoke(self.currentProcedure)

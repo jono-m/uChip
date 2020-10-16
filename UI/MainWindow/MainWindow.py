@@ -56,7 +56,6 @@ class MainWindow(QMainWindow):
         self.procedureRunner.StopProcedure()
 
         self.ReloadSettings()
-        StylesheetLoader.GetInstance().TimerUpdate()
 
     def SaveSettings(self):
         windowSettings = WindowSettings()

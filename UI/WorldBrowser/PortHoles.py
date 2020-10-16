@@ -4,7 +4,6 @@ from UI.WorldBrowser.SelectableItem import *
 class PortHoleWidget(QLabel):
     def __init__(self, graphicsParent: QGraphicsProxyWidget):
         super().__init__()
-        self.setFixedSize(30, 30)
 
         self._IsFilled = False
         self.Color = QColor(245, 215, 66)

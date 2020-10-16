@@ -11,6 +11,10 @@
 	qproperty-alignment: AlignCenter;
 }
 
+MainWindow * {
+	min-height: 0;
+}
+
 /* Menu Bar */
 MenuBar {
     border-width: 0px 0px 1px 0px;
@@ -53,7 +57,7 @@ QComboBox::down-arrow {
     image: url(Assets/downArrow.png);
 }
 QComboBox QAbstractItemView::item, QListWidget::item { 
-    min-width: 50px;
+    min-width: 50px; 
 }
 QListView, QLineEdit {
     border: 1px solid rgba(255, 255, 255, 0.5);
@@ -94,4 +98,13 @@ QTabBar::close-button {
 /* World Browser */
 WorldBrowser {
     border: 5px inset rgba(30, 30, 30, 1);
+}
+#BlockItem * {
+    background-color: rgba(30, 30, 30, 1);
+    border-radius: 8px;
+}
+ChipParametersList, ChipValvesList{
+	max-width: 300px;
+	min-width: 200px;
+	min-height: 200px;
 }

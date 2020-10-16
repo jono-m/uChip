@@ -185,7 +185,7 @@ class MainToolbar(QFrame):
         layout.addLayout(self.annotationSection)
         layout.addLayout(self.solenoidsSection)
 
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
     STATE_CHIP_EDIT = 1
     STATE_PROCEDURE_EDIT = 2
@@ -238,12 +238,9 @@ class MainToolbar(QFrame):
             text = "  " + text
             b = QPushButton()
 
-        b.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
-
         if icon is not None:
             b.setIcon(ColorIcon(icon, color))
 
-        b.setIconSize(QSize(32, 32))
         b.setText(text)
         b.setToolTip(text)
         b.clicked.connect(delegate)

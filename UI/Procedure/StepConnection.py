@@ -50,7 +50,7 @@ class StepConnection(ConnectionItem):
         self.SetPortHoleB(None)
         self.GetFromPortHole().beginPort.step.OnConnectionsChanged.Unregister(self.CheckExistence)
         self.GetToPortHole().completedPort.step.OnConnectionsChanged.Unregister(self.CheckExistence)
-        del self
+        self.scene().removeItem(self)
 
     def CheckExistence(self):
         if not Step.AreStepsConnected(self.completedWidget.completedPortHole, self.beginWidget.beginPortHole):

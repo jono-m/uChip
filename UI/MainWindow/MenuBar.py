@@ -11,7 +11,6 @@ class MenuBar(QFrame):
         self.OnSaveAs = Event()
 
         self.menuBar = QMenuBar()
-        self.menuBar.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         fileMenu = self.menuBar.addMenu("&File")
         newChipAction = QAction(QIcon("Assets/UCIcon.png"), "New Chip", self)
         newChipAction.setShortcut(Qt.CTRL + Qt.Key_N)

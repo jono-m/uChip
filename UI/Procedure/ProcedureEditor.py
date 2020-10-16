@@ -26,6 +26,8 @@ class ProcedureEditor(LogicBlockEditor):
     def LoadProcedure(self, procedure: Procedure):
         super().LoadBlock(procedure)
 
+        self.procedure = procedure
+
         stepItems = [x for x in self.worldBrowser.scene().items() if isinstance(x, StepBlockItem)]
 
         # Go over each loaded block
