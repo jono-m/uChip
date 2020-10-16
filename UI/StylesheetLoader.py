@@ -14,7 +14,10 @@ class StylesheetLoader:
         return StylesheetLoader._instance
 
     def RegisterWidget(self, widget: QWidget):
+        if self.stylesheet is None:
+            self.ReloadSS()
         self.widgetsList.append(widget)
+        widget.setStyleSheet(self.stylesheet)
 
     def __init__(self):
         self.widgetsList: typing.List[QWidget] = []
@@ -27,6 +30,8 @@ class StylesheetLoader:
 
         self.scriptFilename = "UI/STYLESHEET.css"
 
+        self.stylesheet = None
+
     def TimerUpdate(self):
         currentModifiedTime = os.path.getmtime(self.scriptFilename)
         if currentModifiedTime != self.lastModifiedTime:
@@ -35,7 +40,7 @@ class StylesheetLoader:
 
     def ReloadSS(self):
         f = open(self.scriptFilename)
-        stylesheet = f.read()
+        self.stylesheet = f.read()
 
         for widget in self.widgetsList:
-            widget.setStyleSheet(stylesheet)
+            widget.setStyleSheet(self.stylesheet)

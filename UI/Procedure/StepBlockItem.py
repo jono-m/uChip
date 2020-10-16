@@ -12,12 +12,10 @@ class StepBlockItem(LogicBlockItem):
         procedureLayout.setSpacing(0)
         self.beginPortsWidget = QFrame()
         self.beginPortsWidget.setLayout(QHBoxLayout())
-        self.beginPortsWidget.setProperty("roundedFrame", True)
         procedureLayout.addWidget(self.beginPortsWidget)
 
         self.completedPortsWidget = QFrame()
         self.completedPortsWidget.setLayout(QHBoxLayout())
-        self.completedPortsWidget.setProperty("roundedFrame", True)
         procedureLayout.addWidget(self.completedPortsWidget)
 
         super().__init__(s, step)

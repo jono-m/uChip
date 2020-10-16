@@ -7,6 +7,7 @@ class BlockItem(QGraphicsProxyWidget, SelectableItem):
         super().__init__(*args, **kwargs)
 
         blockWidget = QFrame()
+        blockWidget.setObjectName("BlockItem")
         StylesheetLoader.GetInstance().RegisterWidget(blockWidget)
 
         self.blockLayout = QVBoxLayout()

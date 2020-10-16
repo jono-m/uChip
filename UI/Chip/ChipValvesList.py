@@ -55,9 +55,6 @@ class ChipValvesList(QFrame):
                 self.valvesContainer.layout().addWidget(newValveBlock)
                 newValveBlock.setVisible(True)
 
-        self.scrollArea.setMinimumWidth(
-            self.valvesContainer.sizeHint().width() + self.scrollArea.horizontalScrollBar().sizeHint().width())
-
 
 class ValveField(QFrame):
     def __init__(self, valveBlock: ValveLogicBlock):

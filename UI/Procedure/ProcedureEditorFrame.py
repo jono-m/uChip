@@ -35,7 +35,6 @@ class ProcedureEditorFrame(BaseEditorFrame):
 
     def CloseProcedure(self):
         if self.currentProcedure is not None:
-            self.currentProcedure.OnClosed()
             self.currentProcedure.OnClosed.Unregister(self.CloseProcedure)
         self.currentProcedure = None
         self.editor.Clear()

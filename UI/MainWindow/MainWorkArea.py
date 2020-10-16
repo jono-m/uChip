@@ -63,15 +63,15 @@ class MainWorkArea(QFrame):
         sidebarLayout.setSpacing(0)
         sidebarLayout.addWidget(self.chipParametersList)
         sidebarLayout.addWidget(self.valvesList)
-        layout.addWidget(self.toolBar)
+        layout.addWidget(self.toolBar, stretch=0)
 
         innerLayout = QHBoxLayout()
         innerLayout.setContentsMargins(0, 0, 0, 0)
         innerLayout.setSpacing(0)
         innerLayout.addLayout(sidebarLayout)
-        innerLayout.addWidget(self.tabArea)
+        innerLayout.addWidget(self.tabArea, stretch=1)
 
-        layout.addLayout(innerLayout)
+        layout.addLayout(innerLayout, stretch=1)
         self.setLayout(layout)
 
         self.currentEditorFrame: typing.Optional[BaseEditorFrame] = None
@@ -91,6 +91,8 @@ class MainWorkArea(QFrame):
             self.toolBar.SetState(MainToolbar.STATE_LB_EDIT)
 
         self.tabArea.setCurrentIndex(tabIndex)
+
+        print(self.chipParametersList.sizeHint())
 
     def UpdateForProcedureStatus(self, isRunning):
         self.chipFrame.UpdateForProcedureStatus(isRunning)
@@ -118,6 +120,7 @@ class MainWorkArea(QFrame):
     def SelectProcedure(self, p: Procedure):
         self.procedureFrame.OpenProcedure(p)
         self.procedureRunner.SetProcedure(p)
+        self.toolBar.proceduresBox.SelectProcedure(p)
         self.SwitchTabs(1)
 
     def UpdateTabNames(self):

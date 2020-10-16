@@ -19,7 +19,6 @@ class RigViewWidget(QDialog):
         showButton = QPushButton()
         showButton.setText("Configure...")
         showButton.clicked.connect(self.ShowDialog)
-        showButton.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
 
         self.mainLayout.addWidget(showButton)
 
@@ -103,5 +102,3 @@ class SolenoidButton(QPushButton):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setCheckable(True)
-
-        self.setFixedSize(64, 64)
