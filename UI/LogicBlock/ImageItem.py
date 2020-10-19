@@ -5,7 +5,7 @@ from UI.StylesheetLoader import *
 
 class ImageItem(BlockItem):
     def __init__(self, s: QGraphicsScene, image: Image):
-        super().__init__()
+        super().__init__(s)
 
         self.image = image
 
@@ -70,25 +70,23 @@ class ImageSizeDialog(QDialog):
         StylesheetLoader.GetInstance().RegisterWidget(self)
 
         namePanel = QFrame()
-        namePanel.setObjectName("listPanel")
         nameLayout = QHBoxLayout()
         nameLayout.setContentsMargins(0, 0, 0, 0)
         nameLayout.setSpacing(0)
         nameLayout.addWidget(QLabel("File: "))
-        nameLayout.addWidget(QLabel(image.filename))
+        nameLayout.addWidget(QLabel("<i>" + image.filename + "</i>"))
         namePanel.setLayout(nameLayout)
 
         scalePanel = QFrame()
-        scalePanel.setObjectName("listPanel")
         scaleLayout = QHBoxLayout()
         scaleLayout.setContentsMargins(0, 0, 0, 0)
         scaleLayout.setSpacing(0)
-        scaleLayout.addWidget(QLabel("Scale: "))
+        scaleLayout.addWidget(QLabel("Scale: "), stretch=0)
         self.spin = QDoubleSpinBox()
         self.spin.setSingleStep(0.1)
         self.spin.setValue(image.GetScale())
         self.spin.valueChanged.connect(self.image.SetScale)
-        scaleLayout.addWidget(self.spin)
+        scaleLayout.addWidget(self.spin, stretch=1)
         scalePanel.setLayout(scaleLayout)
 
         layout.addWidget(namePanel)
@@ -100,3 +98,4 @@ class ImageSizeDialog(QDialog):
 
         self.setWindowTitle("Image Properties")
         self.show()
+        self.setFixedSize(self.size())
