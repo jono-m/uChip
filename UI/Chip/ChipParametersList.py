@@ -9,6 +9,8 @@ class ChipParametersList(QFrame):
         self.label = QLabel("Chip Parameters")
 
         self.scrollArea = QScrollArea()
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
 
         self.container = QFrame()
 
@@ -19,6 +21,7 @@ class ChipParametersList(QFrame):
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
+        layout.setAlignment(Qt.AlignTop)
         layout.addWidget(self.label)
         layout.addWidget(self.scrollArea)
         self.setLayout(layout)
@@ -26,19 +29,15 @@ class ChipParametersList(QFrame):
         containerLayout = QVBoxLayout()
         containerLayout.setContentsMargins(0, 0, 0, 0)
         containerLayout.setSpacing(0)
+        containerLayout.setAlignment(Qt.AlignTop)
         self.container.setLayout(containerLayout)
 
         parametersLayout = QVBoxLayout()
         parametersLayout.setContentsMargins(0, 0, 0, 0)
         parametersLayout.setSpacing(0)
+        parametersLayout.setAlignment(Qt.AlignTop)
         self.parametersWidget.setLayout(parametersLayout)
         containerLayout.addWidget(self.parametersWidget)
-
-        valvesLayout = QVBoxLayout()
-        valvesLayout.setContentsMargins(0, 0, 0, 0)
-        valvesLayout.setSpacing(0)
-        self.valvesWidget.setLayout(valvesLayout)
-        containerLayout.addWidget(self.valvesWidget)
 
         self.scrollArea.setWidget(self.container)
 
@@ -59,9 +58,6 @@ class ChipParametersList(QFrame):
         self.UpdateParametersList()
 
     def Clear(self):
-        for child in reversed(self.valvesWidget.children()):
-            if isinstance(child, QWidget):
-                child.deleteLater()
         for child in reversed(self.parametersWidget.children()):
             if isinstance(child, QWidget):
                 child.deleteLater()
@@ -73,21 +69,39 @@ class ChipParametersList(QFrame):
         for inputPort in sorted(self.chipController.GetLogicBlock().GetInputs(),
                                 key=lambda x: x.name):
             if inputPort not in inputPorts:
-                newField = ChipParameterField(inputPort)
+                newField = ChipParameterField(inputPort, self.SortList)
                 self.parametersWidget.layout().addWidget(newField)
 
-        valves = [valvesField.valveBlock for valvesField in self.valvesWidget.children() if
+        valves = [valvesField.valveBlock for valvesField in self.parametersWidget.children() if
                   isinstance(valvesField, UnboundValveField)]
 
         for valveBlock in self.chipController.valveBlocks:
             if valveBlock not in valves:
                 if valveBlock.openInput.connectedOutput is None:
-                    newValveBlock = UnboundValveField(valveBlock)
-                    self.valvesWidget.layout().addWidget(newValveBlock)
+                    newValveBlock = UnboundValveField(valveBlock, self.SortList)
+                    self.parametersWidget.layout().addWidget(newValveBlock)
+
+        self.SortList()
+
+    def SortList(self):
+        fields = [parameterField for parameterField in self.parametersWidget.children() if
+                  isinstance(parameterField, ChipParameterField) or isinstance(parameterField, UnboundValveField)]
+        fields.sort(key=ChipParametersList.GetKey)
+        while self.parametersWidget.layout().count() > 0:
+            self.parametersWidget.layout().takeAt(0)
+        for field in fields:
+            self.parametersWidget.layout().addWidget(field)
+
+    @staticmethod
+    def GetKey(field: QWidget):
+        if isinstance(field, ChipParameterField):
+            return field.inputPort.name.lower()
+        if isinstance(field, UnboundValveField):
+            return field.valveBlock.GetName().lower()
 
 
 class ChipParameterField(QFrame):
-    def __init__(self, inputPort: InputPort):
+    def __init__(self, inputPort: InputPort, changedNameDelegate):
         super().__init__()
         self.inputPort = inputPort
 
@@ -105,7 +119,10 @@ class ChipParameterField(QFrame):
         self.inputPort.block.OnOutputsUpdated.Register(self.Update, True)
         self.inputPort.block.OnDestroyed.Register(self.Remove, True)
 
+        self.changedNameDelegate = changedNameDelegate
+
         self.Update()
+
 
     def Remove(self):
         self.inputPort.block.OnConnectionsChanged.Unregister(self.Update)
@@ -122,11 +139,13 @@ class ChipParameterField(QFrame):
             self.Remove()
             return
 
+        if self.parameterSetting.nameLabel.text() != self.inputPort.name:
+            self.changedNameDelegate()
         self.parameterSetting.Update(self.inputPort.name, self.inputPort.GetDefaultData())
 
 
 class UnboundValveField(QFrame):
-    def __init__(self, valveBlock: ValveLogicBlock):
+    def __init__(self, valveBlock: ValveLogicBlock, changedNameDelegate):
         super().__init__()
         self.valveBlock = valveBlock
 
@@ -143,6 +162,8 @@ class UnboundValveField(QFrame):
         self.valveBlock.OnPortsChanged.Register(self.Update, True)
         self.valveBlock.OnOutputsUpdated.Register(self.Update, True)
         self.valveBlock.OnDestroyed.Register(self.Remove, True)
+
+        self.changedNameDelegate = changedNameDelegate
 
         self.Update()
 
@@ -161,4 +182,6 @@ class UnboundValveField(QFrame):
             self.Remove()
             return
 
+        if self.parameterSetting.nameLabel.text() != self.valveBlock.GetName():
+            self.changedNameDelegate()
         self.parameterSetting.Update(self.valveBlock.GetName(), self.valveBlock.openInput.GetDefaultData())

@@ -42,6 +42,8 @@ class BlockConnection(ConnectionItem):
         self.GetToPortHole().inputPort.block.OnConnectionsChanged.Register(self.CheckExistence, True)
         self.GetFromPortHole().outputPort.block.OnConnectionsChanged.Register(self.CheckExistence, True)
 
+        self.lastData = outputPortHole.outputPort.GetData()
+
     def GetFromPortHole(self):
         if isinstance(self._portHoleA, OutputPortHole):
             return self._portHoleA
@@ -55,16 +57,18 @@ class BlockConnection(ConnectionItem):
             return self._portHoleB
 
     def Remove(self):
-        self.SetPortHoleA(None)
-        self.SetPortHoleB(None)
         self.GetToPortHole().inputPort.block.OnConnectionsChanged.Unregister(self.CheckExistence)
         self.GetFromPortHole().outputPort.block.OnConnectionsChanged.Unregister(self.CheckExistence)
+        self.SetPortHoleA(None)
+        self.SetPortHoleB(None)
         self.scene().removeItem(self)
 
     def CheckExistence(self):
-        if not LogicBlock.IsConnected(self.outputWidget.outputPort, self.inputWidget.inputPort):
+        if not LogicBlock.IsConnected(self.GetFromPortHole().outputPort, self.GetToPortHole().inputPort):
             self.Remove()
 
     def TryDelete(self) -> bool:
-        LogicBlock.Disconnect(self.outputWidget.outputPort, self.inputWidget.inputPort)
-        return True
+        if self.GetFromPortHole() is not None and self.GetToPortHole() is not None:
+            LogicBlock.Disconnect(self.GetFromPortHole().outputPort, self.GetToPortHole().inputPort)
+            return True
+        return False

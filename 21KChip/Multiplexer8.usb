@@ -2,7 +2,8 @@ blockName = "8-bit Multiplexer"
 
 
 def Inputs():
-    return {'Number': int}
+    return {'Number': int,
+            'Mode': ['A', 'B', 'X', 'Y']}
 
 
 def Outputs():
@@ -13,10 +14,13 @@ def Outputs():
             'M5': bool,
             'M6': bool,
             'M7': bool,
-            'M8': bool}
+            'M8': bool,
+            'modeNum': int}
 
 
 def Compute(inputs, outputs):
     number = inputs['Number']
+    selection = inputs['Mode']
+    outputs['modeNum'] = selection
     for bit in range(8):
         outputs['M' + str(bit + 1)] = bool((number >> bit) & 0x01)

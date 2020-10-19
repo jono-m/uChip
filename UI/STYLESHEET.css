@@ -64,6 +64,39 @@ QListView, QLineEdit {
 QListView::item:selected { 
     background-color: rgba(0, 0, 0, 0.2);
 }
+QSpinBox, QDoubleSpinBox {
+	border-width: 1px;
+	min-height: 20px;
+	padding-left: 5px;
+	background-color: rgba(0, 0, 0, 0.3);
+}
+QSpinBox::up-button, QDoubleSpinBox::up-button,
+QSpinBox::down-button, QDoubleSpinBox::down-button {
+	width: 20px;
+	background-color: rgba(0, 0, 0, 0.5);
+	border: 1px solid rgba(80, 80, 80, 1);
+	margin: -1px;
+}
+QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover,
+QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover {
+	background-color: rgba(0, 0, 0, 0);
+}
+QSpinBox::up-button:pressed, QDoubleSpinBox::up-button:pressed,
+QSpinBox::down-button:pressed, QDoubleSpinBox::down-button:pressed {
+	background-color: rgba(0, 0, 0, 0.5);
+}
+QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {
+	image: url(Assets/upArrow.png);
+	width: 20px;
+}
+QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
+	image: url(Assets/downArrow.png);
+	width: 20px;
+}
+
+QCheckBox {
+	spacing: 10px;
+}
 
 /* Buttons */
 QPushButton:hover, QToolButton:hover{
@@ -88,31 +121,78 @@ QTabBar::tab:hover {
 }
 QTabBar::tab:selected {
     background-color: rgba(232, 200, 93, 1);
-    color: black;
+    color: black; 
 }
 QTabBar::close-button {
     image: url(Assets/closeIcon.png);
+    margin: 0px 0px 0px 3px;
+    padding: 3px;
+    border-radius: 6px;
+}
+QTabBar::close-button:hover {
+    background-color: rgba(0, 0, 0, 0.3);
 }
 
 /* World Browser */
 WorldBrowser {
     border: 5px inset rgba(30, 30, 30, 1);
 }
-BlockItem, BlockItem * {
+#BlockItem, #BlockItem * {
     background-color: transparent;
 }
+#BlockItem > QFrame {
+    background-color: rgba(50, 50, 50, 1);
+    border-radius: 8px;
+}
+#BlockItem QFrame[state='None'] {
+    border: 4px solid rgba(100, 100, 100, 1);
+    margin: 4px;
+}
+#BlockItem QFrame[valveState=true] {
+    background-color: rgba(160, 191, 101, 1);
+    border-color: rgba(160, 191, 101, 1);
+} 
+#BlockItem QFrame[valveState=false] {
+    background-color: rgba(191, 99, 103, 1);
+    border-color: rgba(151, 79, 83, 1);
+}
+#BlockItem QFrame[state='HoverAndSelect'] {
+    border: 6px solid rgba(52, 222, 235, 1);
+    margin: 2px;
+}
+#BlockItem QFrame[state='Select'] {
+    border: 4px solid rgba(52, 222, 235, 1);
+    margin: 4px;
+}
+#BlockItem QFrame[state='Hover'] {
+    border: 4px solid rgba(35, 159, 168, 1);
+    margin: 4px;
+}
+#BlockItem QFrame[isActive=true] {
+    border: 8px solid rgba(245, 215, 66, 1);
+    margin: 0px;
+}
+PortHoleWidget {
+    min-width: 25px;
+    max-width: 25px;
+    min-height: 25px;
+    max-height: 25px;
+}
+
+/* Logic Blocks */
 #BlockTitle {
-    border-bottom-width: 1px;
+    border-bottom-width: 1px; 
 }
 #BlockTitle QLabel {
     padding: 10px;
+    font-size: 15px;
     qproperty-alignment: AlignLeft;
 }
 #minMaxButton {
     background-color: transparent;
-    min-width: 40px;
-    max-width: 40px;
-    font-size: 20px;
+    min-width: 30px;
+    max-width: 30px;
+    font-size: 10px;
     border-top-right-radius: 8px;
 }
 #minMaxButton:hover {
@@ -121,39 +201,136 @@ BlockItem, BlockItem * {
 #minMaxButton:pressed {
     background-color: rgba(255, 255, 255, 0.3);
 }
-BlockItem > QFrame {
-    background-color: rgba(30, 30, 30, 1);
-    border-radius: 8px;
+#InputPortsList {
+	padding: 10px;
 }
-BlockItem QFrame[state='HoverAndSelect'] {
-    border: 4px solid rgba(52, 222, 235, 1);
-    margin: 2px;
+#OutputPortsList {
+	background-color: rgba(0, 0, 0, 0.1);
+	border-style: solid;
+	border-width: 2px 0 0 2px;
+	border-color: rgba(0, 0, 0, 0.2);
+	border-bottom-right-radius: 8px;
+	padding: 10px;
 }
-BlockItem QFrame[state='Select'] {
-    border: 2px solid rgba(52, 222, 235, 1);
-    margin: 4px;
+#InputPortsList *, #OutputPortsList * {
+	qproperty-alignment: 'AlignLeft';
 }
-BlockItem QFrame[state='Hover'] {
-    border: 2px solid rgba(35, 159, 168, 1);
-    margin: 4px;
+#InputPortsList PortHoleWidget {
+    margin-right: 10px;
 }
-BlockItem QFrame[state='None'] {
-    border: 1px solid rgba(100, 100, 100, 1);
-    margin: 5px;
+#OutputPortsList PortHoleWidget {
+	margin-left: 10px;
 }
-BlockItem QFrame[valveState=true] {
-    background-color: rgba(160, 191, 101, 1);
+InputPortWidget, OutputPortWidget {
+	margin: 5px 0 5px 0;
 }
-BlockItem QFrame[valveState=false] {
-    background-color: rgba(191, 99, 103, 1);
+ParameterWidget QLabel {
+	margin-bottom: 5px;
 }
-PortHoleWidget {
-    min-width: 32px;
-    max-width: 32px;
-    min-height: 32px;
-    max-height: 32px;
+
+/* Step Blocks */
+#BlockItem StepProgressBar {
+    border-width: 1px;
+    min-width: 5px;
+    max-width: 5px;
+    background-color: rgba(0, 0, 0, 0.3);
 }
-ChipParametersList, ChipValvesList{
-	max-width: 300px;
+StepProgressBar::chunk {
+    background: rgba(245, 215, 66, 1);
+}
+
+/* Sidebar */
+ChipParametersList, ChipValvesList {
+	max-width: 200px;
 	min-width: 200px;
+	border-width: 0 0 1px 0;
+}
+ChipParametersList > QLabel, ChipValvesList > QLabel {
+	padding: 10px 0 10px 0;
+	color: white;
+	font-weight: bold;
+	qproperty-alignment: AlignLeft;
+	padding-left: 5px;
+	border-bottom-width: 1px;
+	background-color: rgba(30, 30, 30, 255);
+}
+ChipParameterField, UnboundValveField {
+	padding: 5px;
+	border-width: 1px;
+	margin: 5px 5px 0 5px;
+	border-radius: 5px;
+	background-color: rgba(40, 40, 40, 255);
+}
+ChipParameterField *, UnboundValveField * {
+	background-color: rgba(40, 40, 40, 255);
+	qproperty-alignment: AlignLeft;
+}
+QScrollArea {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+QScrollBar {
+    background-color: rgba(255, 255, 255, 0);
+    width: 10px;
+}
+QScrollBar:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+QScrollBar::handle {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+QScrollBar::handle:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+}
+QScrollBar::add-page, QScrollBar::sub-page {
+    background: none;
+}
+QScrollBar::add-line, QScrollBar::sub-line {
+    border: none;
+    background: none;
+}
+QScrollBar::up-arrow, QScrollBar::down-arrow {
+    border: none;
+    background: none;
+    color: none;
+    width: 0;
+    height: 0;
+}
+ValveField {
+	border-width: 0 0 1px 0;
+}
+ValveField[IsEven=true] * {
+	background-color: rgba(50, 50, 50, 255);
+}
+ValveField[IsEven=false] * {
+	background-color: rgba(30, 30, 30, 255);
+}
+ValveField * {
+	qproperty-alignment: 'AlignLeft | AlignVCenter';
+}
+ValveField QLabel {
+	padding-left: 5px;
+}
+ValveField QSpinBox{
+	max-width: 70px;
+	min-width: 70px;
+	border-width: 0 0 0 1px;
+}
+ValveField QSpinBox::up-button,
+ValveField QSpinBox::down-button {
+	width: 0;
+	height: 0;
+}
+#SolenoidHeading {
+	margin-right: 9px;
+	padding-left: 10px;
+	padding-right: 0px;
+	qproperty-alignment: 'AlignLeft | AlignVCenter';
+	max-width: 65px;
+	min-width: 65px;
+	border-width: 0 1px 0 1px;
+}
+#NameHeading {
+	qproperty-alignment: 'AlignLeft | AlignVCenter';
+	padding-left: 5px;
+	border: none;
 }

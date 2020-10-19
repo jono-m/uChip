@@ -8,7 +8,7 @@ class CustomLogicBlockEditorFrame(BaseEditorFrame):
         self.logicBlock = logicBlock
 
         self.editor = LogicBlockEditor()
-        self.nameFilters = "μChip Logic Block (*.ulb)"
+        self.nameFilters = ["μChip Logic Block (*.ulb)"]
 
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)

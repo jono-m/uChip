@@ -4,8 +4,8 @@ from Util import *
 
 
 class LogicBlockItem(BlockItem):
-    def __init__(self, b: LogicBlock):
-        super().__init__()
+    def __init__(self, scene, b: LogicBlock):
+        super().__init__(scene)
 
         self.block = b
 
@@ -31,16 +31,20 @@ class LogicBlockItem(BlockItem):
         portsLayout.setSpacing(0)
         self.container.layout().addLayout(portsLayout, stretch=1)
         self.inputPortsListWidget = QFrame()
+        self.inputPortsListWidget.setObjectName("InputPortsList")
         self.inputsLayout = QVBoxLayout()
         self.inputsLayout.setContentsMargins(0, 0, 0, 0)
         self.inputsLayout.setSpacing(0)
+        self.inputsLayout.setAlignment(Qt.AlignTop)
         self.inputPortsListWidget.setLayout(self.inputsLayout)
         portsLayout.addWidget(self.inputPortsListWidget)
 
         self.outputPortsListWidget = QFrame()
+        self.outputPortsListWidget.setObjectName("OutputPortsList")
         self.outputsLayout = QVBoxLayout()
         self.outputsLayout.setContentsMargins(0, 0, 0, 0)
         self.outputsLayout.setSpacing(0)
+        self.outputsLayout.setAlignment(Qt.AlignTop)
         self.outputPortsListWidget.setLayout(self.outputsLayout)
         portsLayout.addWidget(self.outputPortsListWidget)
 
@@ -52,8 +56,10 @@ class LogicBlockItem(BlockItem):
         self.SetMinMax(self.block.minimized)
         self.UpdatePorts()
 
+        self.hide()
         QApplication.processEvents()
         self.UpdatePos()
+        self.show()
 
     def SetMinMax(self, minimized):
         self.block.minimized = minimized
@@ -70,7 +76,7 @@ class LogicBlockItem(BlockItem):
         QApplication.processEvents()
 
     def UpdatePos(self):
-        self.setPos(self.block.GetPosition() - self.rect().center())
+        self.setPos(self.block.GetPosition())
 
     def Destroy(self):
         self.block.OnDestroyed.Unregister(self.Destroy)
@@ -82,8 +88,8 @@ class LogicBlockItem(BlockItem):
     def UpdateName(self):
         self.titleBar.setText(self.block.GetName())
 
-        if self.sizeHint() != self.size():
-            self.adjustSize()
+        if self.blockWidget.sizeHint() != self.blockWidget.size():
+            self.blockWidget.adjustSize()
 
     def UpdatePorts(self):
         hasNonConnectable = False
@@ -104,15 +110,10 @@ class LogicBlockItem(BlockItem):
                 outputPortWidget = OutputPortWidget(outputPort, self)
                 self.outputsLayout.addWidget(outputPortWidget)
 
-        hasInputs = len(self.block.GetInputs()) > 0
-        hasOutputs = len(self.block.GetOutputs()) > 0
-        self.outputPortsListWidget.setVisible(hasOutputs)
-        self.inputPortsListWidget.setVisible(hasInputs)
-
         self.minMaxButton.setVisible(hasNonConnectable)
 
     def MoveFinished(self):
-        self.block.SetPosition(self.scenePos() + self.rect().center())
+        self.block.SetPosition(self.scenePos())
         super().MoveFinished()
 
     def TryDelete(self):
@@ -122,6 +123,10 @@ class LogicBlockItem(BlockItem):
     def TryDuplicate(self):
         copyBlock = self.block.Duplicate()
         copyBlock.SetPosition(self.block.GetPosition() + QPointF(30, 30))
+        for item in self.scene().items():
+            if isinstance(item, LogicBlockItem):
+                if item.block == copyBlock:
+                    return item
 
 
 class InputPortWidget(QFrame):
@@ -135,11 +140,10 @@ class InputPortWidget(QFrame):
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
+        layout.setAlignment(Qt.AlignTop)
         self.setLayout(layout)
 
-        isIOBlock = isinstance(self.graphicsParent.block, InputLogicBlock) or isinstance(self.graphicsParent.block,
-                                                                                         OutputLogicBlock)
-        if self.inputPort.isConnectable and not isIOBlock:
+        if self.inputPort.isConnectable and not isinstance(self.graphicsParent.block, InputLogicBlock):
             self.portHole = InputPortHole(inputPort, graphicsParent)
             layout.addWidget(self.portHole)
 
@@ -176,22 +180,22 @@ class InputPortWidget(QFrame):
 
         self.parameterSetting.Update(self.inputPort.name, self.inputPort.GetDefaultData())
 
-        if self.inputPort.isConnectable and not (
-                isinstance(self.graphicsParent.block, InputLogicBlock) or isinstance(self.graphicsParent.block,
-                                                                                     OutputLogicBlock)):
+        if self.inputPort.isConnectable and not isinstance(self.graphicsParent.block, InputLogicBlock):
             if self.inputPort.connectedOutput is not None:
-                self.portHole.SetIsFilled(True)
+                self.portHole.SetIsConnected(True)
                 self.nameText.setVisible(True)
                 self.parameterSetting.setVisible(False)
             else:
-                self.portHole.SetIsFilled(False)
+                self.portHole.SetIsConnected(False)
                 self.nameText.setVisible(False)
                 self.parameterSetting.setVisible(True)
             if self.inputPort.dataType is float:
                 dataText = "{:0.2f}".format(self.inputPort.GetData())
+            elif type(self.inputPort.dataType) == list:
+                dataText = self.inputPort.dataType[self.inputPort.GetData()]
             else:
                 dataText = str(self.inputPort.GetData())
-            self.nameText.setText(self.inputPort.name + "<br>" + dataText)
+            self.nameText.setText(self.inputPort.name + "<br><b>" + dataText + "</b>")
 
 
 class OutputPortWidget(QFrame):
@@ -203,6 +207,7 @@ class OutputPortWidget(QFrame):
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
+        layout.setAlignment(Qt.AlignTop)
         self.setLayout(layout)
 
         self.nameText = QLabel()
@@ -233,15 +238,17 @@ class OutputPortWidget(QFrame):
             return
 
         if len(self.outputPort.connectedInputs) > 0:
-            self.portHole.SetIsFilled(True)
+            self.portHole.SetIsConnected(True)
         else:
-            self.portHole.SetIsFilled(False)
+            self.portHole.SetIsConnected(False)
 
         if self.outputPort.dataType is float:
             dataText = "{:0.2f}".format(self.outputPort.GetData())
+        elif type(self.outputPort.dataType) == list:
+            dataText = self.outputPort.dataType[self.outputPort.GetData()]
         else:
             dataText = str(self.outputPort.GetData())
-        self.nameText.setText(self.outputPort.name + "<br>" + dataText)
+        self.nameText.setText(self.outputPort.name + "<br><b>" + dataText + "</b>")
 
 
 class ParameterWidget(QFrame):
@@ -264,26 +271,27 @@ class ParameterWidget(QFrame):
             self.control = QCheckBox()
             self.control.stateChanged.connect(self.ParameterChanged)
             self.nameLabel.setVisible(False)
-            layout.addWidget(self.control)
         elif self.dataType == float or self.dataType is None:
             self.control = CleanSpinBox()
             self.control.wheelEvent = lambda event: None
             self.control.setKeyboardTracking(False)
             self.control.setRange(-(2 ** 24), 2 ** 24)
             self.control.valueChanged.connect(self.ParameterChanged)
-            layout.addWidget(self.control)
         elif self.dataType == str:
             self.control = QLineEdit()
             self.control.setMaxLength(20)
             self.control.textChanged.connect(self.ParameterChanged)
-            layout.addWidget(self.control)
         elif self.dataType == int:
             self.control = QSpinBox()
             self.control.wheelEvent = lambda event: None
             self.control.setKeyboardTracking(False)
             self.control.setRange(-2 ** 24, 2 ** 24)
             self.control.valueChanged.connect(self.ParameterChanged)
-            layout.addWidget(self.control)
+        elif type(self.dataType) == list:
+            self.control = QComboBox()
+            self.control.activated.connect(self.ParameterChanged)
+            for entry in self.dataType:
+                self.control.addItem(entry)
         else:
             return
 
@@ -304,6 +312,9 @@ class ParameterWidget(QFrame):
         elif isinstance(self.control, QLineEdit):
             if self.control.text() != newValue:
                 self.control.setText(newValue)
+        elif isinstance(self.control, QComboBox):
+            if self.control.currentIndex() != newValue:
+                self.control.setCurrentIndex(newValue)
         self.control.blockSignals(False)
 
     def ParameterChanged(self, newParam):
@@ -312,5 +323,5 @@ class ParameterWidget(QFrame):
                 self.OnParameterChanged.Invoke(True)
             else:
                 self.OnParameterChanged.Invoke(False)
-        elif self.dataType == float or self.dataType == int or self.dataType == str or self.dataType is None:
+        else:
             self.OnParameterChanged.Invoke(newParam)

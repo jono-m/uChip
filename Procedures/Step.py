@@ -56,9 +56,14 @@ class Step(LogicBlock):
 
     @staticmethod
     def DisconnectSteps(completedPort: 'CompletedPort', beginPort: 'BeginPort'):
+        if not Step.AreStepsConnected(completedPort, beginPort):
+            return
         if beginPort is not None and completedPort is not None:
             beginPort.connectedCompleted.remove(completedPort)
             completedPort.connectedBegin.remove(beginPort)
+            beginPort.block.OnConnectionsChanged.Invoke()
+            completedPort.block.OnConnectionsChanged.Invoke()
+
 
     @staticmethod
     def AreStepsConnected(completedPort: 'CompletedPort', beginPort: 'BeginPort'):
@@ -82,18 +87,13 @@ class Step(LogicBlock):
         return True
 
     def DisconnectAll(self):
-        changed = []
-
+        super().DisconnectAll()
         for beginPort in self.GetBeginPorts():
             for completedPort in beginPort.connectedCompleted[:]:
                 self.DisconnectSteps(completedPort, beginPort)
         for completedPort in self.GetCompletedPorts():
             for beginPort in completedPort.connectedBegin[:]:
                 self.DisconnectSteps(completedPort, beginPort)
-                if completedPort.step not in changed:
-                    changed.append(completedPort.step)
-                if beginPort.step not in changed:
-                    changed.append(beginPort.step)
 
     def BeginProcedure(self):
         self._hasRun = False

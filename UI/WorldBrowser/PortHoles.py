@@ -1,44 +1,72 @@
 from UI.WorldBrowser.SelectableItem import *
+from UI.WorldBrowser.BlockItem import *
 
 
-class PortHoleWidget(QLabel):
-    def __init__(self, graphicsParent: QGraphicsProxyWidget):
+class PortHoleWidget(QFrame):
+    def __init__(self, graphicsParent: BlockItem):
         super().__init__()
 
-        self._IsFilled = False
-        self.Color = QColor(245, 215, 66)
+        self._IsConnected = False
+        self.penColor = QColor(245, 215, 66, 255)
+        self.connectedColor = QColor(245, 215, 66, 100)
+        self.hoverColor = QColor(245, 215, 66, 255)
+        self.highlightColor = QColor(245, 215, 66, 150)
         self._IsHighlighted = False
+        self._IsHovered = False
+        self.connectedThickness = 4
+        self.unconnectedThickness = 2
         self.graphicsParent = graphicsParent
 
         self.connectionClass: typing.Type[ConnectionItem] = ConnectionItem
 
         self.connections: typing.List[ConnectionItem] = []
 
+    def IsHovered(self):
+        return self._IsHovered
+
     def IsHighlighted(self):
         return self._IsHighlighted
 
-    def IsFilled(self):
-        return self._IsFilled
+    def IsConnected(self):
+        return self._IsConnected
 
-    def SetHighlighted(self, highlighted):
+    def SetIsHighlighted(self, highlighted):
         if self._IsHighlighted != highlighted:
             self._IsHighlighted = highlighted
             self.update()
 
-    def SetIsFilled(self, filled):
-        if self._IsFilled != filled:
-            self._IsFilled = filled
+    def SetIsHovered(self, hovered):
+        if self._IsHovered != hovered:
+            self._IsHovered = hovered
+            self.update()
+
+    def SetIsConnected(self, filled):
+        if self._IsConnected != filled:
+            self._IsConnected = filled
             self.update()
 
     def paintEvent(self, event: QPaintEvent):
         painter = QPainter(self)
-        if self._IsFilled or self._IsHighlighted:
-            painter.setBrush(QBrush(self.Color))
+        if self._IsHighlighted:
+            color = self.highlightColor
+        elif self._IsHovered:
+            color = self.hoverColor
+        elif self._IsConnected:
+            color = self.connectedColor
         else:
-            painter.setBrush(Qt.NoBrush)
-        painter.setPen(QPen(self.Color, 2))
+            color = None
 
-        r = self.rect()
+        if color is None:
+            painter.setBrush(Qt.NoBrush)
+        else:
+            painter.setBrush(color)
+
+        if self._IsConnected:
+            painter.setPen(QPen(self.penColor, self.connectedThickness))
+        else:
+            painter.setPen(QPen(self.penColor, self.unconnectedThickness))
+
+        r = self.contentsRect()
 
         painter.drawEllipse(r.center(), r.width() / 3, r.height() / 3)
 
@@ -56,7 +84,7 @@ class PortHoleWidget(QLabel):
             return self.graphicsParent.mapToScene(self.graphicsParent.rect().center())
         else:
             return self.graphicsParent.mapToScene(
-                self.mapTo(self.graphicsParent.widget(), self.rect().center()))
+                self.mapTo(self.graphicsParent.blockWidget, self.rect().center()))
 
 
 class ConnectionItem(QGraphicsPathItem, SelectableItem):
@@ -66,6 +94,7 @@ class ConnectionItem(QGraphicsPathItem, SelectableItem):
 
         self.arrowSpacing = 80
         self.arrowSize = 25
+        self.pulsePercentageSize = 0.4
         self.hoverWidth = 8
         self.lineWidth = 5
 
@@ -160,9 +189,9 @@ class ConnectionItem(QGraphicsPathItem, SelectableItem):
             pen.setColor(self.selectedColor)
         else:
             if self._portHoleA is not None:
-                pen.setColor(self._portHoleA.Color)
+                pen.setColor(self._portHoleA.penColor)
             elif self._portHoleB is not None:
-                pen.setColor(self._portHoleB.Color)
+                pen.setColor(self._portHoleB.penColor)
 
         if self.IsHovered:
             pen.setWidth(self.hoverWidth)
@@ -200,7 +229,9 @@ class ConnectionItem(QGraphicsPathItem, SelectableItem):
     def SetIsHovered(self, hoverOn):
         if self.IsHovered != hoverOn:
             self.IsHovered = hoverOn
+            self.update()
 
     def SetIsSelected(self, isSelected):
         if self.IsSelected != isSelected:
             self.IsSelected = isSelected
+            self.update()

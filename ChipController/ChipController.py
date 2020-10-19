@@ -60,6 +60,11 @@ class ChipController:
 
     def OnBlockAdded(self, newBlock):
         if isinstance(newBlock, ValveLogicBlock):
+            solNo = 0
+            sols = [valveBlock.GetSolenoidNumber() for valveBlock in self.valveBlocks]
+            while solNo in sols:
+                solNo += 1
+            newBlock.solenoidNumberInput.SetDefaultData(solNo)
             self.valveBlocks.append(newBlock)
 
     def OnBlockRemoved(self, block):

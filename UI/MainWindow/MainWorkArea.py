@@ -204,9 +204,9 @@ class MainWorkArea(QFrame):
             if filename is not None:
                 name, extension = os.path.splitext(filename[0])
                 if extension == '.ucc':
-                    self.editorFrame.RequestChipOpen(filename[0])
+                    self.RequestChipOpen(filename[0])
                 elif extension == '.ulb':
-                    self.editorFrame.OpenLogicBlock(filename[0])
+                    self.OpenLogicBlock(filename[0])
 
     def ShowProceduresDialog(self):
         d = ProceduresDialog(self.chipFrame.chipController, parent=self)
