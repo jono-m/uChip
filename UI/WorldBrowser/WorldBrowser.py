@@ -237,7 +237,7 @@ class WorldBrowser(QGraphicsView):
         for hoveredItem in self._hoveredItems:
             if isinstance(hoveredItem, BlockItem):
                 localPosition = hoveredItem.mapFromScene(self.mapToScene(self._currentCursorPosition))
-                w = hoveredItem.widget().childAt(localPosition.toPoint())
+                w = hoveredItem.blockWidget.childAt(localPosition.toPoint())
                 if isinstance(w, PortHoleWidget):
                     return w
 
@@ -249,27 +249,30 @@ class WorldBrowser(QGraphicsView):
 
         if portHole != self._hoveredPortHole:
             if self._hoveredPortHole is not None:
-                self._hoveredPortHole.SetHighlighted(False)
+                self._hoveredPortHole.SetIsHovered(False)
+                self._hoveredPortHole.SetIsHighlighted(False)
 
             self._hoveredPortHole = portHole
             if self._state == State.CONNECTING:
                 if not self.anchorPort.CanConnect(self._hoveredPortHole):
                     self._hoveredPortHole = None
+                else:
+                    self._hoveredPortHole.SetIsHighlighted(True)
 
             if self._hoveredPortHole is not None:
-                self._hoveredPortHole.SetHighlighted(True)
+                self._hoveredPortHole.SetIsHovered(True)
 
     def UpdateConnectionLine(self):
         if self._state == State.CONNECTING and self._actionsEnabled:
             self.tempConnectionLine.setVisible(True)
-            self.anchorPort.SetHighlighted(True)
+            self.anchorPort.SetIsHighlighted(True)
             self.tempConnectionLine.overridePos = self.mapToScene(self._currentCursorPosition)
             self.tempConnectionLine.UpdatePath()
             self.tempConnectionLine.SetPortHoleA(self.anchorPort)
             self.tempConnectionLine.SetPortHoleB(self._hoveredPortHole)
         else:
             if self.anchorPort is not None:
-                self.anchorPort.SetHighlighted(False)
+                self.anchorPort.SetIsHighlighted(False)
             self.anchorPort = None
             self.tempConnectionLine.SetPortHoleA(None)
             self.tempConnectionLine.SetPortHoleB(None)
@@ -321,7 +324,9 @@ class WorldBrowser(QGraphicsView):
                         self._hoveredItems.remove(item)
                     self._hoveredPortHole = None
         if event.key() == Qt.Key.Key_D and event.modifiers() == Qt.Modifier.CTRL:
-            if self.selectedItem is not None:
-                newItem = self.selectedItem.TryDuplicate()
+            selectedItemsCopy = self._selectedItems[:]
+            self.ClearSelection()
+            for item in selectedItemsCopy:
+                newItem = item.TryDuplicate()
                 if newItem is not None:
-                    self.SelectItem(newItem)
+                    self.AddToSelection(newItem)

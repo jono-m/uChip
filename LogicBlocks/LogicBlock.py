@@ -1,6 +1,6 @@
 from Util import *
 from PySide2.QtCore import *
-
+import math
 
 class LogicBlock:
     def __init__(self):
@@ -110,17 +110,21 @@ class LogicBlock:
             outputPort.block.OnRefresh.Invoke((outputPort, inputPort))
 
     @staticmethod
-    def Disconnect(outputPort: 'OutputPort', inputPort: 'InputPort', suppressMessages=False):
+    def Disconnect(outputPort: 'OutputPort', inputPort: 'InputPort'):
+        if not LogicBlock.IsConnected(outputPort, inputPort):
+            return
         if inputPort is not None and outputPort is not None:
             outputPort.connectedInputs.remove(inputPort)
             inputPort.connectedOutput = None
-            if not suppressMessages:
-                outputPort.block.OnConnectionsChanged.Invoke()
-                inputPort.block.OnConnectionsChanged.Invoke()
+            outputPort.block.OnConnectionsChanged.Invoke()
+            inputPort.block.OnConnectionsChanged.Invoke()
 
     @staticmethod
     def IsConnected(outputPort: 'OutputPort', inputPort: 'InputPort'):
-        if outputPort not in outputPort.block.GetOutputs() or inputPort not in inputPort.block.GetInputs():
+        if outputPort is None or \
+                outputPort not in outputPort.block.GetOutputs() or \
+                inputPort is None or \
+                inputPort not in inputPort.block.GetInputs():
             return False
         if inputPort not in outputPort.connectedInputs:
             return False
@@ -132,10 +136,10 @@ class LogicBlock:
         for inputPort in self._inputs:
             connectedOutput = inputPort.connectedOutput
             if connectedOutput is not None:
-                self.Disconnect(connectedOutput, inputPort, True)
+                self.Disconnect(connectedOutput, inputPort)
         for outputPort in self._outputs:
             for connectedInput in outputPort.connectedInputs[:]:
-                self.Disconnect(outputPort, connectedInput, True)
+                self.Disconnect(outputPort, connectedInput)
 
     @staticmethod
     def GetName(self=None) -> str:
@@ -185,10 +189,10 @@ class Port:
 # One input port can connect to one output port. Or, it can be disconnected, in which case a default value
 # is used.
 class InputPort(Port):
-    def __init__(self, block: LogicBlock, name: str, dataType: typing.Type, isConnectable=True):
+    def __init__(self, block: LogicBlock, name: str, dataType: typing.Union[typing.Type, typing.List], isConnectable=True):
         super().__init__(block, name)
         self.dataType = dataType
-        if self.dataType is None:
+        if self.dataType is None or type(self.dataType) == list:
             self._defaultData = 0
         else:
             self._defaultData = dataType()
@@ -198,6 +202,8 @@ class InputPort(Port):
     def SetDefaultData(self, newValue):
         if self.dataType is None:
             self._defaultData = newValue
+        elif type(self.dataType) == list:
+            self._defaultData = max(0, min(len(self.dataType), newValue))
         else:
             self._defaultData = self.dataType(newValue)
         self.block.OnDefaultChanged.Invoke(self)
@@ -209,6 +215,8 @@ class InputPort(Port):
         if self.connectedOutput is not None:
             if self.dataType is None:
                 return self.connectedOutput.GetData()
+            elif type(self.dataType) == list:
+                return math.floor(max(0, min(len(self.dataType), self.connectedOutput.GetData())))
             else:
                 return self.dataType(self.connectedOutput.GetData())
         else:

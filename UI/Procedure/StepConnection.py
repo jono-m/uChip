@@ -46,14 +46,14 @@ class StepConnection(ConnectionItem):
         self.GetFromPortHole().completedPort.step.OnConnectionsChanged.Register(self.CheckExistence, True)
 
     def Destroy(self):
+        self.GetFromPortHole().completedPort.step.OnConnectionsChanged.Unregister(self.CheckExistence)
+        self.GetToPortHole().beginPort.step.OnConnectionsChanged.Unregister(self.CheckExistence)
         self.SetPortHoleA(None)
         self.SetPortHoleB(None)
-        self.GetFromPortHole().beginPort.step.OnConnectionsChanged.Unregister(self.CheckExistence)
-        self.GetToPortHole().completedPort.step.OnConnectionsChanged.Unregister(self.CheckExistence)
         self.scene().removeItem(self)
 
     def CheckExistence(self):
-        if not Step.AreStepsConnected(self.completedWidget.completedPortHole, self.beginWidget.beginPortHole):
+        if not Step.AreStepsConnected(self.GetFromPortHole().completedPort, self.GetToPortHole().beginPort):
             self.Destroy()
 
     def GetFromPortHole(self):
@@ -100,5 +100,5 @@ class StepConnection(ConnectionItem):
         return path
 
     def TryDelete(self) -> bool:
-        Step.DisconnectSteps(self.completedWidget.completedPortHole, self.beginWidget.beginPortHole)
+        Step.DisconnectSteps(self.GetFromPortHole().completedPort, self.GetToPortHole().beginPort)
         return True

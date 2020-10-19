@@ -20,7 +20,7 @@ class ProcedureEditor(LogicBlockEditor):
 
     def CreateBlockItem(self, newBlock: LogicBlock):
         if isinstance(newBlock, Step):
-            return BlockItemGraphicsWidget(self.worldBrowser.scene(), StepBlockItem(newBlock))
+            return StepBlockItem(self.worldBrowser.scene(), newBlock)
         return super().CreateBlockItem(newBlock)
 
     def LoadProcedure(self, procedure: Procedure):

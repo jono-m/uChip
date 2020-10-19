@@ -4,7 +4,7 @@ from UI.Procedure.StepProgressBar import *
 
 
 class StepBlockItem(LogicBlockItem):
-    def __init__(self, step: Step):
+    def __init__(self, scene, step: Step):
         self.step = step
 
         procedureLayout = QVBoxLayout()
@@ -18,7 +18,7 @@ class StepBlockItem(LogicBlockItem):
         self.completedPortsWidget.setLayout(QHBoxLayout())
         procedureLayout.addWidget(self.completedPortsWidget)
 
-        super().__init__(step)
+        super().__init__(scene, step)
 
         temp = QWidget()
         temp.setLayout(self.container.layout())
@@ -39,6 +39,8 @@ class StepBlockItem(LogicBlockItem):
 
         self.step.OnOutputsUpdated.Register(self.UpdateProgress, True)
 
+        self.outputPortsListWidget.setVisible(False)
+
         self.UpdatePorts()
         self.UpdateProgress()
 
@@ -49,7 +51,7 @@ class StepBlockItem(LogicBlockItem):
     def UpdateProgress(self):
         self.progressWidget.SetProgress(self.step.GetProgress())
         self.container.setProperty('isActive', self.step.IsRunning())
-        self.setStyle(self.style())
+        self.container.setStyle(self.container.style())
 
     def UpdatePorts(self):
         super().UpdatePorts()
@@ -97,7 +99,7 @@ class BeginPortWidget(QFrame):
         self.beginPort = port
 
         self.portHole = BeginPortHole(port, graphicsParent)
-        self.portHole.Color = QColor(235, 195, 52)
+        self.portHole.connectedColor = QColor(235, 195, 52)
 
         self.nameLabel = QLabel()
 
@@ -126,7 +128,7 @@ class BeginPortWidget(QFrame):
             return
 
         self.nameLabel.setText(self.beginPort.name)
-        self.portHole.SetIsFilled(len(self.beginPort.connectedCompleted) > 0)
+        self.portHole.SetIsConnected(len(self.beginPort.connectedCompleted) > 0)
 
 
 class CompletedPortWidget(QFrame):
@@ -135,7 +137,7 @@ class CompletedPortWidget(QFrame):
         self.completedPort = port
         self.portHole = CompletedPortHole(port, graphicsParent)
 
-        self.portHole.Color = QColor(235, 195, 52)
+        self.portHole.connectedColor = QColor(235, 195, 52)
         self.nameLabel = QLabel()
 
         layout = QVBoxLayout()
@@ -162,6 +164,6 @@ class CompletedPortWidget(QFrame):
             self.Remove()
             return
 
-        self.portHole.SetIsFilled(len(self.completedPort.connectedBegin) > 0)
+        self.portHole.SetIsConnected(len(self.completedPort.connectedBegin) > 0)
 
         self.nameLabel.setText(self.completedPort.name)

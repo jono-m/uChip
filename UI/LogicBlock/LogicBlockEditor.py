@@ -39,7 +39,7 @@ class LogicBlockEditor(QFrame):
         # Go over each loaded block
         for blockItem in addedBlockItems:
             # Connect each output in the block
-            for outputPort in blockItem.blockWidget.block.GetOutputs():
+            for outputPort in blockItem.block.GetOutputs():
                 # To each input
                 for inputPort in outputPort.connectedInputs:
                     self.CreateConnectionItem((outputPort, inputPort))
@@ -55,7 +55,7 @@ class LogicBlockEditor(QFrame):
 
     def CreateBlockItem(self, newBlock: LogicBlock):
         if isinstance(newBlock, LogicBlock):
-            return BlockItemGraphicsWidget(self.worldBrowser.scene(), LogicBlockItem(newBlock))
+            return LogicBlockItem(self.worldBrowser.scene(), newBlock)
 
     def CreateImageItem(self, image: Image):
         return ImageItem(self.worldBrowser.scene(), image)

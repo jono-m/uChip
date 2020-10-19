@@ -10,7 +10,7 @@ class ChipEditorFrame(BaseEditorFrame):
         self.chipController: typing.Optional[ChipController] = None
 
         self.editor = ChipEditor()
-        self.nameFilters = "μChip Chip Controller (*.ucc)"
+        self.nameFilters = ["μChip Chip Controller (*.ucc)"]
 
         self.hLayout = QHBoxLayout()
         self.hLayout.setContentsMargins(0, 0, 0, 0)

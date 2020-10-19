@@ -2,16 +2,21 @@ from UI.WorldBrowser.SelectableItem import *
 from UI.StylesheetLoader import *
 
 
-class BlockItem(QFrame, SelectableItem):
-    def __init__(self):
+class BlockItem(QGraphicsProxyWidget, SelectableItem):
+    def __init__(self, scene: QGraphicsScene):
         super().__init__()
 
-        StylesheetLoader.GetInstance().RegisterWidget(self)
+        self.blockWidget = QFrame()
+        self.blockWidget.setObjectName("BlockItem")
+        self.setWidget(self.blockWidget)
+        scene.addItem(self)
+
+        StylesheetLoader.GetInstance().RegisterWidget(self.blockWidget)
 
         self.blockLayout = QVBoxLayout()
         self.blockLayout.setContentsMargins(0, 0, 0, 0)
         self.blockLayout.setSpacing(0)
-        self.setLayout(self.blockLayout)
+        self.blockWidget.setLayout(self.blockLayout)
 
         self.container = QFrame()
         self.blockLayout.addWidget(self.container)
@@ -24,19 +29,7 @@ class BlockItem(QFrame, SelectableItem):
         layout.setSpacing(0)
         self.container.setLayout(layout)
 
-        self.OnPosChange = Event()
-        self.OnStyleUpdate = Event()
-
-        self._scenePos = QPointF()
-
         self.UpdateStyle()
-
-    def scenePos(self):
-        return self._scenePos
-
-    def setPos(self, point: QPointF):
-        self._scenePos = point
-        self.OnPosChange.Invoke(self._scenePos)
 
     def SetIsHovered(self, hoverOn):
         if self.displayHovered != hoverOn:
@@ -61,19 +54,7 @@ class BlockItem(QFrame, SelectableItem):
             else:
                 self.container.setProperty('state', 'None')
         if oldProperty is None or oldProperty != self.container.property('state'):
-            self.OnStyleUpdate.Invoke()
-
-
-class BlockItemGraphicsWidget(QGraphicsProxyWidget, SelectableItem):
-    def __init__(self, scene: QGraphicsScene, blockWidget: BlockItem, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.blockWidget = blockWidget
-        self.blockWidget.OnPosChange.Register(lambda point: self.setPos(point))
-        self.blockWidget.OnStyleUpdate.Register(lambda: self.setStyle(self.style()))
-        self.setWidget(self.blockWidget)
-        scene.addItem(self)
-        self.setPos(self.blockWidget.scenePos())
+            self.container.setStyle(self.container.style())
 
     def IsContainerSelected(self, scenePos):
         childAt = self.blockWidget.childAt(self.mapFromScene(scenePos).toPoint())
@@ -86,7 +67,7 @@ class BlockItemGraphicsWidget(QGraphicsProxyWidget, SelectableItem):
     def IsChildFocused(widget: QWidget):
         for child in widget.children():
             if isinstance(child, QWidget):
-                if child.hasFocus() or BlockItemGraphicsWidget.IsChildFocused(child):
+                if child.hasFocus() or BlockItem.IsChildFocused(child):
                     return True
         return False
 
@@ -95,7 +76,7 @@ class BlockItemGraphicsWidget(QGraphicsProxyWidget, SelectableItem):
         widget.clearFocus()
         for child in widget.children():
             if isinstance(child, QWidget):
-                BlockItemGraphicsWidget.ClearFocusAll(child)
+                BlockItem.ClearFocusAll(child)
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         self.ClearFocusAll(self.blockWidget)
@@ -106,7 +87,7 @@ class BlockItemGraphicsWidget(QGraphicsProxyWidget, SelectableItem):
         super().mousePressEvent(event)
 
     def DoMove(self, currentPosition: QPointF, delta: QPointF):
-        self.blockWidget.setPos(self.pos() + delta)
+        self.setPos(self.pos() + delta)
 
     def IsMovableAtPoint(self, scenePoint: QPointF):
         return self.IsContainerSelected(scenePoint)
@@ -115,21 +96,6 @@ class BlockItemGraphicsWidget(QGraphicsProxyWidget, SelectableItem):
         if not self.IsChildFocused(self.widget()):
             return self.blockWidget.TryDelete()
         return False
-
-    def SetIsHovered(self, hoverOn):
-        self.blockWidget.SetIsHovered(hoverOn)
-
-    def SetIsSelected(self, isSelected):
-        self.blockWidget.SetIsSelected(isSelected)
-
-    def TryDuplicate(self):
-        return self.blockWidget.TryDuplicate()
-
-    def IsSelectable(self) -> bool:
-        return self.blockWidget.IsSelectable()
-
-    def MoveFinished(self):
-        self.blockWidget.MoveFinished()
 
     def OnDoubleClick(self):
         pass

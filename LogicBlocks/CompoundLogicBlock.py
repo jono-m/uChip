@@ -59,15 +59,15 @@ class CompoundLogicBlock(LogicBlock):
 
     def GetInputs(self):
         inputBlocks = [x for x in self._subBlocks if
-                       isinstance(x, InputLogicBlock) and x.blockInputPort in self._inputs]
+                       isinstance(x, InputLogicBlock) and x.parentBlockInputPort in self._inputs]
         inputBlocks.sort(key=lambda x: x.GetPosition().y())
-        return [x.blockInputPort for x in inputBlocks]
+        return [x.parentBlockInputPort for x in inputBlocks]
 
     def GetOutputs(self):
         outputBlocks = [x for x in self._subBlocks if
-                        isinstance(x, OutputLogicBlock) and x.blockOutputPort in self._outputs]
+                        isinstance(x, OutputLogicBlock) and x.parentBlockOutputPort in self._outputs]
         outputBlocks.sort(key=lambda x: x.GetPosition().y())
-        return [x.blockOutputPort for x in outputBlocks]
+        return [x.parentBlockOutputPort for x in outputBlocks]
 
     def GetFilename(self):
         return self._filename
@@ -164,7 +164,7 @@ class CompoundLogicBlock(LogicBlock):
 
     def AddSubBlock(self, newBlock: 'LogicBlock'):
         if isinstance(newBlock, InputLogicBlock) or isinstance(newBlock, OutputLogicBlock):
-            newBlock.SetupForProxy(self)
+            newBlock.SetParentBlock(self)
         self._subBlocks.add(newBlock)
         newBlock.OnPortsChanged.Register(self.OnModified.Invoke)
         newBlock.OnConnectionsChanged.Register(self.OnModified.Invoke)

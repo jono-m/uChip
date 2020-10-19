@@ -51,6 +51,7 @@ class BaseEditorFrame(QFrame):
 
     def TrySaveAs(self):
         dialog = SaveAsDialog(self)
+        dialog.setNameFilters(self.nameFilters)
         if dialog.exec_():
             filename = dialog.selectedFiles()
 
@@ -96,4 +97,3 @@ class SaveAsDialog(QFileDialog):
         self.setWindowTitle("Save")
         self.setFileMode(QFileDialog.AnyFile)
         self.setAcceptMode(QFileDialog.AcceptSave)
-        self.setNameFilters([self.nameFilters])

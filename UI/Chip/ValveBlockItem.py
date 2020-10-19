@@ -3,8 +3,8 @@ from ChipController.ValveBlock import *
 
 
 class ValveBlockItem(LogicBlockItem):
-    def __init__(self, vb: ValveLogicBlock):
-        super().__init__(vb)
+    def __init__(self, scene, vb: ValveLogicBlock):
+        super().__init__(scene, vb)
         self.vb = vb
 
         self.vb.OnOutputsUpdated.Register(self.ChangeColor, True)
@@ -13,4 +13,4 @@ class ValveBlockItem(LogicBlockItem):
         lastStyle = self.container.property("valveState")
         if lastStyle is None or lastStyle != self.vb.IsOpen():
             self.container.setProperty("valveState", self.vb.IsOpen())
-            self.setStyle(self.style())
+            self.container.setStyle(self.container.style())
