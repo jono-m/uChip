@@ -16,25 +16,33 @@ class RigViewWidget(QDialog):
 
         self.solenoidButtons: typing.List[SolenoidButton] = []
 
-        showButton = QPushButton()
-        showButton.setText("Configure...")
-        showButton.clicked.connect(self.ShowDialog)
+        buttonLayout = QHBoxLayout()
+        buttonLayout.setAlignment(Qt.AlignLeft)
+        configureButton = QPushButton()
+        configureButton.setText("Configure Rig...")
+        configureButton.clicked.connect(self.ShowDialog)
 
-        self.mainLayout.addWidget(showButton)
+        closeButton = QPushButton("Close")
+        closeButton.clicked.connect(lambda: self.accept())
+        buttonLayout.addWidget(configureButton, stretch=0)
+        buttonLayout.addWidget(QLabel(), stretch=1)
+        buttonLayout.addWidget(closeButton, stretch=0)
 
         self.solenoidsScrollArea = QScrollArea()
 
         self.mainLayout.addWidget(self.solenoidsScrollArea)
+        self.mainLayout.addLayout(buttonLayout)
 
         self.solenoidsContainer = QFrame()
 
         self.solenoidsScrollArea.setWidget(self.solenoidsContainer)
+        self.solenoidsScrollArea.setWidgetResizable(True)
 
-        self.layout = QGridLayout()
-        self.layout.setContentsMargins(0, 0, 0, 0)
-        self.layout.setSpacing(0)
+        self.solenoidsLayout = QVBoxLayout()
+        self.solenoidsLayout.setContentsMargins(0, 0, 0, 0)
+        self.solenoidsLayout.setSpacing(0)
 
-        self.solenoidsContainer.setLayout(self.layout)
+        self.solenoidsContainer.setLayout(self.solenoidsLayout)
 
         self.rig = rig
 
@@ -49,34 +57,46 @@ class RigViewWidget(QDialog):
         newWindow.exec_()
 
     def Repopulate(self):
-        for i in reversed(range(self.layout.count())):
-            self.layout.itemAt(i).widget().deleteLater()
+        for i in reversed(range(self.solenoidsLayout.count())):
+            self.solenoidsLayout.itemAt(i).widget().deleteLater()
 
         self.solenoidButtons = []
 
+        currentLayout = None
         for solenoidNumber in range(len(self.rig.solenoidStates)):
+            row = int(solenoidNumber / 8)
+            column = solenoidNumber % 8
+
+            if column == 0:
+                container = QFrame()
+                currentLayout = QHBoxLayout()
+                currentLayout.setContentsMargins(0, 0, 0, 0)
+                currentLayout.setSpacing(0)
+                container.setLayout(currentLayout)
+                container.setProperty("IsEven", row % 2 == 0)
+                self.solenoidsLayout.addWidget(container)
+
+                eightSet = range(row * 8, (row + 1) * 8)
+                onButton = QPushButton("OPEN ALL")
+                onButton.clicked.connect(
+                    lambda checked=False, es=eightSet: self.EightSetButtonPressed(es, True))
+                offButton = QPushButton("CLOSE ALL")
+                offButton.clicked.connect(
+                    lambda checked=False, es=eightSet: self.EightSetButtonPressed(es, False))
+                currentLayout.addWidget(onButton)
+                currentLayout.addWidget(offButton)
+
             newSolenoidButton = SolenoidButton(text=str(solenoidNumber))
             newSolenoidButton.clicked.connect(
                 lambda checked=False, num=solenoidNumber: self.SolenoidClickedHandler(num))
             self.solenoidButtons.append(newSolenoidButton)
 
-            row = int(solenoidNumber / 8)
-            column = solenoidNumber % 8 + 2
-            self.layout.addWidget(newSolenoidButton, row, column)
+            currentLayout.addWidget(newSolenoidButton)
 
         if len(self.solenoidButtons) == 0:
-            self.layout.addWidget(QLabel("No devices connected."), 0, 0)
+            self.solenoidsLayout.addWidget(QLabel("No devices connected."), 0, 0)
 
-        for rowNumber in range(int(len(self.rig.solenoidStates) / 8)):
-            eightSet = range(rowNumber * 8, (rowNumber + 1) * 8)
-            onButton = QPushButton("OPEN ALL")
-            onButton.clicked.connect(
-                lambda checked=False, es=eightSet: self.EightSetButtonPressed(es, True))
-            offButton = QPushButton("CLOSE ALL")
-            offButton.clicked.connect(
-                lambda checked=False, es=eightSet: self.EightSetButtonPressed(es, False))
-            self.layout.addWidget(onButton, rowNumber, 0)
-            self.layout.addWidget(offButton, rowNumber, 1)
+        self.adjustSize()
 
     def EightSetButtonPressed(self, eightSet, isOn):
         for solenoidNumber in eightSet:

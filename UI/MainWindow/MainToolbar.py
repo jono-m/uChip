@@ -239,6 +239,8 @@ class MainToolbar(QFrame):
         self.procedureSelectionBox.setEnabled(not isRunning)
 
         for b in self.buttons:
+            if b == self.stopButton or b == self.playButton:
+                continue
             b.setEnabled(not isRunning)
 
         self.stopButton.setVisible(isRunning)

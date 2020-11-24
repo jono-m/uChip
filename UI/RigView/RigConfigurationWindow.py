@@ -33,6 +33,7 @@ class RigConfigurationWindow(QDialog):
 
         settingsPanel = QFrame()
         settingsLayout = QVBoxLayout()
+        settingsLayout.setAlignment(Qt.AlignTop)
         settingsLayout.setContentsMargins(0, 0, 0, 0)
         settingsLayout.setSpacing(0)
         settingsLayout.addWidget(self.serialNumberDisplay)
@@ -48,6 +49,7 @@ class RigConfigurationWindow(QDialog):
         buttonsLayout.addWidget(downButton)
 
         listLayout = QVBoxLayout()
+        listLayout.addWidget(QLabel("Detected devices:"))
         listLayout.setContentsMargins(0, 0, 0, 0)
         listLayout.setSpacing(0)
         listLayout.addWidget(self.listDisplay)
@@ -69,7 +71,14 @@ class RigConfigurationWindow(QDialog):
 
         ok = QPushButton("OK")
         ok.clicked.connect(self.accept)
-        layout.addWidget(ok)
+        bottomBar = QFrame()
+        bottomBar.setObjectName("BottomBar")
+        bottomLayout = QHBoxLayout()
+        bottomLayout.setContentsMargins(0, 0, 0, 0)
+        bottomBar.setLayout(bottomLayout)
+        bottomLayout.addWidget(ok)
+        bottomLayout.setAlignment(Qt.AlignRight)
+        layout.addWidget(bottomBar)
 
         self.setLayout(layout)
         self.setWindowTitle("Rig configuration")
