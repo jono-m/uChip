@@ -368,3 +368,63 @@ QStatusBar QLabel {
     color: rgba(255, 255, 255, 0.6);
     qproperty-alignment: 'AlignLeft | AlignVCenter';
 }
+RigViewWidget QScrollArea {
+    padding: 0px;
+    margin: 0px;
+}
+RigViewWidget QFrame[IsEven=false] {
+    background-color: rgba(40, 40, 40, 255);
+    border: 1px solid rgba(0, 0, 0, 100);
+    border-width: 1px 0 1px 0;
+}
+RigViewWidget QFrame[IsEven=true] {
+    background-color: rgba(50, 50, 50, 255);
+}
+RigViewWidget QLabel {
+    border: 0px;
+    padding: 0px;
+    margin: 0px;
+}
+RigConfigurationWindow QListWidget {
+    padding: 0px;
+    margin-left: 10px;
+    margin-right: 10px;
+    color: white;
+}
+RigConfigurationWindow QListWidget::item {
+    color: white;
+}
+RigConfigurationWindow QLabel {
+    border: none;
+    padding: 0px;
+}
+RigConfigurationWindow QFrame {
+    padding: 5px;
+}
+RigConfigurationWindow QCheckBox {
+    margin: 5px;
+}
+RigConfigurationWindow {
+    padding: 0px;
+}
+#BottomBar {
+    padding: 0px;
+    background-color: rgba(255, 255, 255, 10);
+    margin: 5px 0 0 0;
+    border-width: 1px 0 0 0;
+}
+#BottomBar QPushButton {
+    min-width: 50px;
+}
+SolenoidButton {
+    background-color: rgb(200, 0, 0);
+}
+SolenoidButton:hover {
+    background-color: rgb(255, 0, 0);
+}
+SolenoidButton:checked {
+    background-color: rgb(0, 200, 0);
+}
+SolenoidButton:checked:hover {
+    background-color: rgb(0, 255, 0);
+}
