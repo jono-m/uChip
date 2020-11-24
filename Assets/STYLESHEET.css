@@ -148,6 +148,11 @@ WorldBrowser {
     border: 4px solid rgba(100, 100, 100, 1);
     margin: 4px;
 }
+#BlockItem QFrame[IsImage=true] {
+    background-color: transparent;
+    border: none;
+    margin: 8px;
+}
 #BlockItem QFrame[valveState=true] {
     background-color: rgba(160, 191, 101, 1);
     border-color: rgba(160, 191, 101, 1);
@@ -185,7 +190,6 @@ PortHoleWidget {
 }
 #BlockTitle QLabel {
     padding: 10px;
-    font-size: 15px;
     qproperty-alignment: AlignLeft;
 }
 #minMaxButton {
@@ -241,18 +245,17 @@ StepProgressBar::chunk {
 
 /* Sidebar */
 ChipParametersList, ChipValvesList {
-	max-width: 200px;
-	min-width: 200px;
+	max-width: 400px;
+	min-width: 300px;
 	border-width: 0 0 1px 0;
 }
 ChipParametersList > QLabel, ChipValvesList > QLabel {
 	padding: 10px 0 10px 0;
 	color: white;
-	font-weight: bold;
 	qproperty-alignment: AlignLeft;
 	padding-left: 5px;
 	border-bottom-width: 1px;
-	background-color: rgba(30, 30, 30, 255);
+	background-color: rgba(40, 40, 40, 255);
 }
 ChipParameterField, UnboundValveField {
 	padding: 5px;
@@ -302,7 +305,7 @@ ValveField[IsEven=true] * {
 	background-color: rgba(50, 50, 50, 255);
 }
 ValveField[IsEven=false] * {
-	background-color: rgba(30, 30, 30, 255);
+	background-color: rgba(40, 40, 40, 255);
 }
 ValveField * {
 	qproperty-alignment: 'AlignLeft | AlignVCenter';
@@ -311,9 +314,12 @@ ValveField QLabel {
 	padding-left: 5px;
 }
 ValveField QSpinBox{
-	max-width: 70px;
-	min-width: 70px;
+	max-width: 110px;
+	min-width: 110px;
 	border-width: 0 0 0 1px;
+}
+ValveField QSpinBox:hover{
+    background-color: rgba(255, 255, 255, 0.1);
 }
 ValveField QSpinBox::up-button,
 ValveField QSpinBox::down-button {
@@ -321,12 +327,11 @@ ValveField QSpinBox::down-button {
 	height: 0;
 }
 #SolenoidHeading {
-	margin-right: 9px;
 	padding-left: 10px;
-	padding-right: 0px;
+	padding-right: 14px;
 	qproperty-alignment: 'AlignLeft | AlignVCenter';
-	max-width: 65px;
-	min-width: 65px;
+	max-width: 100px;
+	min-width: 100px;
 	border-width: 0 1px 0 1px;
 }
 #NameHeading {
@@ -349,4 +354,17 @@ QDialog QPushButton {
     border-radius: 5px;
     font-weight: bold;
     max-width: 100px;
+}
+QStatusBar {
+    border-top-width: 2px;
+    padding-top: 20px;
+}
+QStatusBar::item {
+    border: none;
+}
+QStatusBar QLabel {
+    border-width: 0 2px 0 0;
+    padding: 5px;
+    color: rgba(255, 255, 255, 0.6);
+    qproperty-alignment: 'AlignLeft | AlignVCenter';
 }

@@ -39,7 +39,7 @@ class CompoundLogicBlock(LogicBlock):
     def AddImage(self, image: 'Image'):
         self._images.add(image)
         self.OnModified.Invoke()
-        image.OnScaleChanged.Register(self.OnModified.Invoke)
+        image.OnPropertyChange.Register(self.OnModified.Invoke)
         image.OnMoved.Register(self.OnModified.Invoke)
         image.OnDestroyed.Register(self.RemoveImage)
         self.OnImageAdded.Invoke(image)
@@ -50,7 +50,7 @@ class CompoundLogicBlock(LogicBlock):
         self._images.remove(image)
         self.OnModified.Invoke()
         image.OnDestroyed.Unregister(self.RemoveImage)
-        image.OnScaleChanged.Unregister(self.OnModified.Invoke)
+        image.OnPropertyChange.Unregister(self.OnModified.Invoke)
         image.OnMoved.Unregister(self.OnModified.Invoke)
         self.OnImageRemoved.Invoke(image)
 
@@ -222,11 +222,16 @@ class Image:
         self._position = QPointF(0, 0)
         self.filename = filename
         self._scale = 1
+        self._opacity = 1
 
-        self.OnScaleChanged = Event()
+        self.OnPropertyChange = Event()
         self.OnMoved = Event()
         self.OnDestroyed = Event()
         self.OnClosed = Event()
+
+    def SetOpacity(self, opacity: float):
+        self._opacity = opacity
+        self.OnPropertyChange.Invoke()
 
     def SetPosition(self, position: QPointF):
         self._position = position
@@ -234,7 +239,7 @@ class Image:
 
     def SetScale(self, scale):
         self._scale = scale
-        self.OnScaleChanged.Invoke()
+        self.OnPropertyChange.Invoke()
 
     def Destroy(self):
         self.OnDestroyed.Invoke(self)
@@ -247,3 +252,6 @@ class Image:
 
     def GetScale(self):
         return self._scale
+
+    def GetOpacity(self):
+        return self._opacity

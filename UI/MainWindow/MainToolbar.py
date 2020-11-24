@@ -4,7 +4,7 @@ from LogicBlocks.NumberBlocks import *
 from LogicBlocks.ScriptedBlock import *
 from UI.Procedure.ProcedureMenu import *
 from UI.Procedure.ProcedureSelectionBox import *
-
+from UI.MainWindow.StatusBar import *
 
 class ToolbarSection:
     def __init__(self, name):
@@ -178,6 +178,8 @@ class MainToolbar(QFrame):
         proceduresWidgetLayout.setSpacing(0)
         proceduresWidget.setLayout(proceduresWidgetLayout)
         self.procedureSelectionBox = ProcedureSelectionBox()
+        self.procedureSelectionBox.setToolTip("Procedure Selection")
+        self.procedureSelectionBox.installEventFilter(self)
         self.procedureSelectionBox.OnProcedureSelected.Register(self.OnProcedureSelected.Invoke)
         self.playButton = self.CreateButton("Assets/playIcon.png", "Run Procedure",
                                             delegate=self.OnProcedurePlay.Invoke, trueColor=True,
@@ -236,22 +238,24 @@ class MainToolbar(QFrame):
     def UpdateForProcedureStatus(self, isRunning):
         self.procedureSelectionBox.setEnabled(not isRunning)
 
-        self.stopButton.setVisible(isRunning)
-        self.playButton.setVisible(not isRunning)
-
         for b in self.buttons:
             b.setEnabled(not isRunning)
 
-        self.stopButton.setEnabled(isRunning)
+        self.stopButton.setVisible(isRunning)
+        self.playButton.setVisible(not isRunning)
 
     def CreateButton(self, icon, text, delegate=None, menu=None, above=False, showText=True, trueColor=False):
         b = QToolButton()
+        b.setToolTip(text)
         if showText:
             if above:
                 b.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
             else:
                 text = "   " + text
                 b.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+            b.setText(text)
+        else:
+            b.setText("")
 
         if icon is not None:
             if trueColor:
@@ -260,8 +264,6 @@ class MainToolbar(QFrame):
                 color = QColor(230, 230, 230)
             b.setIcon(ColorIcon(icon, color))
 
-        b.setText(text)
-        b.setToolTip(text)
         if delegate is not None:
             b.clicked.connect(delegate)
         b.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
@@ -272,7 +274,17 @@ class MainToolbar(QFrame):
 
         self.buttons.append(b)
 
+        b.installEventFilter(self)
+
         return b
+
+    def eventFilter(self, watched:QObject, event:QEvent) -> bool:
+        if isinstance(watched, QWidget):
+            if event.type() == QEvent.Enter:
+                StatusBar.globalStatusBar.SetInfoMessage(watched.toolTip())
+            elif event.type() == QEvent.Leave:
+                StatusBar.globalStatusBar.SetInfoMessage("")
+        return False
 
     def LogicBlockMenu(self, blocks: typing.List[typing.Type[LogicBlock]]):
         menu = QMenu(self)
