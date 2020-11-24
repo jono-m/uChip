@@ -6,6 +6,7 @@ from UI.RigView.RigViewWidget import *
 from Procedures.ProcedureRunner import *
 from UI.ProceduresDialog import *
 from UI.Chip.ChipParametersList import *
+from UI.MainWindow.StatusBar import *
 
 
 class MainWorkArea(QFrame):
@@ -33,6 +34,8 @@ class MainWorkArea(QFrame):
         self.toolBar.OnProcedureStop.Register(lambda: self.procedureRunner.StopProcedure(True))
         self.toolBar.OnManageProcedures.Register(self.ShowProceduresDialog)
         self.toolBar.OnOpenRig.Register(self.ShowRig)
+
+        self.statusBar = StatusBar()
 
         self.chipParametersList = ChipParametersList()
         self.valvesList = ChipValvesList()
@@ -72,6 +75,7 @@ class MainWorkArea(QFrame):
         innerLayout.addWidget(self.tabArea, stretch=1)
 
         layout.addLayout(innerLayout, stretch=1)
+        layout.addWidget(self.statusBar, stretch=0)
         self.setLayout(layout)
 
         self.currentEditorFrame: typing.Optional[BaseEditorFrame] = None

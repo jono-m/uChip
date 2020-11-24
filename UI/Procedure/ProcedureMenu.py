@@ -36,6 +36,9 @@ class GetMenu(QMenu):
                 action.triggered.connect(
                     lambda checked=False, b=valveBlock: self.OnAddGet.Invoke(CurrentValveBlock(b)))
 
+        if len(self.actions()) == 0:
+            self.addAction("No parameters found.")
+
 
 class SetMenu(QMenu):
     def __init__(self):
@@ -69,3 +72,6 @@ class SetMenu(QMenu):
                 action = self.addAction(valveBlock.GetName())
                 action.triggered.connect(
                     lambda checked=False, b=valveBlock: self.OnAddSet.Invoke(ValveSettingStep(b)))
+
+        if len(self.actions()) == 0:
+            self.addAction("No parameters found.")

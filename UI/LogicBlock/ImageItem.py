@@ -3,20 +3,33 @@ from UI.WorldBrowser.BlockItem import *
 from UI.StylesheetLoader import *
 
 
+class ImageWidget(QLabel):
+    def __init__(self):
+        super().__init__()
+        self.opacity = 1
+
+    def paintEvent(self, arg__1: QPaintEvent):
+        painter = QPainter()
+        painter.begin(self)
+        painter.setOpacity(self.opacity)
+        painter.drawPixmap(0, 0, self.pixmap())
+
+
 class ImageItem(BlockItem):
     def __init__(self, s: QGraphicsScene, image: Image):
         super().__init__(s)
 
+        self.container.setProperty("IsImage", True)
         self.image = image
 
         self.rawPixmap: typing.Optional[QPixmap] = None
         self.scaledPixmap: typing.Optional[QPixmap] = None
 
-        self.imageWidget = QLabel()
+        self.imageWidget = ImageWidget()
         self.container.layout().addWidget(self.imageWidget)
         self.setZValue(-20)
 
-        self.image.OnScaleChanged.Register(self.RescaleImage, True)
+        self.image.OnPropertyChange.Register(self.RescaleImage, True)
         self.image.OnDestroyed.Register(self.Destroy, True)
 
         s.addItem(self)
@@ -24,7 +37,7 @@ class ImageItem(BlockItem):
         self.RescaleImage()
 
     def Destroy(self):
-        self.image.OnScaleChanged.Unregister(self.ReloadImage)
+        self.image.OnPropertyChange.Unregister(self.ReloadImage)
         self.image.OnDestroyed.Unregister(self.Destroy)
         self.deleteLater()
 
@@ -33,6 +46,7 @@ class ImageItem(BlockItem):
 
     def RescaleImage(self):
         self.scaledPixmap = self.rawPixmap.scaledToWidth(self.rawPixmap.width() * self.image.GetScale())
+        self.imageWidget.opacity = self.image.GetOpacity()
         self.imageWidget.setPixmap(self.scaledPixmap)
         self.widget().setFixedSize(self.scaledPixmap.size())
         self.setPos(self.image.GetPosition() - self.MySize() * 0.5)
@@ -44,10 +58,8 @@ class ImageItem(BlockItem):
         self.image.SetPosition(self.scenePos() + self.MySize() * 0.5)
 
     def TryDelete(self):
-        if super().TryDelete():
-            self.image.Destroy()
-            return True
-        return False
+        self.image.Destroy()
+        return True
 
     def OnDoubleClick(self):
         super().OnDoubleClick()
@@ -89,8 +101,24 @@ class ImageSizeDialog(QDialog):
         scaleLayout.addWidget(self.spin, stretch=1)
         scalePanel.setLayout(scaleLayout)
 
+        opacityPanel = QFrame()
+        opacityLayout = QHBoxLayout()
+        opacityLayout.setContentsMargins(0, 0, 0, 0)
+        opacityLayout.setSpacing(0)
+        opacityLayout.addWidget(QLabel("Opacity: "), stretch=0)
+        self.slider = QSlider(Qt.Horizontal)
+        self.slider.setMinimum(0)
+        self.slider.setMaximum(100)
+        self.slider.setTickInterval(10)
+        self.slider.setTickPosition(QSlider.TicksBelow)
+        self.slider.setValue(image.GetOpacity()*100)
+        self.slider.valueChanged.connect(lambda x: self.image.SetOpacity(float(x)/100))
+        opacityLayout.addWidget(self.slider, stretch=1)
+        opacityPanel.setLayout(opacityLayout)
+
         layout.addWidget(namePanel)
         layout.addWidget(scalePanel)
+        layout.addWidget(opacityPanel)
 
         ok = QPushButton("OK")
         ok.clicked.connect(self.accept)

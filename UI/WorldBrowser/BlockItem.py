@@ -92,10 +92,5 @@ class BlockItem(QGraphicsProxyWidget, SelectableItem):
     def IsMovableAtPoint(self, scenePoint: QPointF):
         return self.IsContainerSelected(scenePoint)
 
-    def TryDelete(self) -> bool:
-        if not self.IsChildFocused(self.widget()):
-            return self.blockWidget.TryDelete()
-        return False
-
     def OnDoubleClick(self):
         pass

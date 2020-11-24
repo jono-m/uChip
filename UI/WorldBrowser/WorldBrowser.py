@@ -3,6 +3,7 @@ from enum import Enum
 from UI.WorldBrowser.BlockItem import *
 from UI.WorldBrowser.PortHoles import *
 from Util import Event
+from UI.MainWindow.StatusBar import *
 
 
 class State(Enum):
@@ -42,14 +43,17 @@ class WorldBrowser(QGraphicsView):
         self.anchorPort: typing.Optional[PortHoleWidget] = None
         self._hoveredPortHole: typing.Optional[PortHoleWidget] = None
 
-        self.selectionBox = self.scene().addRect(QRectF(), QPen(QBrush(QColor(52, 222, 235)), 2), QBrush(QColor(52, 222, 235, 50)))
+        self.selectionBox = self.scene().addRect(QRectF(), QPen(QBrush(QColor(52, 222, 235)), 2),
+                                                 QBrush(QColor(52, 222, 235, 50)))
         self.selectionBox.setZValue(100)
         self.selectionBox.setVisible(False)
 
         self.OnConnectionMade = Event()
 
-        self.gridSpacing = QSize(30, 30)
+        self.gridSpacing = QSize(60, 60)
         self.gridColor = QColor(50, 50, 50)
+
+        self.gridThreshold = -1.5
 
         self._actionsEnabled = True
 
@@ -80,6 +84,9 @@ class WorldBrowser(QGraphicsView):
 
     def drawBackground(self, painter: QPainter, rect: QRectF):
         super().drawBackground(painter, rect)
+
+        if self._zoom <= self.gridThreshold:
+            return
 
         if not self._actionsEnabled:
             return
@@ -155,6 +162,7 @@ class WorldBrowser(QGraphicsView):
 
         oldWorldPos = self.mapToScene(self._currentCursorPosition)
         self._zoom = min(self._zoom + numSteps, 0)
+        self.UpdateView()
         newWorldPos = self.mapToScene(self._currentCursorPosition)
 
         delta = newWorldPos - oldWorldPos
@@ -225,6 +233,9 @@ class WorldBrowser(QGraphicsView):
         self.UpdateUI()
 
         super().mouseMoveEvent(event)
+
+        sceneCoordinates = self.mapToScene(newCursorPosition)
+        StatusBar.globalStatusBar.SetCoordinates(sceneCoordinates.toPoint())
 
     def SetActionsEnabled(self, actionsEnabled):
         self._actionsEnabled = actionsEnabled
