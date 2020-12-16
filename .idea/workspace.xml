@@ -25,12 +25,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="99850780-df20-4af2-831c-10fab045648b" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/500KChip/CombinatorialMultiplexer.usb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/500KChip/Multiplexer10.usb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/STYLESHEET.css" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/STYLESHEET.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/MainWindow/MainToolbar.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/MainWindow/MainToolbar.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/RigView/RigConfigurationWindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/RigView/RigConfigurationWindow.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/RigView/RigViewWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/RigView/RigViewWidget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/devicePreferences.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/devicePreferences.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LogicBlocks/ScriptedBlock.py" beforeDir="false" afterPath="$PROJECT_DIR$/LogicBlocks/ScriptedBlock.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/Chip/ChipEditor.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Chip/ChipEditor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/Procedure/ProcedureMenu.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Procedure/ProcedureMenu.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/WorldBrowser/WorldBrowser.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/WorldBrowser/WorldBrowser.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/windowSettings.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/windowSettings.pkl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -61,7 +62,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../uPunch" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/500KChip" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
@@ -74,6 +75,9 @@
     </option>
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\jonoj\Repositories\uChip\500KChip" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\jonoj\Repositories\uChip\Assets" />
     </key>
@@ -106,6 +110,7 @@
       </list>
     </recent_temporary>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="project-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -168,50 +173,50 @@
     </state>
     <state x="329" y="352" key="FileChooserDialogImpl/0.0.2194.1194@0.0.2194.1194" timestamp="1601328827688" />
     <state x="516" y="413" key="FileChooserDialogImpl/0.0.3440.1400@0.0.3440.1400" timestamp="1604944931740" />
-    <state width="1696" height="486" key="GridCell.Tab.0.bottom" timestamp="1606248055027">
-      <screen x="0" y="0" width="3440" height="1400" />
+    <state width="2173" height="405" key="GridCell.Tab.0.bottom" timestamp="1608080839806">
+      <screen x="0" y="0" width="2194" height="1194" />
     </state>
-    <state width="1075" height="408" key="GridCell.Tab.0.bottom/0.0.2194.1194@0.0.2194.1194" timestamp="1602874431741" />
+    <state width="2173" height="405" key="GridCell.Tab.0.bottom/0.0.2194.1194@0.0.2194.1194" timestamp="1608080839806" />
     <state width="1696" height="486" key="GridCell.Tab.0.bottom/0.0.3440.1400@0.0.3440.1400" timestamp="1606248055027" />
-    <state width="1696" height="486" key="GridCell.Tab.0.center" timestamp="1606248055027">
-      <screen x="0" y="0" width="3440" height="1400" />
+    <state width="2173" height="405" key="GridCell.Tab.0.center" timestamp="1608080839806">
+      <screen x="0" y="0" width="2194" height="1194" />
     </state>
-    <state width="1075" height="408" key="GridCell.Tab.0.center/0.0.2194.1194@0.0.2194.1194" timestamp="1602874431741" />
+    <state width="2173" height="405" key="GridCell.Tab.0.center/0.0.2194.1194@0.0.2194.1194" timestamp="1608080839806" />
     <state width="1696" height="486" key="GridCell.Tab.0.center/0.0.3440.1400@0.0.3440.1400" timestamp="1606248055027" />
-    <state width="1696" height="486" key="GridCell.Tab.0.left" timestamp="1606248055027">
-      <screen x="0" y="0" width="3440" height="1400" />
+    <state width="2173" height="405" key="GridCell.Tab.0.left" timestamp="1608080839806">
+      <screen x="0" y="0" width="2194" height="1194" />
     </state>
-    <state width="1075" height="408" key="GridCell.Tab.0.left/0.0.2194.1194@0.0.2194.1194" timestamp="1602874431741" />
+    <state width="2173" height="405" key="GridCell.Tab.0.left/0.0.2194.1194@0.0.2194.1194" timestamp="1608080839806" />
     <state width="1696" height="486" key="GridCell.Tab.0.left/0.0.3440.1400@0.0.3440.1400" timestamp="1606248055027" />
-    <state width="1696" height="486" key="GridCell.Tab.0.right" timestamp="1606248055027">
-      <screen x="0" y="0" width="3440" height="1400" />
+    <state width="2173" height="405" key="GridCell.Tab.0.right" timestamp="1608080839806">
+      <screen x="0" y="0" width="2194" height="1194" />
     </state>
-    <state width="1075" height="408" key="GridCell.Tab.0.right/0.0.2194.1194@0.0.2194.1194" timestamp="1602874431741" />
+    <state width="2173" height="405" key="GridCell.Tab.0.right/0.0.2194.1194@0.0.2194.1194" timestamp="1608080839806" />
     <state width="1696" height="486" key="GridCell.Tab.0.right/0.0.3440.1400@0.0.3440.1400" timestamp="1606248055027" />
-    <state width="1696" height="486" key="GridCell.Tab.1.bottom" timestamp="1606248055027">
-      <screen x="0" y="0" width="3440" height="1400" />
+    <state width="2173" height="405" key="GridCell.Tab.1.bottom" timestamp="1608080839806">
+      <screen x="0" y="0" width="2194" height="1194" />
     </state>
-    <state width="1075" height="408" key="GridCell.Tab.1.bottom/0.0.2194.1194@0.0.2194.1194" timestamp="1602874431741" />
+    <state width="2173" height="405" key="GridCell.Tab.1.bottom/0.0.2194.1194@0.0.2194.1194" timestamp="1608080839806" />
     <state width="1696" height="486" key="GridCell.Tab.1.bottom/0.0.3440.1400@0.0.3440.1400" timestamp="1606248055027" />
-    <state width="1696" height="486" key="GridCell.Tab.1.center" timestamp="1606248055027">
-      <screen x="0" y="0" width="3440" height="1400" />
+    <state width="2173" height="405" key="GridCell.Tab.1.center" timestamp="1608080839806">
+      <screen x="0" y="0" width="2194" height="1194" />
     </state>
-    <state width="1075" height="408" key="GridCell.Tab.1.center/0.0.2194.1194@0.0.2194.1194" timestamp="1602874431741" />
+    <state width="2173" height="405" key="GridCell.Tab.1.center/0.0.2194.1194@0.0.2194.1194" timestamp="1608080839806" />
     <state width="1696" height="486" key="GridCell.Tab.1.center/0.0.3440.1400@0.0.3440.1400" timestamp="1606248055027" />
-    <state width="1696" height="486" key="GridCell.Tab.1.left" timestamp="1606248055027">
-      <screen x="0" y="0" width="3440" height="1400" />
+    <state width="2173" height="405" key="GridCell.Tab.1.left" timestamp="1608080839806">
+      <screen x="0" y="0" width="2194" height="1194" />
     </state>
-    <state width="1075" height="408" key="GridCell.Tab.1.left/0.0.2194.1194@0.0.2194.1194" timestamp="1602874431741" />
+    <state width="2173" height="405" key="GridCell.Tab.1.left/0.0.2194.1194@0.0.2194.1194" timestamp="1608080839806" />
     <state width="1696" height="486" key="GridCell.Tab.1.left/0.0.3440.1400@0.0.3440.1400" timestamp="1606248055027" />
-    <state width="1696" height="486" key="GridCell.Tab.1.right" timestamp="1606248055027">
-      <screen x="0" y="0" width="3440" height="1400" />
+    <state width="2173" height="405" key="GridCell.Tab.1.right" timestamp="1608080839806">
+      <screen x="0" y="0" width="2194" height="1194" />
     </state>
-    <state width="1075" height="408" key="GridCell.Tab.1.right/0.0.2194.1194@0.0.2194.1194" timestamp="1602874431741" />
+    <state width="2173" height="405" key="GridCell.Tab.1.right/0.0.2194.1194@0.0.2194.1194" timestamp="1608080839806" />
     <state width="1696" height="486" key="GridCell.Tab.1.right/0.0.3440.1400@0.0.3440.1400" timestamp="1606248055027" />
-    <state x="908" y="246" key="SettingsEditor" timestamp="1603127399180">
-      <screen x="0" y="0" width="3440" height="1400" />
+    <state x="137" y="246" key="SettingsEditor" timestamp="1607744435194">
+      <screen x="0" y="0" width="2194" height="1194" />
     </state>
-    <state x="606" y="242" key="SettingsEditor/0.0.2194.1194@0.0.2194.1194" timestamp="1601323176024" />
+    <state x="137" y="246" key="SettingsEditor/0.0.2194.1194@0.0.2194.1194" timestamp="1607744435194" />
     <state x="908" y="246" key="SettingsEditor/0.0.3440.1400@0.0.3440.1400" timestamp="1603127399180" />
     <state x="1284" y="429" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1601582444276">
       <screen x="0" y="0" width="3440" height="1400" />
@@ -257,11 +262,6 @@
           <option name="timeStamp" value="38" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/UI/Chip/ChipValvesList.py</url>
-          <line>82</line>
-          <option name="timeStamp" value="43" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/UI/LogicBlock/BlockConnection.py</url>
           <line>66</line>
           <option name="timeStamp" value="44" />
@@ -275,6 +275,11 @@
           <url>file://$PROJECT_DIR$/UI/RigView/RigViewWidget.py</url>
           <line>54</line>
           <option name="timeStamp" value="48" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/UI/LogicBlock/LogicBlockEditor.py</url>
+          <line>34</line>
+          <option name="timeStamp" value="55" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

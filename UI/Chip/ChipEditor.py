@@ -21,4 +21,4 @@ class ChipEditor(LogicBlockEditor):
         if isinstance(newBlock, ValveLogicBlock):
             return ValveBlockItem(self.worldBrowser.scene(), newBlock)
         else:
-            super().CreateBlockItem(newBlock)
+            return super().CreateBlockItem(newBlock)

@@ -28,7 +28,7 @@ class GetMenu(QMenu):
                                 key=lambda x: x.name):
             action = self.addAction(inputPort.name)
             action.triggered.connect(
-                lambda checked=False, b=inputPort: self.OnAddGet.Invoke(CurrentSettingBlock(inputPort)))
+                lambda checked=False, b=inputPort: self.OnAddGet.Invoke(CurrentSettingBlock(b)))
 
         for valveBlock in sorted(self.chipController.valveBlocks, key=lambda x: x.GetName()):
             if valveBlock.openInput.connectedOutput is None:
@@ -65,7 +65,7 @@ class SetMenu(QMenu):
                                 key=lambda x: x.name):
             action = self.addAction(inputPort.name)
             action.triggered.connect(
-                lambda checked=False, b=inputPort: self.OnAddSet.Invoke(ChipSettingStep(inputPort)))
+                lambda checked=False, b=inputPort: self.OnAddSet.Invoke(ChipSettingStep(b)))
 
         for valveBlock in sorted(self.chipController.valveBlocks, key=lambda x: x.GetName()):
             if valveBlock.openInput.connectedOutput is None:

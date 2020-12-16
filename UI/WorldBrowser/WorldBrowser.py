@@ -1,5 +1,5 @@
 from enum import Enum
-
+import time
 from UI.WorldBrowser.BlockItem import *
 from UI.WorldBrowser.PortHoles import *
 from Util import Event
@@ -93,17 +93,22 @@ class WorldBrowser(QGraphicsView):
 
         painter.setPen(self.gridColor)
 
+        lines = []
         if self.gridSpacing.width() > 0:
             xStart = rect.left() - rect.left() % self.gridSpacing.width()
             while xStart <= rect.right():
-                painter.drawLine(int(xStart), int(rect.bottom()), int(xStart), int(rect.top()))
+                line = QLine(int(xStart), int(rect.bottom()), int(xStart), int(rect.top()))
+                lines.append(line)
                 xStart = xStart + self.gridSpacing.width()
 
         if self.gridSpacing.height() > 0:
             yStart = rect.top() - rect.top() % self.gridSpacing.height()
             while yStart <= rect.bottom():
-                painter.drawLine(int(rect.left()), int(yStart), int(rect.right()), int(yStart))
+                line = QLine(int(rect.left()), int(yStart), int(rect.right()), int(yStart))
+                lines.append(line)
                 yStart = yStart + self.gridSpacing.height()
+
+        painter.drawLines(lines)
 
     def ClearSelection(self):
         for item in self._selectedItems:
