@@ -71,6 +71,14 @@ class ScriptedBlock(LogicBlock):
         else:
             return self.codeLocals['blockName']
 
+    def Duplicate(self) -> 'LogicBlock':
+        newB = ScriptedBlock(self.scriptFilename)
+        for i in range(len(self._inputs)):
+            newB._inputs[i].SetDefaultData(self._inputs[i].GetDefaultData())
+        newB.SetPosition(self.GetPosition())
+        self.OnDuplicated.Invoke(newB)
+        return newB
+
     def UpdateOutputs(self):
         currentModifiedTime = os.path.getmtime(self.scriptFilename)
         if currentModifiedTime != self.lastModifiedTime:
