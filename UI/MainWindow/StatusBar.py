@@ -15,6 +15,9 @@ class StatusBar(QStatusBar):
 
         StatusBar.globalStatusBar = self
 
+        self.SetInfoMessage("Welcome to μChip!")
+        self.SetCoordinates(QPoint(0, 0))
+
     def SetInfoMessage(self, message):
         self.infoMessage.setText(message)
 

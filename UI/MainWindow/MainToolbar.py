@@ -141,8 +141,8 @@ class MainToolbar(QFrame):
             self.CreateButton("Assets/conditionalIcon.png", "Decision",
                               delegate=lambda: self.OnAddLogicBlock.Invoke(IfStep())), 1, 0)
 
-        self.getMenu = GetMenu()
-        self.setMenu = SetMenu()
+        self.getMenu = GetMenu(self)
+        self.setMenu = SetMenu(self)
 
         self.getMenu.OnAddGet.Register(self.OnAddLogicBlock.Invoke, True)
         self.setMenu.OnAddSet.Register(self.OnAddLogicBlock.Invoke, True)
