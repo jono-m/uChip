@@ -18,8 +18,6 @@ class MainWorkArea(QFrame):
         self.procedureRunner.OnBegin.Register(lambda: self.UpdateForProcedureStatus(True))
         self.procedureRunner.OnDone.Register(lambda: self.UpdateForProcedureStatus(False))
 
-        self.rigViewWidget = RigViewWidget(self.rig, parent=self)
-
         self.toolBar = MainToolbar()
         self.toolBar.OnNewLB.Register(lambda: self.OpenLogicBlock(None))
         self.toolBar.OnNewChip.Register(lambda: self.RequestChipOpen(None))
@@ -222,7 +220,8 @@ class MainWorkArea(QFrame):
         self.toolBar.procedureSelectionBox.UpdateProceduresList()
 
     def ShowRig(self):
-        self.rigViewWidget.show()
+        rigViewWidget = RigViewWidget(self.rig, parent=self)
+        rigViewWidget.exec_()
 
 
 class OpenDialog(QFileDialog):

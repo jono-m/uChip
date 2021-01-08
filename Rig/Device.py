@@ -83,6 +83,5 @@ class Device:
                     if port.serial_number[:2] == 'EL':
                         foundDevices.append(port)
 
-        foundDevices += ["A", "B", "C"]
-
+        foundDevices += ['A', 'B', 'C', 'D', 'E', 'F', 'G']
         return foundDevices

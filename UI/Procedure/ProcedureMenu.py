@@ -2,8 +2,8 @@ from ChipController.ChipController import *
 
 
 class GetMenu(QMenu):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent):
+        super().__init__(parent)
         self.chipController: typing.Optional[ChipController] = None
 
         self.OnAddGet = Event()
@@ -41,8 +41,8 @@ class GetMenu(QMenu):
 
 
 class SetMenu(QMenu):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent):
+        super().__init__(parent)
         self.chipController: typing.Optional[ChipController] = None
 
         self.OnAddSet = Event()

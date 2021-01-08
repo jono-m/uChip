@@ -3,6 +3,7 @@ from Rig.Rig import Rig
 from Rig.Device import Device
 from UI.StylesheetLoader import *
 import typing
+import math
 
 
 class RigConfigurationWindow(QDialog):
@@ -95,11 +96,17 @@ class RigConfigurationWindow(QDialog):
         self.listDisplay.clear()
 
         indexToSelect = -1
-        for deviceIndex in range(len(self.rig.GetConnectedDevices())):
+        devs = self.rig.GetConnectedDevices()
+        nSol = math.floor(math.log10(len(devs) * 24 - 1))+1
+        for deviceIndex in range(len(devs)):
             device = self.rig.GetConnectedDevices()[deviceIndex]
             if device.portInfo.serial_number == self.selectedDeviceSerialNumber:
                 indexToSelect = deviceIndex
-            QListWidgetItem(device.portInfo.serial_number, self.listDisplay)
+            start = deviceIndex * 24
+            end = (deviceIndex + 1) * 24 - 1
+            QListWidgetItem(
+                "(" + str(start).zfill(nSol) + "-" + str(end).zfill(nSol) + ") " + device.portInfo.serial_number,
+                self.listDisplay)
 
         self.listDisplay.blockSignals(False)
 

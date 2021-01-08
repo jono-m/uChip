@@ -339,22 +339,6 @@ ValveField QSpinBox::down-button {
 	padding-left: 5px;
 	border: none;
 }
-QDialog > QFrame {
-    padding: 10px;
-    margin: 5px 5px 0 5px;
-    border-width: 1px;
-}
-QDialog * {
-    qproperty-alignment: 'AlignLeft | AlignVCenter';
-}
-QDialog QPushButton {
-    margin: 5px;
-    border-width: 1px;
-    padding: 5px;
-    border-radius: 5px;
-    font-weight: bold;
-    max-width: 100px;
-}
 QStatusBar {
     border-top-width: 2px;
     padding-top: 20px;
@@ -368,22 +352,33 @@ QStatusBar QLabel {
     color: rgba(255, 255, 255, 0.6);
     qproperty-alignment: 'AlignLeft | AlignVCenter';
 }
-RigViewWidget QScrollArea {
-    padding: 0px;
-    margin: 0px;
+
+/* Rig View */
+QDialog QPushButton {
+    border-width: 1px;
+    padding: 5px;
+    border-radius: 5px;
+    font-weight: bold;
 }
 RigViewWidget QFrame[IsEven=false] {
-    background-color: rgba(40, 40, 40, 255);
-    border: 1px solid rgba(0, 0, 0, 100);
-    border-width: 1px 0 1px 0;
+    background-color: rgba(30, 30, 30, 255);
 }
 RigViewWidget QFrame[IsEven=true] {
-    background-color: rgba(50, 50, 50, 255);
+    background-color: rgba(40, 40, 40, 255);
 }
 RigViewWidget QLabel {
-    border: 0px;
-    padding: 0px;
-    margin: 0px;
+    border: none;
+    margin-top: 20px;
+    qproperty-alignment: 'AlignCenter';
+}
+RigViewWidget QScrollArea QLabel {
+    margin-top: 0px;
+    padding: 20px;
+}
+RigViewWidget QFrame QPushButton {
+    min-height: 50px;
+    max-height: 50px;
+    margin: 5px;
 }
 RigConfigurationWindow QListWidget {
     padding: 0px;
@@ -418,6 +413,8 @@ RigConfigurationWindow {
 }
 SolenoidButton {
     background-color: rgb(200, 0, 0);
+    min-width: 50px;
+    max-width: 50px;
 }
 SolenoidButton:hover {
     background-color: rgb(255, 0, 0);

@@ -7,7 +7,7 @@ class RigViewWidget(QDialog):
         super().__init__(*args, **kwargs)
         self.setWindowFlags(Qt.WindowTitleHint | Qt.WindowCloseButtonHint | Qt.Dialog | Qt.MSWindowsFixedSizeDialogHint)
 
-        self.setWindowTitle("Rig Solenoids")
+        self.setWindowTitle("Rig")
 
         self.mainLayout = QVBoxLayout()
         self.mainLayout.setContentsMargins(0, 0, 0, 0)
@@ -16,27 +16,22 @@ class RigViewWidget(QDialog):
 
         self.solenoidButtons: typing.List[SolenoidButton] = []
 
-        buttonLayout = QHBoxLayout()
-        buttonLayout.setAlignment(Qt.AlignLeft)
-        configureButton = QPushButton()
-        configureButton.setText("Configure Rig...")
-        configureButton.clicked.connect(self.ShowDialog)
-
-        closeButton = QPushButton("Close")
-        closeButton.clicked.connect(lambda: self.accept())
-        buttonLayout.addWidget(configureButton, stretch=0)
-        buttonLayout.addWidget(QLabel(), stretch=1)
-        buttonLayout.addWidget(closeButton, stretch=0)
-
-        self.solenoidsScrollArea = QScrollArea()
-
-        self.mainLayout.addWidget(self.solenoidsScrollArea)
-        self.mainLayout.addLayout(buttonLayout)
+        self.configureButton = QPushButton()
+        self.configureButton.setText("Configure Rig...")
+        self.configureButton.clicked.connect(self.ShowDialog)
 
         self.solenoidsContainer = QFrame()
 
-        self.solenoidsScrollArea.setWidget(self.solenoidsContainer)
-        self.solenoidsScrollArea.setWidgetResizable(True)
+        self.mainLayout.addWidget(self.configureButton)
+        self.mainLayout.addWidget(QLabel("Solenoids"))
+
+        scrollArea = QScrollArea()
+        scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scrollArea.setWidgetResizable(True)
+        scrollArea.setWidget(self.solenoidsContainer)
+
+        self.mainLayout.addWidget(scrollArea)
 
         self.solenoidsLayout = QVBoxLayout()
         self.solenoidsLayout.setContentsMargins(0, 0, 0, 0)
@@ -72,6 +67,7 @@ class RigViewWidget(QDialog):
                 currentLayout = QHBoxLayout()
                 currentLayout.setContentsMargins(0, 0, 0, 0)
                 currentLayout.setSpacing(0)
+                currentLayout.setAlignment(Qt.AlignLeft)
                 container.setLayout(currentLayout)
                 container.setProperty("IsEven", row % 2 == 0)
                 self.solenoidsLayout.addWidget(container)
@@ -94,9 +90,12 @@ class RigViewWidget(QDialog):
             currentLayout.addWidget(newSolenoidButton)
 
         if len(self.solenoidButtons) == 0:
-            self.solenoidsLayout.addWidget(QLabel("No devices connected."), 0, 0)
+            self.solenoidsLayout.addWidget(QLabel("No devices connected."))
 
+        self.solenoidsContainer.adjustSize()
         self.adjustSize()
+        print(self.solenoidsContainer.sizeHint())
+        print(self.solenoidsContainer.size())
 
     def EightSetButtonPressed(self, eightSet, isOn):
         for solenoidNumber in eightSet:
