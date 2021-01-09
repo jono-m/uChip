@@ -25,7 +25,7 @@ class CustomLogicBlockEditorFrame(BaseEditorFrame):
         self.updateTimer.timeout.connect(self.TimerUpdate)
         self.updateTimer.start(100)
 
-        self.hasFilename = logicBlock.GetFilename() is not None
+        self.hasFilename = logicBlock.absolutePath is not None
 
     def TimerUpdate(self):
         if self.logicBlock is not None:
