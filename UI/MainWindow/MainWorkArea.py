@@ -15,8 +15,8 @@ class MainWorkArea(QFrame):
 
         self.rig = rig
         self.procedureRunner = procedureRunner
-        self.procedureRunner.OnBegin.Register(lambda: self.UpdateForProcedureStatus(True))
-        self.procedureRunner.OnDone.Register(lambda: self.UpdateForProcedureStatus(False))
+        self.procedureRunner.onBegin.connect(lambda: self.UpdateForProcedureStatus(True))
+        self.procedureRunner.onDone.connect(lambda: self.UpdateForProcedureStatus(False))
 
         self.toolBar = MainToolbar()
         self.toolBar.OnNewLB.Register(lambda: self.OpenLogicBlock(None))
@@ -66,18 +66,20 @@ class MainWorkArea(QFrame):
         sidebarLayout.addWidget(self.valvesList)
         layout.addWidget(self.toolBar, stretch=0)
 
-        innerLayout = QHBoxLayout()
-        innerLayout.setContentsMargins(0, 0, 0, 0)
-        innerLayout.setSpacing(0)
-        innerLayout.addLayout(sidebarLayout)
-        innerLayout.addWidget(self.tabArea, stretch=1)
+        self.innerLayout = QHBoxLayout()
+        self.innerLayout.setContentsMargins(0, 0, 0, 0)
+        self.innerLayout.setSpacing(0)
+        self.innerLayout.addLayout(sidebarLayout)
+        self.innerLayout.addWidget(self.tabArea, stretch=1)
 
-        layout.addLayout(innerLayout, stretch=1)
+        layout.addLayout(self.innerLayout, stretch=1)
         layout.addWidget(self.statusBar, stretch=0)
         self.setLayout(layout)
 
         self.currentEditorFrame: typing.Optional[BaseEditorFrame] = None
         self.SwitchTabs(0)
+
+        self._procedureInTab = True
 
     def SwitchTabs(self, tabIndex):
         if self.currentEditorFrame is not None:
@@ -103,9 +105,19 @@ class MainWorkArea(QFrame):
         self.valvesList.setEnabled(not isRunning)
 
         if isRunning:
-            self.SwitchTabs(1)
-        for i in range(2, self.tabArea.count()):
-            self.tabArea.setTabEnabled(i, isRunning)
+            self.SwitchTabs(0)
+            if self._procedureInTab:
+                self.tabArea.removeTab(1)
+                self.innerLayout.addWidget(self.procedureFrame, stretch=1)
+                self.procedureFrame.setVisible(True)
+                self._procedureInTab = False
+        else:
+            if not self._procedureInTab:
+                self.innerLayout.removeWidget(self.procedureFrame)
+                self.tabArea.insertTab(1, self.procedureFrame, "Procedures")
+                self._procedureInTab = True
+
+        self.UpdateTabNames()
 
     def AddLogicBlock(self, lb: LogicBlock):
         self.currentEditorFrame.AddLogicBlock(lb)
@@ -127,7 +139,7 @@ class MainWorkArea(QFrame):
         self.OnTabNamesChanged.Invoke()
         for i in range(self.tabArea.count()):
             frame = self.tabArea.widget(i)
-            self.tabArea.setTabText(i, frame.GetFrameTitle())
+            # self.tabArea.setTabText(i, frame.GetFrameTitle())
 
     def GetWindowTitle(self):
         return self.chipFrame.FormattedFilename() + " - μChip"

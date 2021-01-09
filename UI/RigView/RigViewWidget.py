@@ -25,13 +25,13 @@ class RigViewWidget(QDialog):
         self.mainLayout.addWidget(self.configureButton)
         self.mainLayout.addWidget(QLabel("Solenoids"))
 
-        scrollArea = QScrollArea()
-        scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        scrollArea.setWidgetResizable(True)
-        scrollArea.setWidget(self.solenoidsContainer)
+        self.scrollArea = QScrollArea()
+        self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setWidget(self.solenoidsContainer)
 
-        self.mainLayout.addWidget(scrollArea)
+        self.mainLayout.addWidget(self.scrollArea)
 
         self.solenoidsLayout = QVBoxLayout()
         self.solenoidsLayout.setContentsMargins(0, 0, 0, 0)
@@ -93,9 +93,9 @@ class RigViewWidget(QDialog):
             self.solenoidsLayout.addWidget(QLabel("No devices connected."))
 
         self.solenoidsContainer.adjustSize()
+        self.scrollArea.setFixedWidth(self.solenoidsContainer.width() + self.scrollArea.verticalScrollBar().width())
         self.adjustSize()
-        print(self.solenoidsContainer.sizeHint())
-        print(self.solenoidsContainer.size())
+        self.UpdateDisplay()
 
     def EightSetButtonPressed(self, eightSet, isOn):
         for solenoidNumber in eightSet:
@@ -111,6 +111,9 @@ class RigViewWidget(QDialog):
         for i in range(len(self.solenoidButtons)):
             self.solenoidButtons[i].setEnabled(i not in self.rig.drivenSolenoids)
             self.solenoidButtons[i].setChecked(self.rig.IsSolenoidOn(i))
+            self.solenoidButtons[i].setProperty("IsDriven", not self.solenoidButtons[i].isEnabled())
+            self.solenoidButtons[i].setStyle(self.solenoidButtons[i].style())
+            self.solenoidButtons[i].update()
             if self.solenoidButtons[i].isEnabled():
                 self.solenoidButtons[i].setToolTip("")
             else:

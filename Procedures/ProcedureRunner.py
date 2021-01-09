@@ -1,13 +1,18 @@
 from Procedures.Procedure import *
+import PySide2.QtCore
 
 
-class ProcedureRunner:
-    def __init__(self):
+class ProcedureRunner(QObject):
+    onBegin = Signal()
+    onDone = Signal()
+    onCompleted = Signal()
+    onInterruptRequest = Signal()
+
+    def __init__(self, parent: QWidget):
+        super().__init__()
         self.currentProcedure: typing.Optional[Procedure] = None
 
-        self.OnBegin = Event()
-        self.OnDone = Event()
-
+        self._parent = parent
         self.isRunning = False
 
     def IsRunning(self):
@@ -23,7 +28,7 @@ class ProcedureRunner:
     def RunProcedure(self):
         if self.IsRunning() or self.currentProcedure is None:
             return
-        self.OnBegin.Invoke()
+        self.onBegin.emit()
 
         self.currentProcedure.Start()
         self.isRunning = True
@@ -31,20 +36,15 @@ class ProcedureRunner:
     def StopProcedure(self, interrupt=True):
         if self.IsRunning():
             if interrupt:
-                msgBox = QMessageBox()
-                msgBox.setWindowTitle("Confirm Stop")
-                msgBox.setText("There is a procedure running")
-                msgBox.setInformativeText("Are you sure that you want to stop?")
-                msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-                msgBox.setDefaultButton(QMessageBox.No)
-                ret = msgBox.exec()
-                if ret != QMessageBox.Yes:
-                    return False
-                else:
-                    self.currentProcedure.Stop()
-
-            self.isRunning = False
-            self.OnDone.Invoke()
-            return True
+                self.onInterruptRequest.emit()
+            else:
+                self.ProcedureFinished()
+                self.onCompleted.emit()
         else:
-            self.OnDone.Invoke()
+            self.onDone.emit()
+
+    def ProcedureFinished(self, force=False):
+        if force:
+            self.currentProcedure.Stop()
+        self.isRunning = False
+        self.onDone.emit()
