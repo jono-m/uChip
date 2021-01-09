@@ -42,10 +42,24 @@ class ImageItem(BlockItem):
         self.deleteLater()
 
     def ReloadImage(self):
-        self.rawPixmap = QPixmap(self.image.filename)
+        if not os.path.exists(self.image.absolutePath):
+            self.rawPixmap = None
+        else:
+            self.rawPixmap = QPixmap(self.image.absolutePath)
 
     def RescaleImage(self):
-        self.scaledPixmap = self.rawPixmap.scaledToWidth(self.rawPixmap.width() * self.image.GetScale())
+        if self.rawPixmap is None:
+            errorImage = QImage(256, 256, QImage.Format_RGB16)
+            errorImage.fill(Qt.red)
+            painter = QPainter()
+            painter.begin(errorImage)
+            painter.setPen(Qt.white)
+            painter.setFont(QFont("sans-serif", 12, QFont.Bold))
+            painter.drawText(errorImage.rect(), Qt.AlignCenter, "Image not found.")
+            painter.end()
+            self.scaledPixmap = QPixmap(errorImage)
+        else:
+            self.scaledPixmap = self.rawPixmap.scaledToWidth(self.rawPixmap.width() * self.image.GetScale())
         self.imageWidget.opacity = self.image.GetOpacity()
         self.imageWidget.setPixmap(self.scaledPixmap)
         self.widget().setFixedSize(self.scaledPixmap.size())
@@ -86,7 +100,7 @@ class ImageSizeDialog(QDialog):
         nameLayout.setContentsMargins(0, 0, 0, 0)
         nameLayout.setSpacing(0)
         nameLayout.addWidget(QLabel("File: "))
-        nameLayout.addWidget(QLabel("<i>" + image.filename + "</i>"))
+        nameLayout.addWidget(QLabel("<i>" + image.absolutePath + "</i>"))
         namePanel.setLayout(nameLayout)
 
         scalePanel = QFrame()

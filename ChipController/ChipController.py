@@ -81,6 +81,12 @@ class ChipController:
     def Save(self, filename=None):
         if filename is not None:
             self._filename = filename
+            self._logicBlock.absolutePath = filename
+            for procedure in self._procedures:
+                procedure.absolutePath = filename
+        self._logicBlock.UpdateRelativePaths()
+        for procedure in self._procedures:
+            procedure.UpdateRelativePaths()
         file = open(self._filename, "wb")
         pickle.dump(self, file)
         file.close()
@@ -93,6 +99,13 @@ class ChipController:
         file = open(filename, "rb")
         chipController: ChipController = pickle.load(file)
         file.close()
+        chipController._filename = filename
+        for procedure in chipController._procedures:
+            procedure.absolutePath = filename
+            procedure.UpdateAbsolutePaths()
+
+        chipController._logicBlock.absolutePath = filename
+        chipController._logicBlock.UpdateAbsolutePaths()
         chipController._logicBlock.ReloadFileSubBlocks()
         return chipController
 

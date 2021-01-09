@@ -1,12 +1,14 @@
 from LogicBlocks.IOBlocks import *
 import dill as pickle
+from pathlib import Path
 import os
 
 
 class CompoundLogicBlock(LogicBlock):
     def __init__(self):
         super().__init__()
-        self._filename = None
+        self.relativePath = None
+        self.absolutePath = None
         self._version = None  # Used to keep track of which version of this compound block is used in another block.
 
         self._subBlocks: typing.Set[LogicBlock] = set()
@@ -69,13 +71,11 @@ class CompoundLogicBlock(LogicBlock):
         outputBlocks.sort(key=lambda x: x.GetPosition().y())
         return [x.parentBlockOutputPort for x in outputBlocks]
 
-    def GetFilename(self):
-        return self._filename
-
     def Save(self, filename=None):
         if filename is not None:
-            self._filename = filename
-        file = open(self._filename, "wb")
+            self.absolutePath = filename
+        self.UpdateRelativePaths()
+        file = open(self.absolutePath, "wb")
         pickle.dump(self, file)
         file.close()
         self.OnSaved.Invoke()
@@ -84,7 +84,7 @@ class CompoundLogicBlock(LogicBlock):
         unexplored: typing.List[CompoundLogicBlock] = [compoundBlock]
         while len(unexplored) > 0:
             toExplore = unexplored.pop(0)
-            if toExplore._filename == self._filename:
+            if toExplore.relativePath == self.relativePath:
                 return True
             else:
                 unexplored += [x for x in toExplore._subBlocks if isinstance(x, CompoundLogicBlock)]
@@ -118,6 +118,32 @@ class CompoundLogicBlock(LogicBlock):
                         LogicBlock.Connect(newOutput, inputPort)
                     break
 
+    def UpdateAbsolutePaths(self):
+        myCompoundBlocks = [x for x in self._subBlocks if isinstance(x, CompoundLogicBlock)]
+
+        for compoundBlock in myCompoundBlocks:
+            # Any compound logic blocks need to be reloaded from their files to make sure that changes have been
+            # included
+            if compoundBlock.relativePath is not None:
+                compoundBlock.absolutePath = str((Path(self.absolutePath) / compoundBlock.relativePath).resolve())
+                compoundBlock.UpdateAbsolutePaths()
+
+        for image in self._images:
+            image.absolutePath = str((Path(self.absolutePath) / image.relativePath).resolve())
+
+    def UpdateRelativePaths(self):
+        myCompoundBlocks = [x for x in self._subBlocks if isinstance(x, CompoundLogicBlock)]
+
+        for compoundBlock in myCompoundBlocks:
+            # Any compound logic blocks need to be reloaded from their files to make sure that changes have been
+            # included
+            if compoundBlock.absolutePath is not None:
+                compoundBlock.relativePath = os.path.relpath(compoundBlock.absolutePath, self.absolutePath)
+                compoundBlock.UpdateRelativePaths()
+
+        for image in self._images:
+            image.relativePath = os.path.relpath(image.absolutePath, self.absolutePath)
+
     def ReloadFileSubBlocks(self):
         # Make sure to remove any loops that might have been created through other file weirdness...
         self.RemoveLoops()
@@ -127,10 +153,10 @@ class CompoundLogicBlock(LogicBlock):
         for compoundBlock in myCompoundBlocks:
             # Any compound logic blocks need to be reloaded from their files to make sure that changes have been
             # included
-            if compoundBlock._filename is not None:
-                if os.path.exists(compoundBlock._filename):
+            if compoundBlock.relativePath is not None:
+                if os.path.exists(compoundBlock.absolutePath):
                     # File is still there, is it more updated than this one?
-                    if compoundBlock._version != os.path.getmtime(compoundBlock._filename):
+                    if compoundBlock._version != os.path.getmtime(compoundBlock.absolutePath):
                         # Outdated. Reload it!
                         replacementBlock = compoundBlock.Duplicate()
                         compoundBlock.BridgeConnections(replacementBlock)
@@ -140,6 +166,7 @@ class CompoundLogicBlock(LogicBlock):
                         pass
                 else:
                     # Doesn't exist
+                    # TODO: Display an error message
                     self.RemoveSubBlock(compoundBlock)
 
     @staticmethod
@@ -151,11 +178,13 @@ class CompoundLogicBlock(LogicBlock):
         block: CompoundLogicBlock = pickle.load(file)
         block._version = _version
         file.close()
+        block.absolutePath = filename
+        block.UpdateAbsolutePaths()
         block.ReloadFileSubBlocks()
         return block
 
     def Duplicate(self) -> 'CompoundLogicBlock':
-        newB = CompoundLogicBlock.LoadFromFile(self._filename)
+        newB = CompoundLogicBlock.LoadFromFile(self.absolutePath)
         for i in range(len(self._inputs)):
             newB._inputs[i].SetDefaultData(self._inputs[i].GetDefaultData())
         newB.SetPosition(self.GetPosition())
@@ -165,6 +194,7 @@ class CompoundLogicBlock(LogicBlock):
     def AddSubBlock(self, newBlock: 'LogicBlock'):
         if isinstance(newBlock, InputLogicBlock) or isinstance(newBlock, OutputLogicBlock):
             newBlock.SetParentBlock(self)
+
         self._subBlocks.add(newBlock)
         newBlock.OnPortsChanged.Register(self.OnModified.Invoke)
         newBlock.OnConnectionsChanged.Register(self.OnModified.Invoke)
@@ -191,10 +221,10 @@ class CompoundLogicBlock(LogicBlock):
         self.OnModified.Invoke()
 
     def GetName(self=None):
-        if self is None or self._filename is None:
+        if self is None or self.relativePath is None:
             return "New Logic Block"
         else:
-            name, extension = os.path.splitext(os.path.basename(self._filename))
+            name, extension = os.path.splitext(os.path.basename(self.relativePath))
             return name
 
     def UpdateOutputs(self):
@@ -218,9 +248,10 @@ class CompoundLogicBlock(LogicBlock):
 
 
 class Image:
-    def __init__(self, filename: str):
+    def __init__(self, absolutePath: str):
         self._position = QPointF(0, 0)
-        self.filename = filename
+        self.absolutePath = absolutePath
+        self.relativePath = None
         self._scale = 1
         self._opacity = 1
 
