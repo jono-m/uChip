@@ -67,7 +67,6 @@ class ChipValvesList(QFrame):
         for valveBlock in sorted(self.chipController.valveBlocks, key=lambda x: x.GetPosition().y()):
             if valveBlock not in valves:
                 newValveBlock = ValveField(valveBlock, self.SortList)
-                print()
                 newValveBlock.setProperty("IsEven", self.valvesContainer.layout().count() % 2 == 0)
                 self.valvesContainer.layout().addWidget(newValveBlock)
                 newValveBlock.setVisible(True)

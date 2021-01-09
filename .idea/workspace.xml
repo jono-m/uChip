@@ -26,10 +26,13 @@
   <component name="ChangeListManager">
     <list default="true" id="99850780-df20-4af2-831c-10fab045648b" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ChipController/ChipController.py" beforeDir="false" afterPath="$PROJECT_DIR$/ChipController/ChipController.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LogicBlocks/CompoundLogicBlock.py" beforeDir="false" afterPath="$PROJECT_DIR$/LogicBlocks/CompoundLogicBlock.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/LogicBlock/CustomLogicBlockEditorFrame.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/LogicBlock/CustomLogicBlockEditorFrame.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/LogicBlock/ImageItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/LogicBlock/ImageItem.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/STYLESHEET.css" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/STYLESHEET.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Procedures/ProcedureRunner.py" beforeDir="false" afterPath="$PROJECT_DIR$/Procedures/ProcedureRunner.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/BaseEditorFrame.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/BaseEditorFrame.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/Chip/ChipValvesList.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Chip/ChipValvesList.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/MainWindow/MainWorkArea.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/MainWindow/MainWorkArea.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/RigView/RigViewWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/RigView/RigViewWidget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/windowSettings.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/windowSettings.pkl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -143,11 +146,6 @@
           <option name="timeStamp" value="8" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Procedures/ProcedureRunner.py</url>
-          <line>23</line>
-          <option name="timeStamp" value="12" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/UI/WorldBrowser/SelectableItem.py</url>
           <line>11</line>
           <option name="timeStamp" value="31" />
@@ -171,6 +169,11 @@
           <url>file://$PROJECT_DIR$/UI/RigView/RigViewWidget.py</url>
           <line>49</line>
           <option name="timeStamp" value="48" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/UI/RigView/RigViewWidget.py</url>
+          <line>96</line>
+          <option name="timeStamp" value="49" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

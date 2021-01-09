@@ -73,10 +73,11 @@ class BaseEditorFrame(QFrame):
 
     def RequestClose(self):
         if self.isModified:
-            msgBox = QMessageBox()
+            msgBox = QMessageBox(self)
             msgBox.setWindowTitle("Confirm Close")
             msgBox.setText("'" + self.GetName() + "' has been modified.")
             msgBox.setInformativeText("Do you want to save your changes?")
+            msgBox.setIcon(QMessageBox.Icon.Warning)
             msgBox.setStandardButtons(QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
             msgBox.setDefaultButton(QMessageBox.Save)
             msgBox.setWindowIcon(QIcon("Assets/icon.png"))

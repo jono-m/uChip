@@ -416,6 +416,14 @@ SolenoidButton {
     min-width: 50px;
     max-width: 50px;
 }
+SolenoidButton[IsDriven=true] {
+    background-image: url('Assets/locked.PNG');
+    background-repeat: false;
+    background-position: center;
+}
+SolenoidButton[IsDriven=false] {
+    background-image: none;
+}
 SolenoidButton:hover {
     background-color: rgb(255, 0, 0);
 }
@@ -424,4 +432,8 @@ SolenoidButton:checked {
 }
 SolenoidButton:checked:hover {
     background-color: rgb(0, 255, 0);
+}
+
+QMessageBox QLabel {
+    qproperty-alignment: 'AlignLeft';
 }

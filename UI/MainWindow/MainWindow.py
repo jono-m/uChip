@@ -20,9 +20,11 @@ class MainWindow(QMainWindow):
 
         self.rig = Rig()
 
-        self.procedureRunner = ProcedureRunner()
-        self.procedureRunner.OnBegin.Register(lambda: self.menuBarWidget.UpdateForProcedureStatus(True))
-        self.procedureRunner.OnDone.Register(lambda: self.menuBarWidget.UpdateForProcedureStatus(False))
+        self.procedureRunner = ProcedureRunner(self)
+        self.procedureRunner.onBegin.connect(lambda: self.menuBarWidget.UpdateForProcedureStatus(True))
+        self.procedureRunner.onDone.connect(lambda: self.menuBarWidget.UpdateForProcedureStatus(False))
+        self.procedureRunner.onInterruptRequest.connect(self.ShowInterruptDialog)
+        self.procedureRunner.onCompleted.connect(self.ShowCompletedDialog)
 
         self.workArea = MainWorkArea(self.rig, self.procedureRunner)
         self.workArea.OnTabNamesChanged.Register(self.UpdateName)
@@ -56,6 +58,32 @@ class MainWindow(QMainWindow):
         self.procedureRunner.StopProcedure()
 
         self.ReloadSettings()
+
+        self._interruptDialog = None
+
+    def ShowCompletedDialog(self):
+        if self._interruptDialog is not None:
+            self._interruptDialog.reject()
+            self._interruptDialog = None
+        msgBox = QMessageBox(self)
+        msgBox.setIcon(QMessageBox.Icon.Information)
+        msgBox.setWindowTitle("Procedure Completed")
+        msgBox.setText("The procedure has finished.")
+        msgBox.setStandardButtons(QMessageBox.Ok)
+        ret = msgBox.exec()
+
+    def ShowInterruptDialog(self):
+        self._interruptDialog = QMessageBox(self)
+        self._interruptDialog.setWindowTitle("Confirm Stop")
+        self._interruptDialog.setIcon(QMessageBox.Icon.Warning)
+        self._interruptDialog.setText("There is a procedure running")
+        self._interruptDialog.setInformativeText("Are you sure that you want to stop?")
+        self._interruptDialog.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        self._interruptDialog.setDefaultButton(QMessageBox.No)
+        ret = self._interruptDialog.exec()
+        if ret == QMessageBox.Yes:
+            self.procedureRunner.ProcedureFinished(True)
+        self._interruptDialog = None
 
     def SaveSettings(self):
         windowSettings = WindowSettings()
@@ -92,7 +120,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(name + " - μChip")
 
     def closeEvent(self, event: QCloseEvent):
-        if self.procedureRunner.IsRunning() and not self.procedureRunner.StopProcedure(True):
+        if self.procedureRunner.IsRunning():
+            self.procedureRunner.StopProcedure(True)
             event.ignore()
             return
         if self.workArea.RequestCloseAllTabs():
