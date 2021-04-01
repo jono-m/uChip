@@ -26,14 +26,15 @@
   <component name="ChangeListManager">
     <list default="true" id="99850780-df20-4af2-831c-10fab045648b" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/STYLESHEET.css" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/STYLESHEET.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Procedures/ProcedureRunner.py" beforeDir="false" afterPath="$PROJECT_DIR$/Procedures/ProcedureRunner.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/21KChip/CombinatorialMultiplexer.usb" beforeDir="false" afterPath="$PROJECT_DIR$/21KChip/CombinatorialMultiplexer.usb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/21KChip/Multiplexer8.usb" beforeDir="false" afterPath="$PROJECT_DIR$/21KChip/Multiplexer8.usb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LogicBlocks/CompoundLogicBlock.py" beforeDir="false" afterPath="$PROJECT_DIR$/LogicBlocks/CompoundLogicBlock.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TotallyNewPath/andGate.ulb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TotallyNewPath/testChip.PNG" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TotallyNewPath/testChip.ucc" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/BaseEditorFrame.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/BaseEditorFrame.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/Chip/ChipValvesList.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Chip/ChipValvesList.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/MainWindow/MainWorkArea.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/MainWindow/MainWorkArea.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/RigView/RigViewWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/RigView/RigViewWidget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/windowSettings.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/windowSettings.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/exe.win32-3.8/windowSettings.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/build/exe.win32-3.8/windowSettings.pkl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -156,11 +157,6 @@
           <option name="timeStamp" value="38" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/UI/LogicBlock/BlockConnection.py</url>
-          <line>66</line>
-          <option name="timeStamp" value="44" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/LogicBlocks/ScriptedBlock.py</url>
           <line>61</line>
           <option name="timeStamp" value="45" />
@@ -174,6 +170,26 @@
           <url>file://$PROJECT_DIR$/UI/RigView/RigViewWidget.py</url>
           <line>96</line>
           <option name="timeStamp" value="49" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/UI/Chip/ChipEditorFrame.py</url>
+          <line>35</line>
+          <option name="timeStamp" value="63" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/LogicBlocks/CompoundLogicBlock.py</url>
+          <line>31</line>
+          <option name="timeStamp" value="64" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/LogicBlocks/CompoundLogicBlock.py</url>
+          <line>36</line>
+          <option name="timeStamp" value="65" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/LogicBlocks/CompoundLogicBlock.py</url>
+          <line>207</line>
+          <option name="timeStamp" value="66" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

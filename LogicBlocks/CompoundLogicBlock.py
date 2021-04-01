@@ -84,6 +84,7 @@ class CompoundLogicBlock(LogicBlock):
         unexplored: typing.List[CompoundLogicBlock] = [compoundBlock]
         while len(unexplored) > 0:
             toExplore = unexplored.pop(0)
+            # TODO: This is where the bug for reloading on save is -- the relativepath is always None...
             if toExplore.relativePath == self.relativePath:
                 return True
             else:
@@ -122,8 +123,6 @@ class CompoundLogicBlock(LogicBlock):
         myCompoundBlocks = [x for x in self._subBlocks if isinstance(x, CompoundLogicBlock)]
 
         for compoundBlock in myCompoundBlocks:
-            # Any compound logic blocks need to be reloaded from their files to make sure that changes have been
-            # included
             if compoundBlock.relativePath is not None:
                 compoundBlock.absolutePath = str((Path(self.absolutePath) / compoundBlock.relativePath).resolve())
                 compoundBlock.UpdateAbsolutePaths()
@@ -135,8 +134,6 @@ class CompoundLogicBlock(LogicBlock):
         myCompoundBlocks = [x for x in self._subBlocks if isinstance(x, CompoundLogicBlock)]
 
         for compoundBlock in myCompoundBlocks:
-            # Any compound logic blocks need to be reloaded from their files to make sure that changes have been
-            # included
             if compoundBlock.absolutePath is not None:
                 compoundBlock.relativePath = os.path.relpath(compoundBlock.absolutePath, self.absolutePath)
                 compoundBlock.UpdateRelativePaths()
@@ -180,6 +177,7 @@ class CompoundLogicBlock(LogicBlock):
         file.close()
         block.absolutePath = filename
         block.UpdateAbsolutePaths()
+        block.UpdateRelativePaths()
         block.ReloadFileSubBlocks()
         return block
 
@@ -221,10 +219,10 @@ class CompoundLogicBlock(LogicBlock):
         self.OnModified.Invoke()
 
     def GetName(self=None):
-        if self is None or self.relativePath is None:
+        if self is None or self.absolutePath is None:
             return "New Logic Block"
         else:
-            name, extension = os.path.splitext(os.path.basename(self.relativePath))
+            name, extension = os.path.splitext(os.path.basename(self.absolutePath))
             return name
 
     def UpdateOutputs(self):
