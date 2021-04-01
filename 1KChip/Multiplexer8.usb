@@ -13,7 +13,7 @@ def Outputs():
             'M5': bool,
             'M6': bool,
             'M7': bool,
-            'M8': bool,
+            'M8': bool}
 
 
 def Compute(inputs, outputs):

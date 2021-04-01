@@ -49,7 +49,7 @@ class BaseEditorFrame(QFrame):
     def AddLogicBlock(self, lb: LogicBlock):
         pass
 
-    def TrySaveAs(self):
+    def TrySaveAs(self) -> bool:
         dialog = SaveAsDialog(self)
         dialog.setNameFilters(self.nameFilters)
         if dialog.exec_():
@@ -65,11 +65,12 @@ class BaseEditorFrame(QFrame):
     def UpdateFromSave(self):
         pass
 
-    def RequestSave(self, saveAs=False):
+    def RequestSave(self, saveAs=False) -> bool:
         if not self.hasFilename or saveAs:
             return self.TrySaveAs()
         else:
-            return self.DoSave()
+            self.DoSave()
+            return True
 
     def RequestClose(self):
         if self.isModified:

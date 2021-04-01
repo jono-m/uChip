@@ -139,7 +139,7 @@ class MainWorkArea(QFrame):
         self.OnTabNamesChanged.Invoke()
         for i in range(self.tabArea.count()):
             frame = self.tabArea.widget(i)
-            # self.tabArea.setTabText(i, frame.GetFrameTitle())
+            self.tabArea.setTabText(i, frame.GetFrameTitle())
 
     def GetWindowTitle(self):
         return self.chipFrame.FormattedFilename() + " - μChip"
