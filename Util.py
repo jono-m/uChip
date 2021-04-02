@@ -71,4 +71,3 @@ class ColorIcon(QIcon):
 
         if color is not None:
             self.addPixmap(disabledPixmap, QIcon.Disabled)
-

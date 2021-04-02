@@ -25,16 +25,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="99850780-df20-4af2-831c-10fab045648b" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/FileTracker.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/21KChip/CombinatorialMultiplexer.usb" beforeDir="false" afterPath="$PROJECT_DIR$/21KChip/CombinatorialMultiplexer.usb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/21KChip/Multiplexer8.usb" beforeDir="false" afterPath="$PROJECT_DIR$/21KChip/Multiplexer8.usb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LogicBlocks/CompoundLogicBlock.py" beforeDir="false" afterPath="$PROJECT_DIR$/LogicBlocks/CompoundLogicBlock.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TotallyNewPath/andGate.ulb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TotallyNewPath/testChip.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TotallyNewPath/testChip.ucc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/BaseEditorFrame.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/BaseEditorFrame.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/MainWindow/MainWorkArea.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/MainWindow/MainWorkArea.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/exe.win32-3.8/windowSettings.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/build/exe.win32-3.8/windowSettings.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LogicBlocks/ScriptedBlock.py" beforeDir="false" afterPath="$PROJECT_DIR$/LogicBlocks/ScriptedBlock.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Util.py" beforeDir="false" afterPath="$PROJECT_DIR$/Util.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -178,17 +173,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/LogicBlocks/CompoundLogicBlock.py</url>
-          <line>31</line>
+          <line>29</line>
           <option name="timeStamp" value="64" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/LogicBlocks/CompoundLogicBlock.py</url>
-          <line>36</line>
+          <line>34</line>
           <option name="timeStamp" value="65" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/LogicBlocks/CompoundLogicBlock.py</url>
-          <line>207</line>
+          <line>205</line>
           <option name="timeStamp" value="66" />
         </line-breakpoint>
       </breakpoints>
