@@ -1,15 +1,13 @@
 from LogicBlocks.IOBlocks import *
 import dill as pickle
-from pathlib import Path
-import os
+from FileTracker import FileTracker
 
 
 class CompoundLogicBlock(LogicBlock):
     def __init__(self):
         super().__init__()
-        self.relativePath = None
-        self.absolutePath = None
-        self._version = None  # Used to keep track of which version of this compound block is used in another block.
+
+        self.fileTracker = FileTracker()
 
         self._subBlocks: typing.Set[LogicBlock] = set()
         self._images: typing.Set[Image] = set()
@@ -153,7 +151,7 @@ class CompoundLogicBlock(LogicBlock):
             if compoundBlock.relativePath is not None:
                 if os.path.exists(compoundBlock.absolutePath):
                     # File is still there, is it more updated than this one?
-                    if compoundBlock._version != os.path.getmtime(compoundBlock.absolutePath):
+                    if compoundBlock._lastModifiedTime != os.path.getmtime(compoundBlock.absolutePath):
                         # Outdated. Reload it!
                         replacementBlock = compoundBlock.Duplicate()
                         compoundBlock.BridgeConnections(replacementBlock)
@@ -173,7 +171,7 @@ class CompoundLogicBlock(LogicBlock):
             return None
         file = open(filename, "rb")
         block: CompoundLogicBlock = pickle.load(file)
-        block._version = _version
+        block._lastModifiedTime = _version
         file.close()
         block.absolutePath = filename
         block.UpdateAbsolutePaths()

@@ -5,34 +5,34 @@ import os
 class ScriptedBlock(LogicBlock):
     def __init__(self, scriptFilename):
         super().__init__()
-        self.goodBuiltins = ['abs', 'ascii', 'bin', 'chr', 'hex', 'iter', 'len', 'max', 'min', 'next', 'oct', 'ord',
+        self._goodBuiltins = ['abs', 'ascii', 'bin', 'chr', 'hex', 'iter', 'len', 'max', 'min', 'next', 'oct', 'ord',
                              'pow',
                              'round', 'sorted', 'sum', 'None', 'Ellipsis', 'False', 'True', 'bool', 'bytes', 'complex',
                              'dict', 'float', 'int', 'list', 'map', 'range', 'reversed', 'set', 'slice', 'str', 'tuple',
                              'zip']
 
-        self.scriptFilename = scriptFilename
-        self.lastModifiedTime = None
-        self.code = ""
-        self.codeLocals = {}
-        self.codeGlobals = {}
+        self._scriptFilename = scriptFilename
+        self._lastModifiedTime = None
+        self._code = ""
+        self._codeLocals = {}
+        self._codeGlobals = {}
 
         self.Reload()
 
     def Reload(self):
-        if not os.path.exists(self.scriptFilename):
+        if not os.path.exists(self._scriptFilename):
             self.Destroy()
             return
-        f = open(self.scriptFilename)
-        self.lastModifiedTime = os.path.getmtime(self.scriptFilename)
-        self.code = f.read()
+        f = open(self._scriptFilename)
+        self._lastModifiedTime = os.path.getmtime(self._scriptFilename)
+        self._code = f.read()
         f.close()
-        self.codeGlobals = {'__builtins__': {k: __builtins__[k] for k in self.goodBuiltins}}
-        self.codeLocals = {}
-        exec(self.code, self.codeGlobals, self.codeLocals)
+        self._codeGlobals = {'__builtins__': {k: __builtins__[k] for k in self._goodBuiltins}}
+        self._codeLocals = {}
+        exec(self._code, self._codeGlobals, self._codeLocals)
 
-        newInputs = self.codeLocals['Inputs']()
-        newOutputs = self.codeLocals['Outputs']()
+        newInputs = self._codeLocals['Inputs']()
+        newOutputs = self._codeLocals['Outputs']()
 
         oldInputs = self.GetInputs()
         oldOutputs = self.GetOutputs()
@@ -69,10 +69,10 @@ class ScriptedBlock(LogicBlock):
         if self is None:
             return "Scripted Block"
         else:
-            return self.codeLocals['blockName']
+            return self._codeLocals['blockName']
 
     def Duplicate(self) -> 'LogicBlock':
-        newB = ScriptedBlock(self.scriptFilename)
+        newB = ScriptedBlock(self._scriptFilename)
         for i in range(len(self._inputs)):
             newB._inputs[i].SetDefaultData(self._inputs[i].GetDefaultData())
         newB.SetPosition(self.GetPosition())
@@ -80,17 +80,14 @@ class ScriptedBlock(LogicBlock):
         return newB
 
     def UpdateOutputs(self):
-        currentModifiedTime = os.path.getmtime(self.scriptFilename)
-        if currentModifiedTime != self.lastModifiedTime:
-            self.Reload()
 
         inputs = {}
         for inputPort in self.GetInputs():
             inputs[inputPort.name] = inputPort.GetData()
         outputs = {}
-        self.codeLocals['inputs'] = inputs
-        self.codeLocals['outputs'] = outputs
-        eval("Compute(inputs, outputs)", self.codeGlobals, self.codeLocals)
+        self._codeLocals['inputs'] = inputs
+        self._codeLocals['outputs'] = outputs
+        eval("Compute(inputs, outputs)", self._codeGlobals, self._codeLocals)
         for outputPort in self.GetOutputs():
             if outputPort.name in outputs:
                 outputPort.SetData(outputs[outputPort.name])
