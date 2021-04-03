@@ -29,9 +29,9 @@ class CustomLogicBlockEditorFrame(BaseEditorFrame):
 
     def TimerUpdate(self):
         if self.logicBlock is not None:
-            self.logicBlock.UpdateOutputs()
+            self.logicBlock.ComputeOutputs()
 
-    def AddLogicBlock(self, lb: LogicBlock):
+    def AddLogicBlock(self, lb: ConnectableBlock):
         lb.SetPosition(self.editor.worldBrowser.GetCenterPoint())
         if isinstance(lb, CompoundLogicBlock) and self.logicBlock.CreatesLoop(lb):
             QMessageBox.warning(parent=self, title="Element addition failed",

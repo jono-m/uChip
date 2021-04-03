@@ -1,6 +1,6 @@
 from PySide2.QtGui import *
-from Rig.Rig import Rig
-from Rig.Device import Device
+from RigSystem.Rig import Rig
+from RigSystem.Device import Device
 from UI.StylesheetLoader import *
 import typing
 import math

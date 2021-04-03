@@ -1,6 +1,5 @@
-from UI.WorldBrowser.BlockItem import *
 from UI.LogicBlock.BlockConnection import *
-from Util import *
+from UI.Util import *
 
 
 class LogicBlockItem(BlockItem):
@@ -96,7 +95,7 @@ class LogicBlockItem(BlockItem):
 
         inputPorts = [inputWidget.inputPort for inputWidget in self.inputPortsListWidget.children() if
                       isinstance(inputWidget, InputPortWidget)]
-        for inputPort in self.block.GetInputs():
+        for inputPort in self.block.GetInputPorts():
             if not inputPort.isConnectable:
                 hasNonConnectable = True
             if inputPort not in inputPorts:
@@ -105,7 +104,7 @@ class LogicBlockItem(BlockItem):
 
         outputPorts = [outputWidget.outputPort for outputWidget in self.outputPortsListWidget.children() if
                        isinstance(outputWidget, OutputPortWidget)]
-        for outputPort in self.block.GetOutputs():
+        for outputPort in self.block.GetOutputPorts():
             if outputPort not in outputPorts:
                 outputPortWidget = OutputPortWidget(outputPort, self)
                 self.outputsLayout.addWidget(outputPortWidget)
@@ -156,29 +155,29 @@ class InputPortWidget(QFrame):
 
         self.Update()
 
-        self.inputPort.block.OnConnectionsChanged.Register(self.Update, True)
-        self.inputPort.block.OnPortsChanged.Register(self.Update, True)
-        self.inputPort.block.OnOutputsUpdated.Register(self.Update, True)
-        self.inputPort.block.OnDestroyed.Register(self.Remove, True)
+        self.inputPort.ownerBlock.OnConnectionsChanged.Register(self.Update, True)
+        self.inputPort.ownerBlock.OnPortsChanged.Register(self.Update, True)
+        self.inputPort.ownerBlock.OnOutputsUpdated.Register(self.Update, True)
+        self.inputPort.ownerBlock.OnDestroyed.Register(self.Remove, True)
 
         self.Update()
 
     def Remove(self):
-        self.inputPort.block.OnConnectionsChanged.Unregister(self.Update)
-        self.inputPort.block.OnPortsChanged.Unregister(self.Update)
-        self.inputPort.block.OnOutputsUpdated.Unregister(self.Update)
-        self.inputPort.block.OnDestroyed.Unregister(self.Remove)
+        self.inputPort.ownerBlock.OnConnectionsChanged.Unregister(self.Update)
+        self.inputPort.ownerBlock.OnPortsChanged.Unregister(self.Update)
+        self.inputPort.ownerBlock.OnOutputsUpdated.Unregister(self.Update)
+        self.inputPort.ownerBlock.OnDestroyed.Unregister(self.Remove)
         self.deleteLater()
 
     def OnParameterChanged(self, data):
-        self.inputPort.SetDefaultData(data)
+        self.inputPort.SetDefaultValue(data)
 
     def Update(self):
-        if self.inputPort not in self.inputPort.block.GetInputs():
+        if self.inputPort not in self.inputPort.ownerBlock.GetInputPorts():
             self.Remove()
             return
 
-        self.parameterSetting.Update(self.inputPort.name, self.inputPort.GetDefaultData())
+        self.parameterSetting.Update(self.inputPort.name, self.inputPort.GetDefaultValue())
 
         if self.inputPort.isConnectable and not isinstance(self.graphicsParent.block, InputLogicBlock):
             if self.inputPort.connectedOutput is not None:
@@ -190,11 +189,11 @@ class InputPortWidget(QFrame):
                 self.nameText.setVisible(False)
                 self.parameterSetting.setVisible(True)
             if self.inputPort.dataType is float:
-                dataText = "{:0.2f}".format(self.inputPort.GetData())
+                dataText = "{:0.2f}".format(self.inputPort.GetValue())
             elif type(self.inputPort.dataType) == list:
-                dataText = self.inputPort.dataType[self.inputPort.GetData()]
+                dataText = self.inputPort.dataType[self.inputPort.GetValue()]
             else:
-                dataText = str(self.inputPort.GetData())
+                dataText = str(self.inputPort.GetValue())
             self.nameText.setText(self.inputPort.name + "<br><b>" + dataText + "</b>")
 
 
@@ -218,22 +217,22 @@ class OutputPortWidget(QFrame):
 
         self.Update()
 
-        self.outputPort.block.OnConnectionsChanged.Register(self.Update, True)
-        self.outputPort.block.OnPortsChanged.Register(self.Update, True)
-        self.outputPort.block.OnOutputsUpdated.Register(self.Update, True)
-        self.outputPort.block.OnDestroyed.Register(self.Remove, True)
+        self.outputPort.ownerBlock.OnConnectionsChanged.Register(self.Update, True)
+        self.outputPort.ownerBlock.OnPortsChanged.Register(self.Update, True)
+        self.outputPort.ownerBlock.OnOutputsUpdated.Register(self.Update, True)
+        self.outputPort.ownerBlock.OnDestroyed.Register(self.Remove, True)
 
         self.Update()
 
     def Remove(self):
-        self.outputPort.block.OnConnectionsChanged.Unregister(self.Update)
-        self.outputPort.block.OnPortsChanged.Unregister(self.Update)
-        self.outputPort.block.OnOutputsUpdated.Unregister(self.Update)
-        self.outputPort.block.OnDestroyed.Unregister(self.Remove)
+        self.outputPort.ownerBlock.OnConnectionsChanged.Unregister(self.Update)
+        self.outputPort.ownerBlock.OnPortsChanged.Unregister(self.Update)
+        self.outputPort.ownerBlock.OnOutputsUpdated.Unregister(self.Update)
+        self.outputPort.ownerBlock.OnDestroyed.Unregister(self.Remove)
         self.deleteLater()
 
     def Update(self):
-        if self.outputPort not in self.outputPort.block.GetOutputs():
+        if self.outputPort not in self.outputPort.ownerBlock.GetOutputPorts():
             self.Remove()
             return
 
@@ -243,11 +242,11 @@ class OutputPortWidget(QFrame):
             self.portHole.SetIsConnected(False)
 
         if self.outputPort.dataType is float:
-            dataText = "{:0.2f}".format(self.outputPort.GetData())
+            dataText = "{:0.2f}".format(self.outputPort.GetValue())
         elif type(self.outputPort.dataType) == list:
-            dataText = self.outputPort.dataType[self.outputPort.GetData()]
+            dataText = self.outputPort.dataType[self.outputPort.GetValue()]
         else:
-            dataText = str(self.outputPort.GetData())
+            dataText = str(self.outputPort.GetValue())
         self.nameText.setText(self.outputPort.name + "<br><b>" + dataText + "</b>")
 
 

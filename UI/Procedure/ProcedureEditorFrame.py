@@ -23,7 +23,7 @@ class ProcedureEditorFrame(BaseEditorFrame):
             return "No Procedure Selected."
         return self.currentProcedure.GetName()
 
-    def AddLogicBlock(self, lb: LogicBlock):
+    def AddLogicBlock(self, lb: BaseConnectableBlock):
         lb.SetPosition(self.editor.worldBrowser.GetCenterPoint())
         self.currentProcedure.AddSubBlock(lb)
 

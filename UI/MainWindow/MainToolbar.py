@@ -1,7 +1,7 @@
-from LogicBlocks.BooleanBlocks import *
-from LogicBlocks.ConditionalBlocks import *
-from LogicBlocks.NumberBlocks import *
-from LogicBlocks.ScriptedBlock import *
+from BlockSystem.Blocks.BooleanBlocks import *
+from BlockSystem.Blocks.ConditionalBlocks import *
+from BlockSystem.Blocks.NumberBlocks import *
+from BlockSystem.Blocks.ScriptedBlock import *
 from UI.Procedure.ProcedureMenu import *
 from UI.Procedure.ProcedureSelectionBox import *
 from UI.MainWindow.StatusBar import *
@@ -68,18 +68,18 @@ class MainToolbar(QFrame):
 
         self.fileMenuSection = ToolbarSection("File")
         self.fileMenuSection.AddElement(
-            self.CreateButton("Assets/chipIconPlus.png", "New Chip", self.OnNewChip.Invoke, trueColor=True), 0, 0)
+            self.CreateButton("Images/chipIconPlus.png", "New Chip", self.OnNewChip.Invoke, trueColor=True), 0, 0)
         self.fileMenuSection.AddElement(
-            self.CreateButton("Assets/LBIconPlus.png", "New Logic Block", self.OnNewLB.Invoke, trueColor=True), 1, 0)
+            self.CreateButton("Images/LBIconPlus.png", "New Logic Block", self.OnNewLB.Invoke, trueColor=True), 1, 0)
         self.fileMenuSection.AddElement(
-            self.CreateButton("Assets/openIcon.png", "Open...", self.OnOpen.Invoke, above=True, trueColor=True), 0, 1,
+            self.CreateButton("Images/openIcon.png", "Open...", self.OnOpen.Invoke, above=True, trueColor=True), 0, 1,
             2, 1)
         self.fileMenuSection.AddElement(
-            self.CreateButton("Assets/saveIcon.png", "Save", self.OnSave.Invoke, trueColor=True), 0, 2)
+            self.CreateButton("Images/saveIcon.png", "Save", self.OnSave.Invoke, trueColor=True), 0, 2)
         self.fileMenuSection.AddElement(
-            self.CreateButton("Assets/saveAsIcon.png", "Save As...", self.OnSaveAs.Invoke, trueColor=True), 1, 2)
+            self.CreateButton("Images/saveAsIcon.png", "Save As...", self.OnSaveAs.Invoke, trueColor=True), 1, 2)
 
-        mathMenu = self.LogicBlockMenu([NumberLogicBlock,
+        mathMenu = self.LogicBlockMenu([NumberConstantBlock,
                                         Add,
                                         Subtract,
                                         Multiply,
@@ -110,35 +110,35 @@ class MainToolbar(QFrame):
 
         self.logicBlocksSection = ToolbarSection("Control Elements")
         self.logicBlocksSection.AddElement(
-            self.CreateButton("Assets/mathIcon.png", "Math", menu=mathMenu), 0, 0)
+            self.CreateButton("Images/mathIcon.png", "Math", menu=mathMenu), 0, 0)
         self.logicBlocksSection.AddElement(
-            self.CreateButton("Assets/logicIcon.png", "Logic", menu=logicMenu), 1, 0)
+            self.CreateButton("Images/logicIcon.png", "Logic", menu=logicMenu), 1, 0)
         self.logicBlocksSection.AddElement(
-            self.CreateButton("Assets/conditionalIcon.png", "Conditionals", menu=conditionalsMenu), 0, 1)
+            self.CreateButton("Images/conditionalIcon.png", "Conditionals", menu=conditionalsMenu), 0, 1)
         self.logicBlocksSection.AddElement(
-            self.CreateButton("Assets/timeIcon.png", "Time", delegate=lambda: self.OnAddLogicBlock.Invoke(Time())), 1,
+            self.CreateButton("Images/timeIcon.png", "Time", delegate=lambda: self.OnAddLogicBlock.Invoke(Time())), 1,
             1)
         self.logicBlocksSection.AddElement(
-            self.CreateButton("Assets/LBIcon.png", "Custom...", delegate=self.BrowseForBlock, above=True,
+            self.CreateButton("Images/LBIcon.png", "Custom...", delegate=self.BrowseForBlock, above=True,
                               trueColor=True), 0, 2, 2, 1)
 
         self.chipSection = ToolbarSection("Chip Elements")
         self.chipSection.AddElement(
-            self.CreateButton("Assets/checkboxIcon.png", "YES/NO Parameter",
+            self.CreateButton("Images/checkboxIcon.png", "YES/NO Parameter",
                               delegate=lambda: self.OnAddLogicBlock.Invoke(InputLogicBlock(bool, True))), 0, 0)
         self.chipSection.AddElement(
-            self.CreateButton("Assets/numberIcon.png", "Number Parameter",
+            self.CreateButton("Images/numberIcon.png", "Number Parameter",
                               delegate=lambda: self.OnAddLogicBlock.Invoke(InputLogicBlock(float, True))), 1, 0)
         self.chipSection.AddElement(
-            self.CreateButton("Assets/valveIcon.png", "Valve", above=True,
+            self.CreateButton("Images/valveIcon.png", "Valve", above=True,
                               delegate=lambda: self.OnAddLogicBlock.Invoke(ValveLogicBlock())), 0, 1, 2, 1)
 
         self.procedureElementsSection = ToolbarSection("Procedure Elements")
         self.procedureElementsSection.AddElement(
-            self.CreateButton("Assets/timeIcon.png", "Wait Step",
+            self.CreateButton("Images/timeIcon.png", "Wait Step",
                               delegate=lambda: self.OnAddLogicBlock.Invoke(WaitStep())), 0, 0)
         self.procedureElementsSection.AddElement(
-            self.CreateButton("Assets/conditionalIcon.png", "Decision",
+            self.CreateButton("Images/conditionalIcon.png", "Decision",
                               delegate=lambda: self.OnAddLogicBlock.Invoke(IfStep())), 1, 0)
 
         self.getMenu = GetMenu(self)
@@ -154,21 +154,21 @@ class MainToolbar(QFrame):
 
         self.ioSection = ToolbarSection("Input/Output")
         self.ioSection.AddElement(
-            self.CreateButton("Assets/checkboxIcon.png", "YES/NO Input",
+            self.CreateButton("Images/checkboxIcon.png", "YES/NO Input",
                               delegate=lambda: self.OnAddLogicBlock.Invoke(InputLogicBlock(bool))), 0, 0)
         self.ioSection.AddElement(
-            self.CreateButton("Assets/numberIcon.png", "Number Input",
+            self.CreateButton("Images/numberIcon.png", "Number Input",
                               delegate=lambda: self.OnAddLogicBlock.Invoke(InputLogicBlock(float))), 1, 0)
         self.ioSection.AddElement(
-            self.CreateButton("Assets/checkboxIcon.png", "YES/NO Output",
+            self.CreateButton("Images/checkboxIcon.png", "YES/NO Output",
                               delegate=lambda: self.OnAddLogicBlock.Invoke(OutputLogicBlock(bool))), 0, 1)
         self.ioSection.AddElement(
-            self.CreateButton("Assets/numberIcon.png", "Number Output",
+            self.CreateButton("Images/numberIcon.png", "Number Output",
                               delegate=lambda: self.OnAddLogicBlock.Invoke(OutputLogicBlock(float))), 1, 1)
 
         self.annotationSection = ToolbarSection("Other")
         self.annotationSection.AddElement(
-            self.CreateButton("Assets/imageIcon.png", "Image", above=True, delegate=self.BrowseForImage), 0, 0, 2, 1)
+            self.CreateButton("Images/imageIcon.png", "Image", above=True, delegate=self.BrowseForImage), 0, 0, 2, 1)
 
         self.proceduresSection = ToolbarSection("Procedures")
 
@@ -181,13 +181,13 @@ class MainToolbar(QFrame):
         self.procedureSelectionBox.setToolTip("Procedure Selection")
         self.procedureSelectionBox.installEventFilter(self)
         self.procedureSelectionBox.OnProcedureSelected.Register(self.OnProcedureSelected.Invoke)
-        self.playButton = self.CreateButton("Assets/playIcon.png", "Run Procedure",
+        self.playButton = self.CreateButton("Images/playIcon.png", "Run Procedure",
                                             delegate=self.OnProcedurePlay.Invoke, trueColor=True,
                                             showText=False)
-        self.stopButton = self.CreateButton("Assets/stopIcon.png", "Stop Procedure",
+        self.stopButton = self.CreateButton("Images/stopIcon.png", "Stop Procedure",
                                             delegate=self.OnProcedureStop.Invoke, trueColor=True,
                                             showText=False)
-        self.addButton = self.CreateButton("Assets/plusIcon.png", "New Procedure",
+        self.addButton = self.CreateButton("Images/plusIcon.png", "New Procedure",
                                            delegate=self.PromptNewProcedure,
                                            showText=False)
 
@@ -199,11 +199,11 @@ class MainToolbar(QFrame):
         self.proceduresSection.AddElement(proceduresWidget, 0, 0)
 
         self.proceduresSection.AddElement(
-            self.CreateButton("Assets/listIcon.png", "Manage...", delegate=self.OnManageProcedures.Invoke), 1, 0)
+            self.CreateButton("Images/listIcon.png", "Manage...", delegate=self.OnManageProcedures.Invoke), 1, 0)
 
         self.solenoidsSection = ToolbarSection("Rig")
         self.solenoidsSection.AddElement(
-            self.CreateButton("Assets/solenoidsIcon.png", "Open Rig...", above=True,
+            self.CreateButton("Images/solenoidsIcon.png", "Open Rig...", above=True,
                               delegate=self.OnOpenRig.Invoke), 0, 0, 2, 1)
 
         sections = [self.fileMenuSection,
@@ -288,7 +288,7 @@ class MainToolbar(QFrame):
                 StatusBar.globalStatusBar.SetInfoMessage("")
         return False
 
-    def LogicBlockMenu(self, blocks: typing.List[typing.Type[LogicBlock]]):
+    def LogicBlockMenu(self, blocks: typing.List[typing.Type[BaseConnectableBlock]]):
         menu = QMenu(self)
         for block in blocks:
             newAction = menu.addAction(block.GetName())

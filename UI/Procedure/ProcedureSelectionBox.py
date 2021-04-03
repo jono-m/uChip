@@ -1,4 +1,4 @@
-from ChipController.ChipController import *
+from BlockSystem.ChipController.Chip import *
 
 
 class ProcedureSelectionBox(QComboBox):
@@ -7,7 +7,7 @@ class ProcedureSelectionBox(QComboBox):
         self.OnProcedureSelected = Event()
         self.setView(QListView())
 
-        self.chipController: typing.Optional[ChipController] = None
+        self.chipController: typing.Optional[Chip] = None
 
         self.activated.connect(self.HandleProcedureSelection)
 
@@ -19,7 +19,7 @@ class ProcedureSelectionBox(QComboBox):
             self.chipController.OnProcedureRemoved.Unregister(self.UpdateProceduresList)
             self.currentProcedure = None
 
-    def SetChipController(self, cc: ChipController):
+    def SetChipController(self, cc: Chip):
         self.ClearChipController()
         self.chipController = cc
         self.chipController.OnProcedureAdded.Register(self.UpdateProceduresList, True)

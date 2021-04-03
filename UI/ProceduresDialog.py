@@ -1,9 +1,9 @@
-from ChipController.ChipController import *
+from BlockSystem.ChipController.Chip import *
 from UI.StylesheetLoader import *
 
 
 class ProceduresDialog(QDialog):
-    def __init__(self, chipController: ChipController, *args, **kwargs):
+    def __init__(self, chipController: Chip, *args, **kwargs):
         super().__init__(f=Qt.WindowTitleHint | Qt.WindowCloseButtonHint, *args, **kwargs)
 
         self.setWindowTitle("Procedures Manager")
@@ -18,11 +18,11 @@ class ProceduresDialog(QDialog):
         self.okButton = QPushButton("OK")
         self.okButton.clicked.connect(self.OkClicked)
         self.renameButton = QToolButton()
-        self.renameButton.setIcon(ColorIcon("Assets/pencilIcon.png", QColor(255, 255, 255)))
+        self.renameButton.setIcon(ColorIcon("Images/pencilIcon.png", QColor(255, 255, 255)))
         self.renameButton.setToolTip("Rename Procedure")
         self.renameButton.clicked.connect(self.OnRenameClicked)
         self.deleteProcedureButton = QToolButton()
-        self.deleteProcedureButton.setIcon(ColorIcon("Assets/minimizeIcon.png", QColor(255, 255, 255)))
+        self.deleteProcedureButton.setIcon(ColorIcon("Images/minimizeIcon.png", QColor(255, 255, 255)))
         self.deleteProcedureButton.setToolTip("Delete Procedure")
         self.deleteProcedureButton.clicked.connect(self.OnDeleteClicked)
 

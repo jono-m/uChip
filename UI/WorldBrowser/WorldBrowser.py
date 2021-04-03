@@ -1,8 +1,6 @@
 from enum import Enum
-import time
-from UI.WorldBrowser.BlockItem import *
 from UI.WorldBrowser.PortHoles import *
-from Util import Event
+from UI.Util import Event
 from UI.MainWindow.StatusBar import *
 
 

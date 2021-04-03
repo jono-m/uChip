@@ -1,6 +1,3 @@
-from LogicBlocks.IOBlocks import *
-
-
 # noinspection PyMethodMayBeStatic
 class SelectableItem:
     def SetIsHovered(self, hoverOn):

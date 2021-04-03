@@ -3,7 +3,7 @@ from UI.Procedure.ProcedureEditorFrame import *
 from UI.LogicBlock.CustomLogicBlockEditorFrame import *
 from UI.MainWindow.MainToolbar import *
 from UI.RigView.RigViewWidget import *
-from Procedures.ProcedureRunner import *
+from BlockSystem.Procedures.ProcedureRunner import *
 from UI.ProceduresDialog import *
 from UI.Chip.ChipParametersList import *
 from UI.MainWindow.StatusBar import *
@@ -49,7 +49,7 @@ class MainWorkArea(QFrame):
         self.tabArea = QTabWidget(self)
         self.tabArea.setTabPosition(QTabWidget.South)
         self.tabArea.setTabsClosable(True)
-        self.tabArea.addTab(self.chipFrame, QIcon("Assets/icon.png"), "Chip Tab")
+        self.tabArea.addTab(self.chipFrame, QIcon("Images/icon.png"), "Chip Tab")
         self.tabArea.addTab(self.procedureFrame, "Procedures")
         self.tabArea.tabBar().setTabButton(0, QTabBar.RightSide, None)
         self.tabArea.tabBar().setTabButton(1, QTabBar.RightSide, None)
@@ -119,7 +119,7 @@ class MainWorkArea(QFrame):
 
         self.UpdateTabNames()
 
-    def AddLogicBlock(self, lb: LogicBlock):
+    def AddLogicBlock(self, lb: BaseConnectableBlock):
         self.currentEditorFrame.AddLogicBlock(lb)
 
     def AddImage(self, image: Image):
@@ -165,13 +165,13 @@ class MainWorkArea(QFrame):
             return
 
         if filename is None:
-            cc = ChipController()
+            cc = Chip()
         else:
-            cc = ChipController.LoadFromFile(filename)
+            cc = Chip.LoadFromFile(filename)
 
         self.OpenChipController(cc)
 
-    def OpenChipController(self, cc: ChipController):
+    def OpenChipController(self, cc: Chip):
         self.chipFrame.OpenChipController(cc)
         self.toolBar.SetChipController(cc)
         self.chipParametersList.SetChipController(cc)
