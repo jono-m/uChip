@@ -7,7 +7,7 @@ class ChipEditorFrame(BaseEditorFrame):
     def __init__(self, rig: Rig):
         super().__init__()
 
-        self.chipController: typing.Optional[ChipController] = None
+        self.chipController: typing.Optional[Chip] = None
 
         self.editor = ChipEditor()
         self.nameFilters = ["μChip Chip Controller (*.ucc)"]
@@ -20,7 +20,7 @@ class ChipEditorFrame(BaseEditorFrame):
 
         self.rig = rig
 
-    def OpenChipController(self, chipController: ChipController):
+    def OpenChipController(self, chipController: Chip):
         self.CloseChipController()
         self.chipController = chipController
 
@@ -31,7 +31,7 @@ class ChipEditorFrame(BaseEditorFrame):
 
         self.hasFilename = chipController.GetFilename() is not None
 
-    def AddLogicBlock(self, lb: LogicBlock):
+    def AddLogicBlock(self, lb: BaseConnectableBlock):
         lb.SetPosition(self.editor.worldBrowser.GetCenterPoint())
         self.chipController.GetLogicBlock().AddSubBlock(lb)
 
@@ -57,7 +57,7 @@ class ChipEditorFrame(BaseEditorFrame):
 
     def RequestNew(self):
         if self.RequestClose():
-            self.OpenChip(ChipController())
+            self.OpenChip(Chip())
 
     def DoSave(self, filename=None):
         self.chipController.Save(filename)

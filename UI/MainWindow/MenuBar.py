@@ -1,4 +1,4 @@
-from Util import *
+from UI.Util import *
 
 
 class MenuBar(QFrame):
@@ -12,10 +12,10 @@ class MenuBar(QFrame):
 
         self.menuBar = QMenuBar()
         fileMenu = self.menuBar.addMenu("&File")
-        newChipAction = QAction(QIcon("Assets/UCIcon.png"), "New Chip", self)
+        newChipAction = QAction(QIcon("Images/UCIcon.png"), "New Chip", self)
         newChipAction.setShortcut(Qt.CTRL + Qt.Key_N)
         newChipAction.triggered.connect(self.OnNewChip.Invoke)
-        newLBAction = QAction(QIcon("Assets/LBIcon.png"), "New Logic Block", self)
+        newLBAction = QAction(QIcon("Images/LBIcon.png"), "New Logic Block", self)
         newLBAction.triggered.connect(self.OnNewLB.Invoke)
         newLBAction.setShortcut(Qt.CTRL + Qt.SHIFT + Qt.Key_N)
         openAction = QAction("Open...", self)

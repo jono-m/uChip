@@ -1,4 +1,3 @@
-from Procedures.BasicSteps import *
 from UI.WorldBrowser.PortHoles import *
 
 

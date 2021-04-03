@@ -1,9 +1,11 @@
-blockName = "8-bit Multiplexer"
-
+def BlockName():
+    return "8-bit Multiplexer"
 
 def Inputs():
-    return {'Number': int}
+    return {'Number': [int, 0]}
 
+def Parameters():
+    return {'Test Setting', [int, 0]}
 
 def Outputs():
     return {'M1': bool,

@@ -1,5 +1,5 @@
 from UI.RigView.RigConfigurationWindow import *
-from Util import *
+from UI.Util import *
 
 
 class RigViewWidget(QDialog):

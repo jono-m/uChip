@@ -39,7 +39,7 @@ class LogicBlockEditor(QFrame):
         # Go over each loaded block
         for blockItem in addedBlockItems:
             # Connect each output in the block
-            for outputPort in blockItem.block.GetOutputs():
+            for outputPort in blockItem.block.GetOutputPorts():
                 # To each input
                 for inputPort in outputPort.connectedInputs:
                     self.CreateConnectionItem((outputPort, inputPort))
@@ -53,8 +53,8 @@ class LogicBlockEditor(QFrame):
         self.currentBlock.OnImageAdded.Register(self.CreateImageItem, True)
         self.currentBlock.OnClosed.Register(self.Clear, True)
 
-    def CreateBlockItem(self, newBlock: LogicBlock):
-        if isinstance(newBlock, LogicBlock):
+    def CreateBlockItem(self, newBlock: ConnectableBlock):
+        if isinstance(newBlock, ConnectableBlock):
             return LogicBlockItem(self.worldBrowser.scene(), newBlock)
 
     def CreateImageItem(self, image: Image):
@@ -69,14 +69,14 @@ class LogicBlockEditor(QFrame):
         foundInputWidget: typing.Optional[InputPortWidget] = None
 
         for blockItem in blockItems:
-            if foundOutputWidget is None and blockItem.block == t[0].block:
+            if foundOutputWidget is None and blockItem.block == t[0].ownerBlock:
                 outputWidgets = [x for x in blockItem.outputPortsListWidget.children() if
                                  isinstance(x, OutputPortWidget)]
                 for outputWidget in outputWidgets:
                     if outputWidget.outputPort == t[0]:
                         foundOutputWidget = outputWidget
                         break
-            if foundInputWidget is None and blockItem.block == t[1].block:
+            if foundInputWidget is None and blockItem.block == t[1].ownerBlock:
                 inputWidgets = [x for x in blockItem.inputPortsListWidget.children() if isinstance(x, InputPortWidget)]
                 for inputWidget in inputWidgets:
                     if inputWidget.inputPort == t[1]:

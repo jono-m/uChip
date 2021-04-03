@@ -1,10 +1,10 @@
-from ChipController.ChipController import *
+from BlockSystem.ChipController.Chip import *
 
 
 class GetMenu(QMenu):
     def __init__(self, parent):
         super().__init__(parent)
-        self.chipController: typing.Optional[ChipController] = None
+        self.chipController: typing.Optional[Chip] = None
 
         self.OnAddGet = Event()
 
@@ -24,7 +24,7 @@ class GetMenu(QMenu):
 
     def UpdateMenu(self):
         self.clear()
-        for inputPort in sorted(self.chipController.GetLogicBlock().GetInputs(),
+        for inputPort in sorted(self.chipController.GetLogicBlock().GetInputPorts(),
                                 key=lambda x: x.name):
             action = self.addAction(inputPort.name)
             action.triggered.connect(
@@ -43,7 +43,7 @@ class GetMenu(QMenu):
 class SetMenu(QMenu):
     def __init__(self, parent):
         super().__init__(parent)
-        self.chipController: typing.Optional[ChipController] = None
+        self.chipController: typing.Optional[Chip] = None
 
         self.OnAddSet = Event()
 
@@ -61,7 +61,7 @@ class SetMenu(QMenu):
 
     def UpdateMenu(self):
         self.clear()
-        for inputPort in sorted(self.chipController.GetLogicBlock().GetInputs(),
+        for inputPort in sorted(self.chipController.GetLogicBlock().GetInputPorts(),
                                 key=lambda x: x.name):
             action = self.addAction(inputPort.name)
             action.triggered.connect(

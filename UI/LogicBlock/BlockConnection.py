@@ -39,10 +39,10 @@ class BlockConnection(ConnectionItem):
     def __init__(self, s: QGraphicsScene, outputPortHole: OutputPortHole, inputPortHole: InputPortHole):
         super().__init__(s, outputPortHole, inputPortHole)
 
-        self.GetToPortHole().inputPort.block.OnConnectionsChanged.Register(self.CheckExistence, True)
-        self.GetFromPortHole().outputPort.block.OnConnectionsChanged.Register(self.CheckExistence, True)
+        self.GetToPortHole().inputPort.ownerBlock.OnConnectionsChanged.Register(self.CheckExistence, True)
+        self.GetFromPortHole().outputPort.ownerBlock.OnConnectionsChanged.Register(self.CheckExistence, True)
 
-        self.lastData = outputPortHole.outputPort.GetData()
+        self.lastData = outputPortHole.outputPort.GetValue()
 
     def GetFromPortHole(self):
         if isinstance(self._portHoleA, OutputPortHole):
@@ -57,8 +57,8 @@ class BlockConnection(ConnectionItem):
             return self._portHoleB
 
     def Remove(self):
-        self.GetToPortHole().inputPort.block.OnConnectionsChanged.Unregister(self.CheckExistence)
-        self.GetFromPortHole().outputPort.block.OnConnectionsChanged.Unregister(self.CheckExistence)
+        self.GetToPortHole().inputPort.ownerBlock.OnConnectionsChanged.Unregister(self.CheckExistence)
+        self.GetFromPortHole().outputPort.ownerBlock.OnConnectionsChanged.Unregister(self.CheckExistence)
         self.SetPortHoleA(None)
         self.SetPortHoleB(None)
         self.scene().removeItem(self)

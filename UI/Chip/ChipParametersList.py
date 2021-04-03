@@ -1,5 +1,5 @@
 from UI.LogicBlock.LogicBlockItem import *
-from ChipController.ChipController import *
+from BlockSystem.ChipController.Chip import *
 
 
 class ChipParametersList(QFrame):
@@ -41,7 +41,7 @@ class ChipParametersList(QFrame):
 
         self.scrollArea.setWidget(self.container)
 
-        self.chipController: typing.Optional[ChipController] = None
+        self.chipController: typing.Optional[Chip] = None
 
     def CloseChipController(self):
         if self.chipController is not None:
@@ -49,7 +49,7 @@ class ChipParametersList(QFrame):
         self.chipController = None
         self.Clear()
 
-    def SetChipController(self, cc: ChipController):
+    def SetChipController(self, cc: Chip):
         self.CloseChipController()
         self.chipController = cc
 
@@ -66,7 +66,7 @@ class ChipParametersList(QFrame):
         inputPorts = [chipParameterField.inputPort for chipParameterField in self.parametersWidget.children() if
                       isinstance(chipParameterField, ChipParameterField)]
 
-        for inputPort in sorted(self.chipController.GetLogicBlock().GetInputs(),
+        for inputPort in sorted(self.chipController.GetLogicBlock().GetInputPorts(),
                                 key=lambda x: x.name):
             if inputPort not in inputPorts:
                 newField = ChipParameterField(inputPort, self.SortList)
@@ -114,10 +114,10 @@ class ChipParameterField(QFrame):
         self.parameterSetting.OnParameterChanged.Register(self.OnParameterChanged, True)
         layout.addWidget(self.parameterSetting)
 
-        self.inputPort.block.OnConnectionsChanged.Register(self.Update, True)
-        self.inputPort.block.OnPortsChanged.Register(self.Update, True)
-        self.inputPort.block.OnOutputsUpdated.Register(self.Update, True)
-        self.inputPort.block.OnDestroyed.Register(self.Remove, True)
+        self.inputPort.connectableBlock.OnConnectionsChanged.Register(self.Update, True)
+        self.inputPort.connectableBlock.OnPortsChanged.Register(self.Update, True)
+        self.inputPort.connectableBlock.OnOutputsUpdated.Register(self.Update, True)
+        self.inputPort.connectableBlock.OnDestroyed.Register(self.Remove, True)
 
         self.changedNameDelegate = changedNameDelegate
 
@@ -125,23 +125,23 @@ class ChipParameterField(QFrame):
 
 
     def Remove(self):
-        self.inputPort.block.OnConnectionsChanged.Unregister(self.Update)
-        self.inputPort.block.OnPortsChanged.Unregister(self.Update)
-        self.inputPort.block.OnOutputsUpdated.Unregister(self.Update)
-        self.inputPort.block.OnDestroyed.Unregister(self.Remove)
+        self.inputPort.connectableBlock.OnConnectionsChanged.Unregister(self.Update)
+        self.inputPort.connectableBlock.OnPortsChanged.Unregister(self.Update)
+        self.inputPort.connectableBlock.OnOutputsUpdated.Unregister(self.Update)
+        self.inputPort.connectableBlock.OnDestroyed.Unregister(self.Remove)
         self.deleteLater()
 
     def OnParameterChanged(self, data):
-        self.inputPort.SetDefaultData(data)
+        self.inputPort.SetDefaultValue(data)
 
     def Update(self):
-        if self.inputPort not in self.inputPort.block.GetInputs():
+        if self.inputPort not in self.inputPort.connectableBlock.GetInputPorts():
             self.Remove()
             return
 
         if self.parameterSetting.nameLabel.text() != self.inputPort.name:
             self.changedNameDelegate()
-        self.parameterSetting.Update(self.inputPort.name, self.inputPort.GetDefaultData())
+        self.parameterSetting.Update(self.inputPort.name, self.inputPort.GetDefaultValue())
 
 
 class UnboundValveField(QFrame):
@@ -175,7 +175,7 @@ class UnboundValveField(QFrame):
         self.deleteLater()
 
     def OnParameterChanged(self, data):
-        self.valveBlock.openInput.SetDefaultData(data)
+        self.valveBlock.openInput.SetDefaultValue(data)
 
     def Update(self):
         if self.valveBlock.openInput.connectedOutput is not None:
@@ -184,4 +184,4 @@ class UnboundValveField(QFrame):
 
         if self.parameterSetting.nameLabel.text() != self.valveBlock.GetName():
             self.changedNameDelegate()
-        self.parameterSetting.Update(self.valveBlock.GetName(), self.valveBlock.openInput.GetDefaultData())
+        self.parameterSetting.Update(self.valveBlock.GetName(), self.valveBlock.openInput.GetDefaultValue())

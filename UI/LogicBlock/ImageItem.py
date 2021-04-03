@@ -1,4 +1,4 @@
-from LogicBlocks.CompoundLogicBlock import *
+from BlockSystem.Blocks.CompoundLogicBlock import *
 from UI.WorldBrowser.BlockItem import *
 from UI.StylesheetLoader import *
 

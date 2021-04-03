@@ -46,7 +46,7 @@ class BaseEditorFrame(QFrame):
     def AddImage(self, image: Image):
         pass
 
-    def AddLogicBlock(self, lb: LogicBlock):
+    def AddLogicBlock(self, lb: ConnectableBlock):
         pass
 
     def TrySaveAs(self) -> bool:
@@ -81,7 +81,7 @@ class BaseEditorFrame(QFrame):
             msgBox.setIcon(QMessageBox.Icon.Warning)
             msgBox.setStandardButtons(QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
             msgBox.setDefaultButton(QMessageBox.Save)
-            msgBox.setWindowIcon(QIcon("Assets/icon.png"))
+            msgBox.setWindowIcon(QIcon("Images/icon.png"))
             ret = msgBox.exec()
             if ret == QMessageBox.Save:
                 return self.RequestSave()

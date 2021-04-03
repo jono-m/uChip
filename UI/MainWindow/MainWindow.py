@@ -1,6 +1,6 @@
 from UI.MainWindow.MainWorkArea import *
 from UI.MainWindow.MenuBar import *
-from ChipController.ChipUpdateWorker import *
+from BlockSystem.ChipController.ChipUpdateWorker import *
 from UI.StylesheetLoader import *
 
 
@@ -15,7 +15,7 @@ class MainWindow(QMainWindow):
         container.setFrameShape(QFrame.NoFrame)
         self.setCentralWidget(container)
 
-        icon = QIcon("Assets/icon.png")
+        icon = QIcon("Images/icon.png")
         self.setWindowIcon(icon)
 
         self.rig = Rig()

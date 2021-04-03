@@ -1,5 +1,5 @@
 from UI.LogicBlock.LogicBlockItem import *
-from ChipController.ChipController import *
+from BlockSystem.ChipController.Chip import *
 
 
 class ChipValvesList(QFrame):
@@ -39,7 +39,7 @@ class ChipValvesList(QFrame):
 
         self.scrollArea.setWidget(self.valvesContainer)
 
-        self.chipController: typing.Optional[ChipController] = None
+        self.chipController: typing.Optional[Chip] = None
 
     def CloseChipController(self):
         if self.chipController is not None:
@@ -47,7 +47,7 @@ class ChipValvesList(QFrame):
         self.chipController = None
         self.Clear()
 
-    def SetChipController(self, cc: ChipController):
+    def SetChipController(self, cc: Chip):
         self.CloseChipController()
         self.chipController = cc
 
@@ -116,12 +116,12 @@ class ValveField(QFrame):
         self.deleteLater()
 
     def OnParameterChanged(self, data):
-        self.valveBlock.solenoidNumberInput.SetDefaultData(data)
+        self.valveBlock.solenoidNumberInput.SetDefaultValue(data)
 
     def Update(self):
         self.nameField.setText(self.valveBlock.GetName())
         self.parameterSetting.nameLabel.setVisible(False)
 
-        if self.parameterSetting.control.value() != self.valveBlock.solenoidNumberInput.GetDefaultData():
+        if self.parameterSetting.control.value() != self.valveBlock.solenoidNumberInput.GetDefaultValue():
             self.changeDelegate()
-        self.parameterSetting.Update("", self.valveBlock.solenoidNumberInput.GetDefaultData())
+        self.parameterSetting.Update("", self.valveBlock.solenoidNumberInput.GetDefaultValue())

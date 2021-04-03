@@ -1,4 +1,4 @@
-from ChipController.ChipController import *
+from BlockSystem.ChipController.Chip import *
 from UI.LogicBlock.LogicBlockEditor import *
 from UI.Procedure.StepBlockItem import *
 from UI.Procedure.StepConnection import *
@@ -18,8 +18,8 @@ class ProcedureEditor(LogicBlockEditor):
         self.procedure = None
         super().Clear()
 
-    def CreateBlockItem(self, newBlock: LogicBlock):
-        if isinstance(newBlock, Step):
+    def CreateBlockItem(self, newBlock: BaseConnectableBlock):
+        if isinstance(newBlock, BaseStep):
             return StepBlockItem(self.worldBrowser.scene(), newBlock)
         return super().CreateBlockItem(newBlock)
 
@@ -51,13 +51,13 @@ class ProcedureEditor(LogicBlockEditor):
         foundCompletedWidget: typing.Optional[CompletedPortWidget] = None
 
         for stepItem in stepItems:
-            if foundBeginWidget is None and stepItem.step == ports[1].block:
+            if foundBeginWidget is None and stepItem.step == ports[1].ownerBlock:
                 beginWidgets = [x for x in stepItem.beginPortsWidget.children() if isinstance(x, BeginPortWidget)]
                 for beginWidget in beginWidgets:
                     if beginWidget.beginPort == ports[1]:
                         foundBeginWidget = beginWidget
                         break
-            if foundCompletedWidget is None and stepItem.step == ports[0].block:
+            if foundCompletedWidget is None and stepItem.step == ports[0].ownerBlock:
                 completedWidgets = [x for x in stepItem.completedPortsWidget.children() if
                                     isinstance(x, CompletedPortWidget)]
                 for completedWidget in completedWidgets:

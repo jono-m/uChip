@@ -1,5 +1,5 @@
 from UI.LogicBlock.LogicBlockItem import *
-from ChipController.ValveBlock import *
+from BlockSystem.ValveLogicBlock import *
 
 
 class ValveBlockItem(LogicBlockItem):

@@ -1,6 +1,6 @@
 from cx_Freeze import setup, Executable
 
-includeFiles = ["Assets"]
+includeFiles = ["Images"]
 setup(name="uChip",
       version="0.1",
       description="Control software for microfluidic prototyping.",
@@ -9,4 +9,4 @@ setup(name="uChip",
       executables=[Executable(
           base="Win32GUI",
           script="main.py",
-          icon="Assets/icon.ico")])
+          icon="Images/icon.ico")])

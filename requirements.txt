@@ -1,0 +1,4 @@
+PySide2~=5.15.1
+shiboken2~=5.15.1
+pyserial~=3.4
+dill~=0.3.2
