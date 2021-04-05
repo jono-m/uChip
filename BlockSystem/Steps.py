@@ -29,7 +29,10 @@ class ChipSettingStep(BaseStep):
             self.valueInput.SetDefaultValue(self.chipInputPort.GetDefaultValue())
 
         # This is only valid if the chip input port actually exists
-        self.isValid = self.chipInputPort.ownerBlock is not None
+        if self.chipInputPort.ownerBlock is None:
+            self.SetInvalid("Chip port was removed.")
+        else:
+            self.SetValid()
 
     def OnProcedureBegan(self):
         self._initialValue = self.chipInputPort.GetDefaultValue()
@@ -58,7 +61,12 @@ class ValveSettingStep(BaseStep):
 
     def Update(self):
         super().Update()
-        self.isValid = self.valveBlock.isValid and self.valveBlock.openInput.GetConnectedOutput() is None
+        if not self.valveBlock.IsValid():
+            self.SetInvalid("Valve block is invalid.")
+        elif self.valveBlock.openInput.GetConnectedOutput() is None:
+            self.SetInvalid("This valve is driven by the chip.")
+        else:
+            self.SetValid()
 
     def OnStepBegan(self):
         super().OnStepBegan()
