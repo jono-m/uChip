@@ -69,7 +69,7 @@ class BeginPort(Port):
         super().__init__(name)
 
     def CanConnect(self, port: 'Port'):
-        return isinstance(port, CompletedPort)
+        return super().CanConnect(port) and isinstance(port, CompletedPort)
 
 
 class CompletedPort(Port):
@@ -77,4 +77,4 @@ class CompletedPort(Port):
         super().__init__(name)
 
     def CanConnect(self, port: 'Port'):
-        return isinstance(port, BeginPort)
+        return super().CanConnect(port) and isinstance(port, BeginPort)

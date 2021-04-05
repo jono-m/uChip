@@ -104,44 +104,21 @@ class Exponent(BinaryOperationBlock):
         super().__init__(lambda a, b: math.pow(a, b))
 
 
-class LShift(BinaryOperationBlock):
+class BitwiseOperation(BinaryOperationBlock):
     def GetName(self):
-        return "Left Shift (A<<B)"
+        return "Bitwise " + self.modeParameter.dataType[self.modeParameter.GetValue()]
 
     def __init__(self):
-        super().__init__(lambda a, b: a << b, int)
+        super().__init__(self.DoOperation, int)
 
+        self.modeParameter = self.CreateParameter("Operation", ["A << B",
+                                                                "A >> B",
+                                                                "A & B",
+                                                                "A | B",
+                                                                "A ^ B"])
 
-class RShift(BinaryOperationBlock):
-    def GetName(self):
-        return "Right Shift (A>>B)"
-
-    def __init__(self):
-        super().__init__(lambda a, b: a >> b, int)
-
-
-class BAnd(BinaryOperationBlock):
-    def GetName(self):
-        return "Bitwise-AND (A&B)"
-
-    def __init__(self):
-        super().__init__(lambda a, b: a & b, int)
-
-
-class BOr(BinaryOperationBlock):
-    def GetName(self):
-        return "Bitwise-OR (A|B)"
-
-    def __init__(self):
-        super().__init__(lambda a, b: a | b, int)
-
-
-class BNot(UnaryOperationBlock):
-    def GetName(self):
-        return "Bitwise-Not (~In)"
-
-    def __init__(self):
-        super().__init__(lambda a: ~a, int)
+    def DoOperation(self, A: int, B: int):
+        return eval(self.modeParameter.dataType[self.modeParameter.GetValue()])
 
 
 class Round(UnaryOperationBlock):
@@ -167,13 +144,20 @@ class Floor(UnaryOperationBlock):
     def __init__(self):
         super().__init__(lambda a: math.floor(a), float, int)
 
-
-class And(BinaryOperationBlock):
+class BooleanOperation(BinaryOperationBlock):
     def GetName(self):
-        return "And"
+        return "Boolean (" + self.
 
     def __init__(self):
-        super().__init__(lambda a, b: a and b, bool)
+        super().__init__(self.DoOperation, bool)
+
+        self.modeParameter = self.CreateParameter("Operation", ["A and B",
+                                                                "A or B",
+                                                                "A xor B",
+                                                                "A | B",
+                                                                "A ^ B"])
+
+    def DoOperation
 
 
 class Or(BinaryOperationBlock):

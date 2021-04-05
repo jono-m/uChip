@@ -7,7 +7,21 @@ class BaseConnectableBlock:
 
         self._parameters: typing.List[Parameter] = []
 
-        self.isValid = True
+        self._isValid = True
+        self._invalidReason = "Invalid Block!"
+
+    def IsValid(self):
+        return self._isValid
+
+    def GetInvalidReason(self):
+        return self._invalidReason
+
+    def SetValid(self):
+        self._isValid = True
+
+    def SetInvalid(self, invalidReason: str):
+        self.DisconnectAll()
+        self._invalidReason = invalidReason
 
     def GetPorts(self):
         return self._ports
@@ -84,7 +98,8 @@ class Port:
         return self._connectedPorts
 
     def CanConnect(self, port: 'Port'):
-        return self is not None and port is not None
+        return port is not None and self.ownerBlock is not None and port.ownerBlock is not None \
+               and self.ownerBlock.IsValid() and port.ownerBlock.IsValid()
 
     def Connect(self, port: 'Port'):
         if not self.CanConnect(port):

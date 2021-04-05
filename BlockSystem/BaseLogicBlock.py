@@ -45,6 +45,8 @@ class InputPort(Port):
             return self.GetConnectedPorts()[0]
 
     def CanConnect(self, port: 'Port'):
+        if not super().CanConnect(port):
+            return False
         if isinstance(port, OutputPort):
             return not DoesConnectionFormLoop(self, port)
         else:
@@ -87,6 +89,8 @@ class OutputPort(Port):
         self._outputValue = dataType()
 
     def CanConnect(self, port: 'Port'):
+        if not super().CanConnect(port):
+            return False
         if isinstance(port, InputPort):
             return port.CanConnect(self)
         else:

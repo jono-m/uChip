@@ -144,6 +144,9 @@ class ScriptedLogicBlock(BaseLogicBlock):
     def Update(self):
         super().Update()
 
+        if not self.IsValid():
+            return
+
         # Copy over input values from ports
         inputValues = {}
         for inputPort in self.GetInputPorts():
@@ -155,16 +158,19 @@ class ScriptedLogicBlock(BaseLogicBlock):
         for parameter in self.GetParameters():
             parameterValues[parameter.name] = parameter.GetValue()
         self._codeLocals['parameters'] = parameterValues
+        try:
+            # Set up any new ports as needed
+            self.SyncParameters()
+            self.SyncInputPorts()
+            self.SyncOutputPorts()
 
-        # Set up any new ports as needed
-        self.SyncParameters()
-        self.SyncInputPorts()
-        self.SyncOutputPorts()
-
-        # Compute outputs
-        outputValues = {}
-        self._codeLocals['outputs'] = outputValues
-        exec("Compute(inputs, outputs)", self._codeGlobals, self._codeLocals)
+            # Compute outputs
+            outputValues = {}
+            self._codeLocals['outputs'] = outputValues
+            exec("Compute(inputs, outputs)", self._codeGlobals, self._codeLocals)
+        except Exception as e:
+            self.SetInvalid("Script execution error:\n" + str(e))
+            return
 
         # Flush the output values to ports
         for outputPort in self.GetOutputPorts():

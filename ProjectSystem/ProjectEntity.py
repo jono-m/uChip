@@ -1,14 +1,16 @@
-from Project import Project
-from pathlib import Path
 import typing
 
 
 class ProjectEntity:
     def __init__(self):
-        self.editableProperties: typing.Dict[str, object] = {'Position': (0, 0)}
+        self.editableProperties: typing.Dict[str, typing.Any] = {'position': (0, 0)}
 
     def GetPosition(self):
-        return self.editableProperties['Position']
+        self.UpdateEntity()
+        return self.editableProperties['position']
 
     def SetPosition(self, position: typing.Tuple[float, float]):
-        self.editableProperties['Position'] = position
+        self.editableProperties['position'] = position
+
+    def UpdateEntity(self):
+        pass

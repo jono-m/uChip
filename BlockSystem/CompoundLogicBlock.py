@@ -15,6 +15,18 @@ class CompoundLogicBlock(BaseLogicBlock):
     def GetSubBlocks(self):
         return self._subBlocks
 
+    def IsValid(self):
+        if not super().IsValid():
+            return False
+
+        return all([block.IsValid() for block in self.GetSubBlocks()])
+
+    def GetInvalidReason(self):
+        if not super().IsValid():
+            return super().GetInvalidReason()
+
+        return "Error in sub-blocks!"
+
     def AddSubBlock(self, newBlock: BaseLogicBlock):
         if newBlock in self._subBlocks:
             return
@@ -43,9 +55,6 @@ class CompoundLogicBlock(BaseLogicBlock):
 
     def Update(self):
         super().Update()
-        for block in self.GetSubBlocks().copy():
-            if not block.isValid:
-                self.RemoveSubBlock(block)
 
         blocksWaitingForUpdate = self.GetSubBlocks()
         while blocksWaitingForUpdate:
