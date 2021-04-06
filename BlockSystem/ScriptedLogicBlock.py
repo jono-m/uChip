@@ -3,10 +3,9 @@ from BaseLogicBlock import BaseLogicBlock
 
 class ScriptedLogicBlock(BaseLogicBlock):
     def GetName(self):
-        if self is None:
-            return "Scripted Block"
-        else:
-            return self._codeLocals['blockName']
+        if not self.IsValid():
+            return "Invalid Scripted Block"
+        return self._codeLocals['blockName']
 
     def __init__(self):
         super().__init__()

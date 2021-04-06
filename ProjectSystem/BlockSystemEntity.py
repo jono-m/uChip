@@ -8,7 +8,6 @@ class BlockSystemEntity(ProjectEntity):
         self._block = block
 
     def GetBlock(self) -> BaseConnectableBlock:
-        self.UpdateEntity()
         return self._block
 
     def SetBlock(self, block: BaseConnectableBlock):

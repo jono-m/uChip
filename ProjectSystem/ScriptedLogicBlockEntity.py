@@ -1,44 +1,49 @@
-from BlockSystemEntity import BlockSystemEntity
+from BlockSystemEntity import BlockSystemEntity, BaseConnectableBlock
 from BlockSystem.ScriptedLogicBlock import ScriptedLogicBlock
 from pathlib import Path
-import os
-import typing
+from FileTrackingObject import FileTrackingObject
+
+
+class ScriptedLogicBlockFile(FileTrackingObject):
+    def __init__(self, path: Path, block: ScriptedLogicBlock):
+        self._scriptedLogicBlock = block
+        super().__init__(path)
+
+    def ReportError(self, error: str):
+        super().ReportError(error)
+        self._scriptedLogicBlock.SetInvalid(error)
+
+    def GetScriptedLogicBlock(self):
+        return self._scriptedLogicBlock
+
+    def TryReload(self) -> bool:
+        if not super().TryReload():
+            return False
+        try:
+            f = open(self.pathToLoad)
+            code = f.read()
+            f.close()
+        except Exception as e:
+            self.ReportError("Could not open file. Error:\n" + str(e))
+            return False
+        try:
+            self._scriptedLogicBlock.ParseCode(code)
+        except Exception as e:
+            self.ReportError("Script loading error:\n" + str(e))
+            return False
+        return True
+
+    def OnSyncedSuccessfully(self):
+        super().OnSyncedSuccessfully()
+        self._scriptedLogicBlock.SetValid()
 
 
 class ScriptedLogicBlockEntity(BlockSystemEntity):
     def __init__(self, path: Path, block: ScriptedLogicBlock):
         super().__init__(block)
 
-        # Assume it hasn't been loaded yet
-        self.editableProperties['scriptedBlockPath'] = path
-        self._attemptedLoadedPath: typing.Optional[Path] = None
-        self._attemptedLoadedVersion: typing.Optional[float] = None
+        self.editableProperties['scriptedBlockFile'] = ScriptedLogicBlockFile(path, block)
 
-    def UpdateEntity(self):
-        path: Path = self.editableProperties['scriptedBlockPath']
-        block = self.GetBlock()
-        if not isinstance(block, ScriptedLogicBlock):
-            return
-
-        if not path.exists():
-            block.SetInvalid("Cannot find file " + str(path.resolve()) + ".")
-            self._attemptedLoadedPath = None
-            self._attemptedLoadedVersion = None
-        elif self._attemptedLoadedVersion is None or path != self._attemptedLoadedPath or os.path.getmtime(
-                path) > self._attemptedLoadedVersion:
-            try:
-                f = open(path)
-                code = f.read()
-                f.close()
-            except Exception as e:
-                block.SetInvalid("Could not read file " + str(path.resolve()) + ".\nError:" + str(e))
-            else:
-                try:
-                    block.ParseCode(code)
-                except Exception as e:
-                    block.SetInvalid("Script loading error in " + str(path.resolve()) + ":\n" + str(e))
-                else:
-                    block.SetValid()
-
-            self._attemptedLoadedVersion = os.path.getmtime(path)
-            self._attemptedLoadedPath = path
+    def GetBlock(self) -> BaseConnectableBlock:
+        self.editableProperties['scriptedBlockFile'].Sync()
+        return self.editableProperties['scriptedBlockFile'].GetScriptedLogicBlock()

@@ -1,55 +1,63 @@
 from ProjectEntity import ProjectEntity
 from pathlib import Path
 from PySide2.QtGui import QPixmap
+from FileTrackingObject import FileTrackingObject
 import typing
-import time
-import os
+
+
+class ImageFileObject(FileTrackingObject):
+    def __init__(self, path: Path):
+        self._image: typing.Optional[QPixmap] = None
+        super().__init__(path)
+
+    def __getstate__(self):
+        self._image = None
+        return self.__dict__
+
+    def GetImage(self):
+        return self._image
+
+    def ShouldReload(self) -> bool:
+        return super().ShouldReload() or self._image is None
+
+    def ReportError(self, error: str):
+        super().ReportError(error)
+        self._image = None
+
+    def TryReload(self) -> bool:
+        if not super().TryReload():
+            return False
+        try:
+            self._image = QPixmap(str(self.pathToLoad.resolve()))
+        except Exception as e:
+            self.ReportError("Error loading file:\n" + str(e))
+            return False
+        return True
 
 
 class Image(ProjectEntity):
     def __init__(self, path: Path):
         super().__init__()
-        self.editableProperties['imagePath'] = path
+        self.editableProperties['imageFile'] = ImageFileObject(path)
         self.editableProperties['scale'] = 1
         self.editableProperties['opacity'] = 1
 
-        # Assume it hasn't been loaded yet
-        self._rawPixmap: typing.Optional[QPixmap] = None
         self._scaledPixmap: typing.Optional[QPixmap] = None
-        self._loadedPath: typing.Optional[Path] = None
-        self._loadedVersion: typing.Optional[float] = None
-        self._currentScale: typing.Optional[float] = None
+        self._currentScale: float = -1
 
-        self._errorMessage = ""
+    def __getstate__(self):
+        self._scaledPixmap = None
+        return self.__dict__
 
     def GetImage(self) -> typing.Optional[QPixmap]:
-        self.UpdateEntity()
-        return self._scaledPixmap
+        self.editableProperties['imageFile'].Sync()
 
-    def UpdateEntity(self):
-        path: Path = self.editableProperties['imagePath']
-        if not path.exists():
-            self._errorMessage = "Cannot find file " + str(path.resolve()) + "."
-            self._loadedPath = None
-            self._loadedVersion = None
-            self._rawPixmap = None
+        image: QPixmap = self.editableProperties['imageFile'].GetImage()
+        # Update the scaled version
+        if image is None:
             self._scaledPixmap = None
-        elif self._loadedVersion is None or self._loadedPath != path or os.path.getmtime(path) > self._loadedVersion:
-            try:
-                self._scaledPixmap = None
-                self._rawPixmap = QPixmap(str(path.resolve()))
-            except Exception as e:
-                self._errorMessage = "Could not load file " + str(path.resolve()) + ".\nError: " + str(e)
-                self._rawPixmap = None
-
-            self._loadedVersion = os.path.getmtime(path)
-            self._loadedPath = path
-
-        if self._scaledPixmap is None or self._currentScale is None \
-                or self._currentScale != self.editableProperties['scale']:
-            if self._rawPixmap is None:
-                self._scaledPixmap = None
-            else:
-                self._scaledPixmap = self._rawPixmap.scaledToWidth(
-                    self._rawPixmap * self.editableProperties['scale'])
+        elif self._scaledPixmap is None or self._currentScale != self.editableProperties['scale']:
+            self._scaledPixmap = image.scaledToWidth(image * self.editableProperties['scale'])
             self._currentScale = self.editableProperties['scale']
+
+        return self._scaledPixmap

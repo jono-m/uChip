@@ -14,6 +14,9 @@ class Project:
 
         self._projectPath: typing.Optional[Path] = None
 
+    def GetProjectName(self):
+        return self._projectPath.stem
+
     def GetProjectPath(self):
         return self._projectPath
 
@@ -57,11 +60,12 @@ class Project:
             raise ProjectFileError("Could not load file " + str(path.resolve()) + ".\nError:" + str(e))
 
         loadedProject._projectPath = path
-        loadedProject.OnLoadedFromFile()
+
+        loadedProject.OnLoaded()
 
         return loadedProject
 
-    def OnLoadedFromFile(self):
+    def OnLoaded(self):
         self.ConvertAllPaths(False)
 
     def ConvertAllPaths(self, toRelative):
