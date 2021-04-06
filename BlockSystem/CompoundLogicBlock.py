@@ -1,4 +1,5 @@
 from BaseLogicBlock import BaseLogicBlock, InputPort, OutputPort
+from BaseConnectableBlock import BaseConnectableBlock
 from BlockSystem.BaseConnectableBlock import Parameter
 from Util import DatatypeToName
 import typing
@@ -8,9 +9,9 @@ class CompoundLogicBlock(BaseLogicBlock):
     def __init__(self):
         super().__init__()
 
-        self._subBlocks: typing.Set[BaseLogicBlock] = set()
+        self._subBlocks: typing.Set[BaseConnectableBlock] = set()
 
-        self.name = "Unnamed Logic Block"
+        self.name = "Unnamed Compound Block"
 
     def GetSubBlocks(self):
         return self._subBlocks
@@ -27,8 +28,8 @@ class CompoundLogicBlock(BaseLogicBlock):
 
         return "Error in sub-blocks!"
 
-    def AddSubBlock(self, newBlock: BaseLogicBlock):
-        if newBlock in self._subBlocks:
+    def AddSubBlock(self, newBlock: BaseConnectableBlock):
+        if newBlock in self.GetSubBlocks():
             return
 
         if isinstance(newBlock, InputLogicBlock):
@@ -38,7 +39,7 @@ class CompoundLogicBlock(BaseLogicBlock):
 
         self._subBlocks.add(newBlock)
 
-    def RemoveSubBlock(self, block: 'BaseLogicBlock'):
+    def RemoveSubBlock(self, block: BaseConnectableBlock):
         if block not in self._subBlocks:
             return
 
@@ -60,8 +61,12 @@ class CompoundLogicBlock(BaseLogicBlock):
         while blocksWaitingForUpdate:
             blocksReadyForUpdate = []
             for blockWaitingForUpdate in blocksWaitingForUpdate:
-                parentBlocks = [port.ownerBlock for port in blockWaitingForUpdate.GetInputPorts()]
-                areAllParentsUpdated = all(parentBlock not in blocksWaitingForUpdate for parentBlock in parentBlocks)
+                if isinstance(blockWaitingForUpdate, BaseLogicBlock):
+                    parentBlocks = [port.ownerBlock for port in blockWaitingForUpdate.GetInputPorts()]
+                    areAllParentsUpdated = all(
+                        parentBlock not in blocksWaitingForUpdate for parentBlock in parentBlocks)
+                else:
+                    areAllParentsUpdated = True
                 if areAllParentsUpdated:
                     blocksReadyForUpdate.append(blockWaitingForUpdate)
 

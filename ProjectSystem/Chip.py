@@ -1,12 +1,12 @@
 from BlockSystem.Procedure import Procedure
 from BlockSystem.BaseLogicBlock import BaseLogicBlock
-from BlockSystem.CompoundLogicBlock import CompoundLogicBlock
+from BlockSystem.CompoundLogicBlock import CompoundConnectableBlock
 from BlockSystem.ValveLogicBlock import ValveLogicBlock
 from RigSystem.Rig import Rig
 import typing
 
 
-class Chip(CompoundLogicBlock):
+class Chip(CompoundConnectableBlock):
     def __init__(self):
         super().__init__()
         self._procedures: typing.List[Procedure] = []
