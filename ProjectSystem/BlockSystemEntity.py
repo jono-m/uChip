@@ -12,3 +12,6 @@ class BlockSystemEntity(ProjectEntity):
 
     def SetBlock(self, block: BaseConnectableBlock):
         self._block = block
+
+    def OnEntityRemoved(self):
+        self._block.DisconnectAll()

@@ -10,3 +10,9 @@ class ProjectEntity:
 
     def SetPosition(self, position: typing.Tuple[float, float]):
         self.editableProperties['position'] = position
+
+    def OnEntityAdded(self):
+        pass
+
+    def OnEntityRemoved(self):
+        pass

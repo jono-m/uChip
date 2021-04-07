@@ -1,5 +1,7 @@
 import typing
 
+ParameterTypeSpec = typing.Union[typing.Type, typing.List]
+
 
 class BaseConnectableBlock:
     def __init__(self):
@@ -20,7 +22,6 @@ class BaseConnectableBlock:
         self._isValid = True
 
     def SetInvalid(self, invalidReason: str):
-        self.DisconnectAll()
         self._invalidReason = invalidReason
 
     def GetPorts(self):
@@ -44,7 +45,7 @@ class BaseConnectableBlock:
     def GetParameters(self):
         return self._parameters
 
-    def CreateParameter(self, name: str, dataType: typing.Union[typing.Type, typing.List], initialValue=None):
+    def CreateParameter(self, name: str, dataType: ParameterTypeSpec, initialValue=None):
         return self.AddParameter(Parameter(name, dataType, initialValue))
 
     def AddParameter(self, parameter: 'Parameter'):
@@ -67,7 +68,7 @@ class BaseConnectableBlock:
 
 
 class Parameter:
-    def __init__(self, name: str, dataType: typing.Union[typing.Type, typing.List], initialValue=None):
+    def __init__(self, name: str, dataType: ParameterTypeSpec, initialValue=None):
         self.name = name
         self.dataType = dataType
         if type(self.dataType) == list:
