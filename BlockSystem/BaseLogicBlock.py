@@ -1,17 +1,18 @@
 from BlockSystem.BaseConnectableBlock import BaseConnectableBlock, Port
 import typing
 
+LogicPortTypeSpec = typing.Union[typing.Type, typing.List, None]
 
 class BaseLogicBlock(BaseConnectableBlock):
     def __init__(self):
         super().__init__()
 
-    def CreateInputPort(self, name: str, dataType: typing.Union[typing.Type, typing.List, None], defaultValue=None):
+    def CreateInputPort(self, name: str, dataType: LogicPortTypeSpec, defaultValue=None):
         newPort = InputPort(name, dataType, defaultValue)
         self.AddPort(newPort)
         return newPort
 
-    def CreateOutputPort(self, name: str, dataType: typing.Union[typing.Type, typing.List, None]):
+    def CreateOutputPort(self, name: str, dataType: LogicPortTypeSpec):
         newPort = OutputPort(name, dataType)
         self.AddPort(newPort)
         return newPort

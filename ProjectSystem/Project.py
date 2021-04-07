@@ -1,5 +1,6 @@
 from ProjectEntity import ProjectEntity
 from pathlib import Path
+from FileTrackingObject import FileTrackingObject
 import typing
 import dill
 
@@ -25,10 +26,13 @@ class Project:
 
     def AddEntity(self, entity: ProjectEntity):
         if entity not in self._entities:
+            entity.OnEntityAdded()
             self._entities.append(entity)
 
     def RemoveEntity(self, entity: ProjectEntity):
-        self._entities.remove(entity)
+        if entity in self._entities:
+            entity.OnEntityRemoved()
+            self._entities.remove(entity)
 
     def Save(self, path: Path):
         lastPath = self._projectPath
@@ -72,8 +76,13 @@ class Project:
         for entity in self._entities:
             for name in entity.editableProperties:
                 editableProperty = entity.editableProperties[name]
+                if isinstance(editableProperty, FileTrackingObject):
+                    editableProperty.pathToLoad = self.ConvertPath(editableProperty.pathToLoad, toRelative)
                 if isinstance(editableProperty, Path):
-                    if toRelative:
-                        entity.editableProperties[name] = editableProperty.relative_to(self._projectPath)
-                    else:
-                        entity.editableProperties[name] = self._projectPath / editableProperty
+                    entity.editableProperties[name] = self.ConvertPath(editableProperty, toRelative)
+
+    def ConvertPath(self, child: Path, toRelative):
+        if toRelative:
+            return child.relative_to(self._projectPath)
+        else:
+            return self._projectPath / child
