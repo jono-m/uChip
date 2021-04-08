@@ -17,7 +17,6 @@ class Rig:
     def __init__(self):
         super().__init__()
         self._connectedDevices: List[Device] = []
-        self.OnFlush = Event()
 
         self.deviceSettings: typing.Dict[str, DeviceSetting] = {}
 
@@ -178,8 +177,6 @@ class Rig:
                                          self.deviceSettings[device.portInfo.serial_number].invertB,
                                          self.deviceSettings[device.portInfo.serial_number].invertC)
             device.Flush(states)
-
-        self.OnFlush.Invoke()
 
     def GetDeviceInversion(self, serNo):
         return (self.deviceSettings[serNo].invertA,

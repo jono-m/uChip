@@ -1,6 +1,6 @@
 import typing
 
-ParameterTypeSpec = typing.Union[typing.Type, typing.List]
+ParameterTypeSpec = typing.Union[typing.Type, typing.List, None]
 
 
 class BaseConnectableBlock:

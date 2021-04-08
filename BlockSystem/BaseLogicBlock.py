@@ -1,18 +1,17 @@
-from BlockSystem.BaseConnectableBlock import BaseConnectableBlock, Port
+from BlockSystem.BaseConnectableBlock import BaseConnectableBlock, Port, ParameterTypeSpec
 import typing
 
-LogicPortTypeSpec = typing.Union[typing.Type, typing.List, None]
 
 class BaseLogicBlock(BaseConnectableBlock):
     def __init__(self):
         super().__init__()
 
-    def CreateInputPort(self, name: str, dataType: LogicPortTypeSpec, defaultValue=None):
+    def CreateInputPort(self, name: str, dataType: ParameterTypeSpec, defaultValue=None):
         newPort = InputPort(name, dataType, defaultValue)
         self.AddPort(newPort)
         return newPort
 
-    def CreateOutputPort(self, name: str, dataType: LogicPortTypeSpec):
+    def CreateOutputPort(self, name: str, dataType: ParameterTypeSpec):
         newPort = OutputPort(name, dataType)
         self.AddPort(newPort)
         return newPort
@@ -28,7 +27,7 @@ class BaseLogicBlock(BaseConnectableBlock):
 # is used.
 # isConnectable: Set this to false if the port is only for default values
 class InputPort(Port):
-    def __init__(self, name: str, dataType: typing.Union[typing.Type, typing.List, None], defaultValue=None):
+    def __init__(self, name: str, dataType: ParameterTypeSpec, defaultValue=None):
         super().__init__(name)
         self.dataType = dataType
         if type(dataType) == list or dataType is None:
@@ -84,10 +83,13 @@ class InputPort(Port):
 
 # One output port can connect to many input ports.
 class OutputPort(Port):
-    def __init__(self, name: str, dataType: typing.Type):
+    def __init__(self, name: str, dataType: ParameterTypeSpec):
         super().__init__(name)
         self.dataType = dataType
-        self._outputValue = dataType()
+        if dataType is None or type(dataType) == list:
+            self._outputValue = 0
+        else:
+            self._outputValue = dataType()
 
     def CanConnect(self, port: 'Port'):
         if not super().CanConnect(port):
@@ -101,8 +103,13 @@ class OutputPort(Port):
         return self._outputValue
 
     def SetValue(self, value):
-        # Cast over to output data type
-        self._outputValue = self.dataType(value)
+        if self.dataType is None:
+            self._outputValue = value
+        elif type(self.dataType) == list:
+            return max(0, min(len(self.dataType), int(value)))
+        else:
+            # Cast over to output data type
+            self._outputValue = self.dataType(value)
 
 
 def DoesConnectionFormLoop(inputPort: InputPort, outputPort: OutputPort):

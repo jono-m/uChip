@@ -123,7 +123,6 @@ class ChipParameterField(QFrame):
 
         self.Update()
 
-
     def Remove(self):
         self.inputPort.connectableBlock.OnConnectionsChanged.Unregister(self.Update)
         self.inputPort.connectableBlock.OnPortsChanged.Unregister(self.Update)

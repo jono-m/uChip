@@ -2,10 +2,10 @@ from BlockSystemEntity import BlockSystemEntity, BaseConnectableBlock
 from BlockSystem.ProjectLogicBlock import ProjectLogicBlock
 from ProjectSystem.Project import Project
 from pathlib import Path
-from FileTrackingObject import FileTrackingObject
+from FileTracker import FileTracker
 
 
-class ProjectLogicBlockFile(FileTrackingObject):
+class ProjectLogicBlockFileTracker(FileTracker):
     def __init__(self, path: Path, block: ProjectLogicBlock):
         self._projectLogicBlock = block
         super().__init__(path)
@@ -41,7 +41,7 @@ class ProjectLogicBlockEntity(BlockSystemEntity):
     def __init__(self, path: Path, block: ProjectLogicBlock):
         super().__init__(block)
 
-        self.editableProperties['blockProjectFile'] = ProjectLogicBlockFile(path, block)
+        self.editableProperties['blockProjectFile'] = ProjectLogicBlockFileTracker(path, block)
 
     def GetBlock(self) -> BaseConnectableBlock:
         self.editableProperties['blockProjectFile'].Sync()

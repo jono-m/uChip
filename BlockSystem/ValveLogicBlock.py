@@ -4,7 +4,7 @@ from LogicBlocks import BaseLogicBlock
 class ValveLogicBlock(BaseLogicBlock):
     def GetName(self):
         if self.nicknameParameter.GetValue() == "":
-            return "Valve " + self.solenoidNumber.GetValue()
+            return "Valve " + self.solenoidNumberInput.GetValue()
         else:
             return self.nicknameParameter.GetValue()
 
@@ -12,4 +12,4 @@ class ValveLogicBlock(BaseLogicBlock):
         super().__init__()
         self.nicknameParameter = self.CreateParameter("Nickname", str, "")
         self.openInput = self.CreateInputPort("Is Open?", bool)
-        self.solenoidNumber = self.CreateParameter("Solenoid Number", int, 0)
+        self.solenoidNumberInput = self.CreateParameter("Solenoid Number", int, 0)
