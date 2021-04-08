@@ -27,7 +27,7 @@ class StylesheetLoader:
 
         self.lastModifiedTime = None
 
-        self.scriptFilename = "Images/STYLESHEET.css"
+        self.scriptFilename = "UI/STYLESHEET.css"
 
         self.stylesheet = None
 

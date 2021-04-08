@@ -52,12 +52,6 @@ class BaseStep(BaseConnectableBlock):
 
     def Update(self):
         super().Update()
-        if self.isRunning:
-            self.UpdateRunning()
-            if self.progress >= 1.0:
-                self.OnStepCompleted()
-
-    def UpdateRunning(self):
         self.progress = 1.0
 
     def GetName(self):

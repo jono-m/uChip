@@ -1,6 +1,7 @@
 import time
 from BaseStep import BaseStep, BeginPort
-from BlockSystem.BaseLogicBlock import InputPort, OutputPort
+from BlockSystem.BaseLogicBlock import InputPort, OutputPort, BaseLogicBlock
+from BlockSystem.BaseConnectableBlock import Port
 import typing
 
 
@@ -16,7 +17,7 @@ class ChipSettingStep(BaseStep):
 
         self.valueInput = InputPort("Value", None)
         self.AddPort(self.valueInput)
-        self.valueOutput = OutputPort("Set", None)
+        self.valueOutput = SettingPort("Set", None)
         self.AddPort(self.valueOutput)
 
         self._initialValue = None
@@ -34,8 +35,42 @@ class ChipSettingStep(BaseStep):
     def OnStepBegan(self):
         super().OnStepBegan()
         for inputPort in self.valueOutput.GetConnectedPorts():
-            if isinstance(inputPort, InputPort):
-                inputPort.SetDefaultValue(self.valueInput.GetValue())
+            if isinstance(inputPort.ownerBlock, ChipSettingBlock):
+                inputPort.ownerBlock.Set(self.valueInput.GetValue())
+
+
+class ChipSettingBlock(BaseLogicBlock):
+    def GetName(self) -> str:
+        return "Chip Parameter:\n" + str(self._chipInputPort.name)
+
+    def __init__(self, chipInputPort: InputPort):
+        super().__init__()
+        self._chipInputPort = chipInputPort
+
+        self.settingPort = self.CreateInputPort("Set", self._chipInputPort.dataType,
+                                                self._chipInputPort.GetDefaultValue())
+        self.currentValuePort = self.CreateOutputPort("Current", self._chipInputPort.dataType)
+
+    def Update(self):
+        super().Update()
+        if self._chipInputPort.ownerBlock is None:
+            self.SetInvalid("Setting no longer exists.")
+        else:
+            self.SetValid()
+
+        self.settingPort.dataType = self._chipInputPort.dataType
+        self.currentValuePort.dataType = self._chipInputPort.dataType
+        self.currentValuePort.SetValue(self._chipInputPort.GetValue())
+
+    def Set(self, value):
+        self._chipInputPort.SetDefaultValue(value)
+
+
+class SettingPort(OutputPort):
+    def CanConnect(self, port: 'Port'):
+        if not super().CanConnect(port):
+            return False
+        return isinstance(port.ownerBlock, ChipSettingBlock)
 
 
 class WaitStep(BaseStep):
@@ -62,8 +97,8 @@ class WaitStep(BaseStep):
         self._startTime = time.time()
         self._waitTime = self.timeInput.GetValue()
 
-    def UpdateRunning(self):
-        super().UpdateRunning()
+    def Update(self):
+        super().Update()
         if self.terminateEarly.GetValue():
             self.progress = 1
         else:
