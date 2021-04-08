@@ -1,4 +1,5 @@
 from BaseStep import BaseStep
+from BaseConnectableBlock import BaseConnectableBlock
 from Steps import StartStep
 import typing
 
@@ -11,6 +12,8 @@ class Procedure:
         self.activeSteps: typing.List[BaseStep] = []
         self.startStep = startStep
 
+        self._blocks: typing.List[BaseConnectableBlock] = [startStep]
+
         self.name = "New Procedure"
 
     def Start(self):
@@ -21,19 +24,25 @@ class Procedure:
         self.startStep.OnStepBegan()
         self.isRunning = True
 
+    def AddBlock(self, block: BaseConnectableBlock):
+        if block not in self._blocks:
+            self._blocks.append(block)
+
+    def RemoveBlock(self, block: BaseConnectableBlock):
+        if block in self._blocks:
+            self._blocks.remove(block)
+
+    def GetBlocks(self):
+        return self._blocks
+
     def GetSteps(self):
-        visitedSteps = []
-        stepsToExpand = [self.startStep]
-        while stepsToExpand:
-            stepToExpand = stepsToExpand.pop(0)
-            visitedSteps.append(stepToExpand)
-            [stepsToExpand.append(port.ownerBlock) for port in stepToExpand.GetCompletedPorts() if
-             port.ownerBlock not in visitedSteps]
-        return visitedSteps
+        return [block for block in self.GetBlocks() if isinstance(block, BaseStep)]
 
     def UpdateProcedure(self):
         for step in self.activeSteps.copy():
-            if not step.isRunning:
+            step.Update()
+            if step.progress >= 1.0:
+                step.OnStepCompleted()
                 self.activeSteps.remove(step)
                 for beginPort in step.GetNextPorts():
                     if isinstance(beginPort.ownerBlock, BaseStep):
@@ -55,14 +64,16 @@ class ProcedureStep(BaseStep):
     def __init__(self, procedure: Procedure):
         super().__init__()
 
+        self.CreateBeginPort()
+        self.CreateCompletedPort()
         self.procedure = procedure
 
     def OnStepBegan(self):
         super().OnStepBegan()
         self.procedure.Start()
 
-    def UpdateRunning(self):
-        super().UpdateRunning()
+    def Update(self):
+        super().Update()
         self.procedure.UpdateProcedure()
 
         if self.procedure.isRunning:
