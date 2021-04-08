@@ -1,20 +1,17 @@
 from BaseStep import BaseStep
 from Steps import StartStep
-from BlockSystem.CompoundLogicBlock import CompoundLogicBlock
 import typing
 
 
-class Procedure(CompoundLogicBlock):
-    def __init__(self):
+class Procedure:
+    def __init__(self, startStep: StartStep):
         super().__init__()
 
         self.isRunning = False
         self.activeSteps: typing.List[BaseStep] = []
-        self.startStep = StartStep()
-        self.AddSubBlock(self.startStep)
+        self.startStep = startStep
 
-    def GetSteps(self):
-        return [x for x in self.GetSubBlocks() if isinstance(x, BaseStep)]
+        self.name = "New Procedure"
 
     def Start(self):
         for step in self.GetSteps():
@@ -24,8 +21,17 @@ class Procedure(CompoundLogicBlock):
         self.startStep.OnStepBegan()
         self.isRunning = True
 
-    def Update(self):
-        super().Update()
+    def GetSteps(self):
+        visitedSteps = []
+        stepsToExpand = [self.startStep]
+        while stepsToExpand:
+            stepToExpand = stepsToExpand.pop(0)
+            visitedSteps.append(stepToExpand)
+            [stepsToExpand.append(port.ownerBlock) for port in stepToExpand.GetCompletedPorts() if
+             port.ownerBlock not in visitedSteps]
+        return visitedSteps
+
+    def UpdateProcedure(self):
         for step in self.activeSteps.copy():
             if not step.isRunning:
                 self.activeSteps.remove(step)
@@ -57,7 +63,7 @@ class ProcedureStep(BaseStep):
 
     def UpdateRunning(self):
         super().UpdateRunning()
-        self.procedure.Update()
+        self.procedure.UpdateProcedure()
 
         if self.procedure.isRunning:
             self.progress = max(0.0, min(0.9999, self.procedure.activeSteps[0].GetProgress()))

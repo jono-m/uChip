@@ -1,8 +1,8 @@
-from BlockSystem.BaseLogicBlock import BaseLogicBlock, Port
+from BlockSystem.BaseConnectableBlock import BaseConnectableBlock, Port
 import typing
 
 
-class BaseStep(BaseLogicBlock):
+class BaseStep(BaseConnectableBlock):
     def __init__(self):
         super().__init__()
         self.isRunning = False

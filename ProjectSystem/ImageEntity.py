@@ -1,11 +1,11 @@
 from ProjectEntity import ProjectEntity
 from pathlib import Path
 from PySide2.QtGui import QPixmap
-from FileTrackingObject import FileTrackingObject
+from FileTracker import FileTracker
 import typing
 
 
-class ImageFileObject(FileTrackingObject):
+class ImageFileTracker(FileTracker):
     def __init__(self, path: Path):
         self._image: typing.Optional[QPixmap] = None
         super().__init__(path)
@@ -38,7 +38,7 @@ class ImageFileObject(FileTrackingObject):
 class Image(ProjectEntity):
     def __init__(self, path: Path):
         super().__init__()
-        self.editableProperties['imageFile'] = ImageFileObject(path)
+        self.editableProperties['imageFile'] = ImageFileTracker(path)
         self.editableProperties['scale'] = 1
         self.editableProperties['opacity'] = 1
 

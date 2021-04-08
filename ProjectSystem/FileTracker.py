@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 
 
-class FileTrackingObject:
+class FileTracker:
     def __init__(self, path: Path):
         self.pathToLoad: Path = path
         self._lastAttemptedLoadedPath: typing.Optional[Path] = None

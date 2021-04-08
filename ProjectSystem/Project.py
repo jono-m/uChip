@@ -1,6 +1,6 @@
 from ProjectEntity import ProjectEntity
 from pathlib import Path
-from FileTrackingObject import FileTrackingObject
+from FileTracker import FileTracker
 import typing
 import dill
 
@@ -76,7 +76,7 @@ class Project:
         for entity in self._entities:
             for name in entity.editableProperties:
                 editableProperty = entity.editableProperties[name]
-                if isinstance(editableProperty, FileTrackingObject):
+                if isinstance(editableProperty, FileTracker):
                     editableProperty.pathToLoad = self.ConvertPath(editableProperty.pathToLoad, toRelative)
                 if isinstance(editableProperty, Path):
                     entity.editableProperties[name] = self.ConvertPath(editableProperty, toRelative)

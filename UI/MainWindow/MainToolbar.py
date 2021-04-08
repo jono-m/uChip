@@ -6,6 +6,7 @@ from UI.Procedure.ProcedureMenu import *
 from UI.Procedure.ProcedureSelectionBox import *
 from UI.MainWindow.StatusBar import *
 
+
 class ToolbarSection:
     def __init__(self, name):
         self.name = name
@@ -280,7 +281,7 @@ class MainToolbar(QFrame):
 
         return b
 
-    def eventFilter(self, watched:QObject, event:QEvent) -> bool:
+    def eventFilter(self, watched: QObject, event: QEvent) -> bool:
         if isinstance(watched, QWidget):
             if event.type() == QEvent.Enter:
                 StatusBar.globalStatusBar.SetInfoMessage(watched.toolTip())

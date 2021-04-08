@@ -1,99 +1,41 @@
 import time
 from BaseStep import BaseStep, BeginPort
-from BlockSystem.BaseLogicBlock import BaseLogicBlock, InputPort, OutputPort
-from BlockSystem.ValveLogicBlock import ValveLogicBlock
+from BlockSystem.BaseLogicBlock import InputPort, OutputPort
 import typing
 
 
 class ChipSettingStep(BaseStep):
     def GetName(self):
-        return "Set Chip Parameter: " + self.chipInputPort.name
+        return "Set Value"
 
-    def __init__(self, chipInputPort: InputPort):
+    def __init__(self):
         super().__init__()
 
         self.CreateBeginPort()
         self.CreateCompletedPort()
 
-        self.valueInput = self.CreateInputPort(chipInputPort.name, chipInputPort.dataType)
+        self.valueInput = InputPort("Value", None)
+        self.AddPort(self.valueInput)
+        self.valueOutput = OutputPort("Set", None)
+        self.AddPort(self.valueOutput)
 
         self._initialValue = None
 
-        self.chipInputPort = chipInputPort
-
-    def Update(self):
-        super().Update()
-        self.valueInput.name = self.chipInputPort.name
-        if self.valueInput.dataType != self.chipInputPort.dataType:
-            self.valueInput.dataType = self.chipInputPort.dataType
-            self.valueInput.SetDefaultValue(self.chipInputPort.GetDefaultValue())
-
-        # This is only valid if the chip input port actually exists
-        if self.chipInputPort.ownerBlock is None:
-            self.SetInvalid("Chip port was removed.")
-        else:
-            self.SetValid()
-
     def OnProcedureBegan(self):
-        self._initialValue = self.chipInputPort.GetDefaultValue()
+        super().OnProcedureBegan()
+        self._initialValue = self.valueInput.GetValue()
 
     def OnProcedureStopped(self):
-        self.chipInputPort.SetDefaultValue(self._initialValue)
+        super().OnProcedureStopped()
+        for inputPort in self.valueOutput.GetConnectedPorts():
+            if isinstance(inputPort, InputPort):
+                inputPort.SetDefaultValue(self._initialValue)
 
     def OnStepBegan(self):
         super().OnStepBegan()
-        self.chipInputPort.SetDefaultValue(self.valueInput.GetValue())
-
-
-class ValveSettingStep(BaseStep):
-    def GetName(self):
-        return "Set Valve: " + self.valveBlock.GetName()
-
-    def __init__(self, valveBlock: ValveLogicBlock):
-        super().__init__()
-        self.CreateBeginPort()
-        self.CreateCompletedPort()
-
-        self.valveBlock = valveBlock
-        self.valueInput = self.CreateInputPort("Is Open?", bool)
-
-        self._initialValveState = False
-
-    def Update(self):
-        super().Update()
-        if not self.valveBlock.IsValid():
-            self.SetInvalid("Valve block is invalid.")
-        elif self.valveBlock.openInput.GetConnectedOutput() is None:
-            self.SetInvalid("This valve is driven by the chip.")
-        else:
-            self.SetValid()
-
-    def OnStepBegan(self):
-        super().OnStepBegan()
-        self.valveBlock.openInput.SetDefaultValue(self.valueInput.GetValue())
-
-    def OnProcedureBegan(self):
-        self._initialValveState = self.valveBlock.openInput.GetDefaultValue()
-
-    def OnProcedureStopped(self):
-        self.valveBlock.openInput.SetDefaultValue(self._initialValveState)
-
-
-class CurrentValueBlock(BaseLogicBlock):
-    def GetName(self):
-        return "Current Value: " + self.chipPort.name
-
-    def __init__(self, chipPort: typing.Union[InputPort, OutputPort]):
-        super().__init__()
-        self.valueFromChip = self.CreateOutputPort(chipPort.name, chipPort.dataType)
-        self.chipPort = chipPort
-
-    def Update(self):
-        super().Update()
-        self.valueFromChip.name = self.chipPort.name
-        self.valueFromChip.SetValue(self.chipPort.GetValue())
-
-        self.isValid = self.chipPort.ownerBlock is not None
+        for inputPort in self.valueOutput.GetConnectedPorts():
+            if isinstance(inputPort, InputPort):
+                inputPort.SetDefaultValue(self.valueInput.GetValue())
 
 
 class WaitStep(BaseStep):
@@ -107,15 +49,25 @@ class WaitStep(BaseStep):
 
         self._startTime: typing.Optional[float] = None
 
-        self.timeInput = self.CreateInputPort("Time (s)", float, 1)
+        self.timeInput = InputPort("Time (s)", float, 1)
+        self.AddPort(self.timeInput)
+
+        self.terminateEarly = InputPort("End Now", bool, False)
+        self.AddPort(self.terminateEarly)
+
+        self._waitTime = 1
 
     def OnStepBegan(self):
         super().OnStepBegan()
         self._startTime = time.time()
+        self._waitTime = self.timeInput.GetValue()
 
     def UpdateRunning(self):
         super().UpdateRunning()
-        self.progress = (time.time() - self._startTime) / self.timeInput.GetValue()
+        if self.terminateEarly.GetValue():
+            self.progress = 1
+        else:
+            self.progress = (time.time() - self._startTime) / self._waitTime
 
 
 class StartStep(BaseStep):
@@ -137,7 +89,8 @@ class IfStep(BaseStep):
 
         self.yesPort = self.CreateCompletedPort("Yes")
         self.noPort = self.CreateCompletedPort("No")
-        self.conditionInput = self.CreateInputPort("Condition", bool)
+        self.conditionInput = InputPort("Condition", bool)
+        self.AddPort(self.conditionInput)
 
     def GetNextPorts(self) -> typing.List['BeginPort']:
         if self.conditionInput.GetValue():

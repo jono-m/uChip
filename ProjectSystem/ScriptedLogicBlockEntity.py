@@ -1,10 +1,11 @@
 from BlockSystemEntity import BlockSystemEntity, BaseConnectableBlock
 from BlockSystem.ScriptedLogicBlock import ScriptedLogicBlock
+from ProjectSystem.ScriptedLogicBlockFile import ScriptedLogicBlockFile
 from pathlib import Path
-from FileTrackingObject import FileTrackingObject
+from FileTracker import FileTracker
 
 
-class ScriptedLogicBlockFile(FileTrackingObject):
+class ScriptedLogicBlockFileTracker(FileTracker):
     def __init__(self, path: Path, block: ScriptedLogicBlock):
         self._scriptedLogicBlock = block
         super().__init__(path)
@@ -20,14 +21,15 @@ class ScriptedLogicBlockFile(FileTrackingObject):
         if not super().TryReload():
             return False
         try:
-            f = open(self.pathToLoad)
-            code = f.read()
-            f.close()
+            newFile = ScriptedLogicBlockFile.LoadFromFile(self.pathToLoad)
         except Exception as e:
             self.ReportError("Could not open file. Error:\n" + str(e))
             return False
         try:
-            self._scriptedLogicBlock.ParseCode(code)
+            self._scriptedLogicBlock.Execute(newFile.getNameScript,
+                                             newFile.getPortsScript,
+                                             newFile.getParametersScript,
+                                             newFile.computeOutputsScript)
         except Exception as e:
             self.ReportError("Script loading error:\n" + str(e))
             return False
@@ -42,7 +44,7 @@ class ScriptedLogicBlockEntity(BlockSystemEntity):
     def __init__(self, path: Path, block: ScriptedLogicBlock):
         super().__init__(block)
 
-        self.editableProperties['scriptedBlockFile'] = ScriptedLogicBlockFile(path, block)
+        self.editableProperties['scriptedBlockFile'] = ScriptedLogicBlockFileTracker(path, block)
 
     def GetBlock(self) -> BaseConnectableBlock:
         self.editableProperties['scriptedBlockFile'].Sync()

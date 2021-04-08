@@ -2,7 +2,7 @@ from ProjectSystem.Project import Project
 from BlockSystem.BaseConnectableBlock import Parameter
 from BlockSystem.BaseLogicBlock import BaseLogicBlock, InputPort, OutputPort
 from ProjectSystem.BlockSystemEntity import BlockSystemEntity
-from BlockSystem.Util import DatatypeToName
+from BlockSystem.Util import DatatypeToName, SyncParameters, SyncPorts
 import typing
 
 
@@ -32,22 +32,35 @@ class ProjectLogicBlock(BaseLogicBlock):
     def GetSubBlocks(self):
         return [entity.GetBlock() for entity in self._project.GetEntities() if isinstance(entity, BlockSystemEntity)]
 
-    def SyncWithEntity(self):
-        blocks = self.GetSubBlocks()
-        inputBlocks = [block for block in blocks if isinstance(block, InputLogicBlock) and not block.isParameter]
-        outputBlocks = [block for block in blocks if isinstance(block, OutputLogicBlock)]
-        parameterBlocks = [block for block in blocks if isinstance(block, InputLogicBlock) and block.isParameter]
+    def PushCurrentParametersAndInputs(self):
+        for inputPort in self.GetInputPorts():
+            self.inputMapping[inputPort].defaultValueParameter.SetValue(inputPort.GetValue())
 
-        unmatchedInputPorts = super().GetInputPorts().copy()
-        unmatchedOutputPorts = super().GetOutputPorts().copy()
-        unmatchedParameters = super().GetParameters().copy()
+        for parameter in self.GetParameters():
+            self.parameterMapping[parameter].defaultValueParameter.SetValue(parameter.GetValue())
 
-        for inputBlock in inputBlocks.copy():
-            matchingInputPort = [inputPort for inputPort in unmatchedInputPorts if
-                                 inputPort.name == inputBlock.GetName()]
-            if matchingInputPort:
-                self.inputMapping[matchingInputPort[0]] = inputBlock
-                unmatchedInputPorts.remove(matchingInputPort[0])
+    def PullCurrentOutputs(self):
+        for outputPort in self.GetOutputPorts():
+            outputPort.SetValue(self.outputMapping[outputPort].input.GetValue())
+
+    def Sync(self):
+        subBlocks = self.GetSubBlocks()
+        parameterBlocks = [entity for entity in subBlocks if isinstance(entity, InputLogicBlock) and entity.isParameter]
+        inputBlocks = [entity for entity in subBlocks if isinstance(entity, InputLogicBlock) and not entity.isParameter]
+        outputBlocks = [entity for entity in subBlocks if isinstance(entity, OutputLogicBlock)]
+
+        SyncParameters(self, {key: value for (key, value) in
+                              [(parameterBlock.nameParameter.GetValue(),
+                                (parameterBlock.dataType, parameterBlock.defaultValueParameter.GetValue()))
+                               for parameterBlock in parameterBlocks]})
+        SyncPorts(self,
+                  {key: value for (key, value) in
+                   [(inputBlock.nameParameter.GetValue(),
+                     (inputBlock.dataType, inputBlock.defaultValueParameter.GetValue()))
+                    for inputBlock in inputBlocks]},
+                  {key: value for (key, value) in
+                   [(outputBlock.nameParameter.GetValue(), outputBlock.dataType)
+                    for outputBlock in outputBlocks]})
 
     def Update(self):
         super().Update()
@@ -55,18 +68,9 @@ class ProjectLogicBlock(BaseLogicBlock):
         if not self.IsValid():
             return
 
-        self.SyncWithEntity()
-
-        for inputPort in self.GetInputPorts():
-            self.inputMapping[inputPort].defaultValueParameter.SetValue(inputPort.GetValue())
-
-        for parameter in self.GetParameters():
-            self.parameterMapping[parameter].defaultValueParameter.SetValue(parameter.GetValue())
-
+        self.PushCurrentParametersAndInputs()
         self.UpdateSubBlocks()
-
-        for outputPort in self.GetOutputPorts():
-            outputPort.SetValue(self.outputMapping[outputPort].input.GetValue())
+        self.PullCurrentOutputs()
 
     def UpdateSubBlocks(self):
         blocksWaitingForUpdate = self.GetSubBlocks()

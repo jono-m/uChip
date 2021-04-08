@@ -118,7 +118,7 @@ class BitwiseOperation(BinaryOperationBlock):
                                                                 "A ^ B"])
 
     def DoOperation(self, A: int, B: int):
-        return eval(self.modeParameter.dataType[self.modeParameter.GetValue()])
+        return eval(self.modeParameter.dataType[self.modeParameter.GetValue()], {'A': A, 'B': B})
 
 
 class Round(UnaryOperationBlock):
@@ -144,28 +144,19 @@ class Floor(UnaryOperationBlock):
     def __init__(self):
         super().__init__(lambda a: math.floor(a), float, int)
 
+
 class BooleanOperation(BinaryOperationBlock):
     def GetName(self):
-        return "Boolean (" + self.
+        return "Boolean (" + self.modeParameter.dataType[self.modeParameter.GetValue()] + ")"
 
     def __init__(self):
         super().__init__(self.DoOperation, bool)
 
         self.modeParameter = self.CreateParameter("Operation", ["A and B",
-                                                                "A or B",
-                                                                "A xor B",
-                                                                "A | B",
-                                                                "A ^ B"])
+                                                                "A or B"])
 
-    def DoOperation
-
-
-class Or(BinaryOperationBlock):
-    def GetName(self):
-        return "Or"
-
-    def __init__(self):
-        super().__init__(lambda a, b: a or b, bool)
+    def DoOperation(self, A: int, B: int):
+        return eval(self.modeParameter.dataType[self.modeParameter.GetValue()], {'A': A, 'B': B})
 
 
 class Not(UnaryOperationBlock):
@@ -176,52 +167,22 @@ class Not(UnaryOperationBlock):
         super().__init__(lambda a: not a, bool)
 
 
-class Equals(BinaryOperationBlock):
+class ComparisonOperation(BinaryOperationBlock):
     def GetName(self):
-        return "A equals (==) B"
+        return "Comparison (" + self.modeParameter.dataType[self.modeParameter.GetValue()] + ")"
 
     def __init__(self):
-        super().__init__(lambda a, b: a == b, float, bool)
+        super().__init__(self.DoOperation, float, bool)
 
+        self.modeParameter = self.CreateParameter("Operation", ["A == B",
+                                                                "A != B",
+                                                                "A < B",
+                                                                "A <= B",
+                                                                "A > B",
+                                                                "A >= B"])
 
-class NEqualsBlock(BinaryOperationBlock):
-    def GetName(self):
-        return "A does not equal (!=) B"
-
-    def __init__(self):
-        super().__init__(lambda a, b: a != b, float, bool)
-
-
-class LThanBlock(BinaryOperationBlock):
-    def GetName(self):
-        return "A less than (<) B"
-
-    def __init__(self):
-        super().__init__(lambda a, b: a < b, float, bool)
-
-
-class GThanBlock(BinaryOperationBlock):
-    def GetName(self):
-        return "A greater than (>) B"
-
-    def __init__(self):
-        super().__init__(lambda a, b: a > b, float, bool)
-
-
-class LThanEBlock(BinaryOperationBlock):
-    def GetName(self):
-        return "A less than or equal to (<=) B"
-
-    def __init__(self):
-        super().__init__(lambda a, b: a <= b, float, bool)
-
-
-class GThanEBlock(BinaryOperationBlock):
-    def GetName(self):
-        return "A greater than or equal to (>=) B"
-
-    def __init__(self):
-        super().__init__(lambda a, b: a >= b, float, bool)
+    def DoOperation(self, A: int, B: int):
+        return eval(self.modeParameter.dataType[self.modeParameter.GetValue()], {'A': A, 'B': B})
 
 
 class IfLogicBlock(BaseLogicBlock):
