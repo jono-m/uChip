@@ -14,8 +14,6 @@ class MainWindow(QMainWindow):
         StylesheetLoader.GetInstance().RegisterWidget(self)
 
         container = QFrame()
-        container.setObjectName("Container")
-        container.setFrameShape(QFrame.NoFrame)
         self.setCentralWidget(container)
 
         icon = QIcon("Images/icon.png")
@@ -50,6 +48,6 @@ class MainWindow(QMainWindow):
 
 
 class WindowSettings:
-    size = QSize(1000, 1200)
+    size = QSize(w=1000, h=1200)
     position = QPoint(100, 100)
     maximized = False

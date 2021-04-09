@@ -10,6 +10,8 @@ class ProjectFileError(Exception):
 
 
 class Project:
+    _T = typing.TypeVar('_T', bound=ProjectEntity)
+
     def __init__(self):
         self._entities: typing.List[ProjectEntity] = []
 
@@ -24,10 +26,11 @@ class Project:
     def GetEntities(self):
         return self._entities
 
-    def AddEntity(self, entity: ProjectEntity):
+    def AddEntity(self, entity: _T) -> _T:
         if entity not in self._entities:
             entity.OnEntityAdded()
             self._entities.append(entity)
+        return entity
 
     def RemoveEntity(self, entity: ProjectEntity):
         if entity in self._entities:

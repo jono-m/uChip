@@ -1,13 +1,14 @@
 import typing
-
-ParameterTypeSpec = typing.Union[typing.Type, typing.List, None]
+from BlockSystem.Data import Data
 
 
 class BaseConnectableBlock:
-    def __init__(self):
-        self._ports: typing.List[Port] = []
+    _T = typing.TypeVar('_T', bound='BaseConnectableBlock.Port')
 
-        self._parameters: typing.List[Parameter] = []
+    def __init__(self):
+        self._ports: typing.List[BaseConnectableBlock.Port] = []
+
+        self._settings: typing.List[Data] = []
 
         self._isValid = True
         self._invalidReason = "Invalid Block!"
@@ -22,39 +23,37 @@ class BaseConnectableBlock:
         self._isValid = True
 
     def SetInvalid(self, invalidReason: str):
+        self._isValid = False
         self._invalidReason = invalidReason
 
-    def GetPorts(self):
-        return self._ports
+    def GetPorts(self, portType: typing.Type[_T] = None):
+        if portType is None:
+            return self._ports
+        return [port for port in self._ports if isinstance(port, portType)]
 
-    def AddPorts(self, ports: typing.List['Port']):
-        for port in ports:
-            self.AddPort(port)
-
-    def AddPort(self, port: 'Port'):
-        port.ownerBlock = self
-        if port not in self._ports:
+    def AddPort(self, port: _T) -> _T:
+        if port.GetOwnerBlock() is None:
+            port._ownerBlock = self
             self._ports.append(port)
         return port
 
-    def RemovePort(self, port: 'Port'):
-        port.DisconnectAll()
-        port.ownerBlock = None
-        self._ports.remove(port)
+    def RemovePort(self, port: 'BaseConnectableBlock.Port'):
+        if port.GetOwnerBlock() == self:
+            port._ownerBlock = None
+            self._ports.remove(port)
+            port.DisconnectAll()
 
-    def GetParameters(self):
-        return self._parameters
+    def GetSettings(self):
+        return self._settings
 
-    def CreateParameter(self, name: str, dataType: ParameterTypeSpec, initialValue=None):
-        return self.AddParameter(Parameter(name, dataType, initialValue))
+    def AddSetting(self, setting: Data):
+        if setting not in self._settings:
+            self._settings.append(setting)
+        return setting
 
-    def AddParameter(self, parameter: 'Parameter'):
-        if parameter not in self._parameters:
-            self._parameters.append(parameter)
-        return parameter
-
-    def RemoveParameter(self, parameter: 'Parameter'):
-        self._parameters.remove(parameter)
+    def RemoveSetting(self, setting: Data):
+        if setting in self._settings:
+            self._settings.remove(setting)
 
     def Update(self):
         pass
@@ -66,55 +65,34 @@ class BaseConnectableBlock:
     def GetName(self) -> str:
         return "Unnamed Block"
 
+    class Port:
+        def __init__(self):
+            self._ownerBlock: typing.Optional[BaseConnectableBlock] = None
+            self._connectedPorts: typing.List['BaseConnectableBlock.Port'] = []
 
-class Parameter:
-    def __init__(self, name: str, dataType: ParameterTypeSpec, initialValue=None):
-        self.name = name
-        self.dataType = dataType
-        if type(self.dataType) == list:
-            self._value = 0
-        else:
-            self._value = dataType()
+        def GetConnectedPorts(self):
+            return self._connectedPorts
 
-        if initialValue is not None:
-            self.SetValue(initialValue)
+        def GetOwnerBlock(self):
+            return self._ownerBlock
 
-    def GetValue(self):
-        return self._value
+        def CanConnect(self, port: 'BaseConnectableBlock.Port'):
+            return port is not None and self._ownerBlock is not None and port._ownerBlock is not None \
+                   and self._ownerBlock.IsValid() and port._ownerBlock.IsValid()
 
-    def SetValue(self, value):
-        if type(self.dataType) == list:
-            self._value = max(0, min(len(self.dataType) - 1, int(value)))
-        else:
-            self._value = self.dataType(value)
+        def Connect(self, port: 'BaseConnectableBlock.Port'):
+            if not self.CanConnect(port):
+                return
 
+            if port not in self._connectedPorts:
+                if self not in port._connectedPorts:
+                    port._connectedPorts.append(port)
+                self._connectedPorts.append(port)
 
-class Port:
-    def __init__(self, name: str):
-        self.name: str = name
-        self.ownerBlock: typing.Optional[BaseConnectableBlock] = None
-        self._connectedPorts: typing.List['Port'] = []
+        def Disconnect(self, port: 'BaseConnectableBlock.Port'):
+            self._connectedPorts.remove(port)
+            port._connectedPorts.remove(self)
 
-    def GetConnectedPorts(self):
-        return self._connectedPorts
-
-    def CanConnect(self, port: 'Port'):
-        return port is not None and self.ownerBlock is not None and port.ownerBlock is not None \
-               and self.ownerBlock.IsValid() and port.ownerBlock.IsValid()
-
-    def Connect(self, port: 'Port'):
-        if not self.CanConnect(port):
-            return
-
-        if port not in self._connectedPorts:
-            if self not in port._connectedPorts:
-                port._connectedPorts.append(port)
-            self._connectedPorts.append(port)
-
-    def Disconnect(self, port: 'Port'):
-        self._connectedPorts.remove(port)
-        port._connectedPorts.remove(self)
-
-    def DisconnectAll(self):
-        for port in self.GetConnectedPorts().copy():
-            self.Disconnect(port)
+        def DisconnectAll(self):
+            for port in self.GetConnectedPorts().copy():
+                self.Disconnect(port)

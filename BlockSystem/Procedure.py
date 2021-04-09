@@ -41,7 +41,7 @@ class Procedure:
     def UpdateProcedure(self):
         for step in self.activeSteps.copy():
             step.Update()
-            if step.progress >= 1.0:
+            if step._progress >= 1.0:
                 step.OnStepCompleted()
                 self.activeSteps.remove(step)
                 for beginPort in step.GetNextPorts():

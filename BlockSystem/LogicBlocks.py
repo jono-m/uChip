@@ -1,33 +1,32 @@
 import time
-from BaseLogicBlock import BaseLogicBlock
-from Util import DatatypeToName
-from BlockSystem.BaseConnectableBlock import Parameter
+from BaseConnectableBlock import BaseConnectableBlock
+from DataPorts import InputPort, OutputPort
+from BlockSystem.Data import Data, DataTypeSpec
 import math
-import typing
 
 
-class ConstantBlock(BaseLogicBlock):
-    def __init__(self, dataType: typing.Union[typing.Type, typing.List]):
+class ConstantBlock(BaseConnectableBlock):
+    def __init__(self, dataType: DataTypeSpec):
         super().__init__()
 
-        self.value = self.AddParameter(Parameter("Value: ", dataType))
-        self.output = self.CreateOutputPort("Out", dataType)
+        self.value = self.AddSetting(Data("Value: ", dataType))
+        self.output = self.AddPort(OutputPort(Data("Out", dataType)))
 
     def GetName(self) -> str:
-        return DatatypeToName(self.value.dataType) + " Constant"
+        return self.value.data.GetDataTypeString() + " Constant"
 
     def Update(self):
         super().Update()
         self.output.SetValue(self.value.GetValue())
 
 
-class UnaryOperationBlock(BaseLogicBlock):
+class UnaryOperationBlock(BaseConnectableBlock):
     def __init__(self, operation, dataType=float, outDataType=None):
         super().__init__()
         if outDataType is None:
             outDataType = dataType
-        self.output = self.CreateOutputPort("Out", outDataType)
-        self.inputA = self.CreateInputPort("In", dataType)
+        self.output = self.AddPort(OutputPort(Data("Out", outDataType)))
+        self.inputA = self.AddPort(InputPort(Data("In", dataType)))
         self.operation = operation
 
     def Update(self):
@@ -38,14 +37,14 @@ class UnaryOperationBlock(BaseLogicBlock):
             self.output.SetValue(0)
 
 
-class BinaryOperationBlock(BaseLogicBlock):
+class BinaryOperationBlock(BaseConnectableBlock):
     def __init__(self, operation, dataType=float, outDataType=None):
         super().__init__()
         if outDataType is None:
             outDataType = dataType
-        self.output = self.CreateOutputPort("Out", outDataType)
-        self.inputA = self.CreateInputPort("A", dataType)
-        self.inputB = self.CreateInputPort("B", dataType)
+        self.output = self.AddPort(OutputPort(Data("Out", outDataType)))
+        self.inputA = self.AddPort(InputPort(Data("A", dataType)))
+        self.inputB = self.AddPort(InputPort(Data("B", dataType)))
         self.operation = operation
 
     def Update(self):
@@ -111,11 +110,11 @@ class BitwiseOperation(BinaryOperationBlock):
     def __init__(self):
         super().__init__(self.DoOperation, int)
 
-        self.modeParameter = self.CreateParameter("Operation", ["A << B",
+        self.modeParameter = self.AddSetting(Data("Operation", ["A << B",
                                                                 "A >> B",
                                                                 "A & B",
                                                                 "A | B",
-                                                                "A ^ B"])
+                                                                "A ^ B"]))
 
     def DoOperation(self, A: int, B: int):
         return eval(self.modeParameter.dataType[self.modeParameter.GetValue()], {'A': A, 'B': B})
@@ -152,8 +151,8 @@ class BooleanOperation(BinaryOperationBlock):
     def __init__(self):
         super().__init__(self.DoOperation, bool)
 
-        self.modeParameter = self.CreateParameter("Operation", ["A and B",
-                                                                "A or B"])
+        self.modeParameter = self.AddSetting(Data("Operation", ["A and B",
+                                                                "A or B"]))
 
     def DoOperation(self, A: int, B: int):
         return eval(self.modeParameter.dataType[self.modeParameter.GetValue()], {'A': A, 'B': B})
@@ -174,27 +173,27 @@ class ComparisonOperation(BinaryOperationBlock):
     def __init__(self):
         super().__init__(self.DoOperation, float, bool)
 
-        self.modeParameter = self.CreateParameter("Operation", ["A == B",
+        self.modeParameter = self.AddSetting(Data("Operation", ["A == B",
                                                                 "A != B",
                                                                 "A < B",
                                                                 "A <= B",
                                                                 "A > B",
-                                                                "A >= B"])
+                                                                "A >= B"]))
 
     def DoOperation(self, A: int, B: int):
         return eval(self.modeParameter.dataType[self.modeParameter.GetValue()], {'A': A, 'B': B})
 
 
-class IfLogicBlock(BaseLogicBlock):
+class IfLogicBlock(BaseConnectableBlock):
     def GetName(self):
         return "If/Else (Branch)"
 
     def __init__(self):
         super().__init__()
-        self.output = self.CreateOutputPort("Out", None)
-        self.conditionInput = self.CreateInputPort("Condition", bool)
-        self.trueInput = self.CreateInputPort("If YES", None)
-        self.falseInput = self.CreateInputPort("If NO", None)
+        self.output = self.AddPort(OutputPort(Data("Out", None)))
+        self.conditionInput = self.AddPort(InputPort(Data("Condition", bool)))
+        self.trueInput = self.AddPort(InputPort(Data("If YES", None)))
+        self.falseInput = self.AddPort(InputPort(Data("If NO", None)))
 
     def Update(self):
         super().Update()
@@ -204,7 +203,7 @@ class IfLogicBlock(BaseLogicBlock):
             self.output.SetValue(self.falseInput.GetValue())
 
 
-class TimeLogicBlock(BaseLogicBlock):
+class TimeLogicBlock(BaseConnectableBlock):
     def GetName(self):
         return "Time"
 
@@ -212,8 +211,58 @@ class TimeLogicBlock(BaseLogicBlock):
 
     def __init__(self):
         super().__init__()
-        self.output = self.CreateOutputPort("Time since start (seconds)", float)
+        self.output = self.AddPort(OutputPort(Data("Time since start (seconds)", float)))
 
     def Update(self):
         super().Update()
         self.output.SetValue(time.time() - TimeLogicBlock.programStartTime)
+
+
+# Logic block that represents an input to a project
+class InputBlock(BaseConnectableBlock):
+    def __init__(self, input: Data):
+        super().__init__()
+        self._outputPort = self.AddPort(OutputPort(Data("Value", input.dataType)))
+        self._input = input
+
+    def GetName(self):
+        return "Input: " + self._input.GetName()
+
+    def Update(self):
+        super().Update()
+        self._outputPort.SetValue(self._input.GetValue())
+
+
+# Logic block that represents an output from a project
+class SettingBlock(BaseConnectableBlock):
+    def __init__(self, setting: Data):
+        super().__init__()
+        self._outputPort = self.AddPort(OutputPort(Data("Value", setting.dataType)))
+        self._setting = setting
+
+    def GetName(self):
+        return "Setting: " + self._setting.GetName()
+
+    def Update(self):
+        super().Update()
+        self._outputPort.SetValue(self._setting.GetValue())
+
+
+# Logic block that represents an output from a project
+class OutputLogicBlock(BaseConnectableBlock):
+    def __init__(self, output: Data):
+        super().__init__()
+        self._output = output
+        self._nameSetting = self.AddSetting(Data("Name", str, "New " + output.GetDataTypeString() + " Output"))
+        self._inputPort = self.AddPort(InputPort(Data("Value", output.dataType)))
+
+    def GetOutput(self):
+        return self._output
+
+    def GetName(self) -> str:
+        return "Output: " + self._nameSetting.GetValue()
+
+    def Update(self):
+        super().Update()
+        self._output.SetName(self._nameSetting.GetValue())
+        self._output.SetValue(self._inputPort.GetValue())

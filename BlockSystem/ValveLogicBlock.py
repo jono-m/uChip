@@ -10,6 +10,6 @@ class ValveLogicBlock(BaseLogicBlock):
 
     def __init__(self):
         super().__init__()
-        self.nicknameParameter = self.CreateParameter("Nickname", str, "")
+        self.nicknameParameter = self.CreateSetting("Nickname", str, "")
         self.openInput = self.CreateInputPort("Is Open?", bool)
-        self.solenoidNumberInput = self.CreateParameter("Solenoid Number", int, 0)
+        self.solenoidNumberInput = self.CreateSetting("Solenoid Number", int, 0)

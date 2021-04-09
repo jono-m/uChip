@@ -1,4 +1,4 @@
-from BlockSystem.BaseConnectableBlock import BaseConnectableBlock, Port
+from BlockSystem.BaseConnectableBlock import BaseConnectableBlock
 import typing
 
 
@@ -7,32 +7,22 @@ class BaseStep(BaseConnectableBlock):
         super().__init__()
         self.isRunning = False
         self.hasRun = False
-        self.progress = 0.0
-
-    def GetBeginPorts(self):
-        return [port for port in self.GetPorts() if isinstance(port, BeginPort)]
-
-    def GetCompletedPorts(self):
-        return [port for port in self.GetPorts() if isinstance(port, CompletedPort)]
-
-    def CreateBeginPort(self, name: str = "Begin"):
-        newPort = BeginPort(name)
-        self.AddPort(newPort)
-        return newPort
-
-    def CreateCompletedPort(self, name: str = "Completed"):
-        newPort = CompletedPort(name)
-        self.AddPort(newPort)
-        return newPort
+        self._progress = 0.0
 
     def GetProgress(self):
         if self.isRunning:
-            return max(0.0, min(1.0, self.progress))
+            return self._progress
         else:
             if self.hasRun:
                 return 1.0
             else:
                 return 0.0
+
+    def IsCompleted(self):
+        return self.GetProgress() >= 1.0
+
+    def SetProgress(self, progress):
+        self._progress = max(0.0, min(1.0, progress))
 
     def OnProcedureBegan(self):
         self.hasRun = False
@@ -40,35 +30,50 @@ class BaseStep(BaseConnectableBlock):
     def OnStepBegan(self):
         self.isRunning = True
 
+    def OnStepTick(self):
+        self.SetProgress(1.0)
+
     def OnStepCompleted(self):
         self.hasRun = True
         self.isRunning = False
 
-    def GetNextPorts(self) -> typing.List['CompletedPort']:
-        return sum([completedPort.GetConnectedPorts() for completedPort in self.GetCompletedPorts()], [])
+    def AddBeginPort(self, label=""):
+        return self.AddPort(BaseStep.BeginPort(label))
+
+    def AddCompletedPort(self, label=""):
+        return self.AddPort(BaseStep.CompletedPort(label))
+
+    def GetNextPorts(self) -> typing.List['BaseStep.BeginPort']:
+        return sum([completedPort.GetConnectedPorts() for completedPort in self.GetPorts(BaseStep.CompletedPort)], [])
 
     def OnProcedureStopped(self):
         self.isRunning = False
 
     def Update(self):
         super().Update()
-        self.progress = 1.0
+
+        if self.isRunning:
+            self.OnStepTick()
+            if self.IsCompleted():
+                self.OnStepCompleted()
+                for beginPort in self.GetNextPorts():
+                    beginPort.GetOwnerBlock().OnStepBegan()
 
     def GetName(self):
         return "Unnamed Step"
 
+    class BeginPort(BaseConnectableBlock.Port):
+        def __init__(self, label=""):
+            super().__init__()
+            self.label = label
 
-class BeginPort(Port):
-    def __init__(self, name="Begin"):
-        super().__init__(name)
+        def CanConnect(self, port: BaseConnectableBlock.Port):
+            return super().CanConnect(port) and isinstance(port, BaseStep.CompletedPort)
 
-    def CanConnect(self, port: 'Port'):
-        return super().CanConnect(port) and isinstance(port, CompletedPort)
+    class CompletedPort(BaseConnectableBlock.Port):
+        def __init__(self, label=""):
+            super().__init__()
+            self.label = label
 
-
-class CompletedPort(Port):
-    def __init__(self, name="Completed"):
-        super().__init__(name)
-
-    def CanConnect(self, port: 'Port'):
-        return super().CanConnect(port) and isinstance(port, BeginPort)
+        def CanConnect(self, port: BaseConnectableBlock.Port):
+            return super().CanConnect(port) and isinstance(port, BaseStep.BeginPort)
