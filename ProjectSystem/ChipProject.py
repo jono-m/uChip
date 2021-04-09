@@ -1,10 +1,10 @@
-from ProjectSystem.Project import Project
+from ProjectSystem.BlockSystemProject import BlockSystemProject
 from ProjectSystem.BlockSystemEntity import BlockSystemEntity
 from BlockSystem.ValveLogicBlock import ValveLogicBlock
 from RigSystem.Rig import Rig
 
 
-class ChipProject(Project):
+class ChipProject(BlockSystemProject):
     def __init__(self):
         super().__init__()
 

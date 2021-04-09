@@ -31,7 +31,7 @@ class LogicBlockEditor(QFrame):
         self.currentBlock = block
 
         addedBlockItems = []
-        for subBlock in self.currentBlock.GetSubBlocks():
+        for subBlock in self.currentBlock.GetProjectBlocks():
             newBlockItem = self.CreateBlockItem(subBlock)
             if newBlockItem is not None:
                 addedBlockItems.append(newBlockItem)
