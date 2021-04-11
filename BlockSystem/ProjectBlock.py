@@ -1,12 +1,12 @@
-from ProjectSystem.BlockSystemProject import BlockSystemProject
+from ProjectSystem.Project import Project
 from BlockSystem.BaseConnectableBlock import BaseConnectableBlock
 from BlockSystem.DataPorts import InputPort, OutputPort, DataPort
 from BlockSystem.Data import Data, MatchData
 import typing
 
 
-# A logic block that internally executes a custom logic block project.
-class CustomLogicBlock(BaseConnectableBlock):
+# A Block that internally executes a block system project.
+class ProjectBlock(BaseConnectableBlock):
     def GetName(self):
         if not self.IsValid():
             return "Invalid Project Block"
@@ -14,7 +14,7 @@ class CustomLogicBlock(BaseConnectableBlock):
 
     def __init__(self):
         super().__init__()
-        self._project: typing.Optional[BlockSystemProject] = None
+        self._project: typing.Optional[Project] = None
         self._inputPairs: typing.List[typing.Tuple[InputPort, Data]] = []
         self._settingPairs: typing.List[typing.Tuple[Data, Data]] = []
         self._outputPairs: typing.List[typing.Tuple[OutputPort, Data]] = []
@@ -22,16 +22,16 @@ class CustomLogicBlock(BaseConnectableBlock):
     def IsValid(self):
         return self._project is not None and all([block.IsValid() for block in self._project.GetProjectBlocks()])
 
-    def LoadProject(self, project: BlockSystemProject):
+    def LoadProject(self, project: Project):
         self._project = project
         self.Sync()
 
-    def ContainsProject(self, project: BlockSystemProject):
+    def ContainsProject(self, project: Project):
         if project == self._project:
             return True
         else:
             return any(block.ContainsProject(project) for block in self._project.GetProjectBlocks() if
-                       isinstance(block, CustomLogicBlock))
+                       isinstance(block, ProjectBlock))
 
     # Tries to sync the ports and settings by name.
     def Sync(self):

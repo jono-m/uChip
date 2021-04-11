@@ -220,10 +220,10 @@ class TimeLogicBlock(BaseConnectableBlock):
 
 # Logic block that represents an input to a project
 class InputBlock(BaseConnectableBlock):
-    def __init__(self, input: Data):
+    def __init__(self, inputData: Data):
         super().__init__()
-        self._outputPort = self.AddPort(OutputPort(Data("Value", input.dataType)))
-        self._input = input
+        self._outputPort = self.AddPort(OutputPort(Data("Value", inputData.dataType)))
+        self._input = inputData
 
     def GetName(self):
         return "Input: " + self._input.GetName()
@@ -266,3 +266,17 @@ class OutputLogicBlock(BaseConnectableBlock):
         super().Update()
         self._output.SetName(self._nameSetting.GetValue())
         self._output.SetValue(self._inputPort.GetValue())
+
+
+class ValveLogicBlock(BaseConnectableBlock):
+    def GetName(self):
+        if self.nicknameParameter.GetValue() == "":
+            return "Valve " + self.solenoidNumberInput.GetValue()
+        else:
+            return self.nicknameParameter.GetValue()
+
+    def __init__(self):
+        super().__init__()
+        self.nicknameParameter = self.AddSetting(Data("Nickname", str, ""))
+        self.openInput = self.AddPort(Data("Is Open?", bool))
+        self.solenoidNumberInput = self.AddSetting(Data("Solenoid Number", int, 0))
