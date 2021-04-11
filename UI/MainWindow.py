@@ -2,9 +2,9 @@ from PySide2.QtCore import *
 from PySide2.QtWidgets import *
 from PySide2.QtGui import *
 from UI.StylesheetLoader import StylesheetLoader
-from RigSystem.Rig import Rig
+from RigSystem.CreateRig import CreateRig
 import dill
-import os
+from pathlib import Path
 
 
 class MainWindow(QMainWindow):
@@ -19,7 +19,7 @@ class MainWindow(QMainWindow):
         icon = QIcon("Images/icon.png")
         self.setWindowIcon(icon)
 
-        self.rig = Rig()
+        self.rig = CreateRig()
 
     def SaveSettings(self):
         windowSettings = WindowSettings()
@@ -31,10 +31,11 @@ class MainWindow(QMainWindow):
         file.close()
 
     def ReloadSettings(self):
-        windowSettings = WindowSettings()
-        if os.path.exists("windowSettings.pkl"):
+        if Path("windowSettings.pkl").exists():
             file = open("windowSettings.pkl", "rb")
             windowSettings = dill.load(file)
+        else:
+            windowSettings = WindowSettings()
 
         self.resize(windowSettings.size)
         self.move(windowSettings.position)
@@ -45,6 +46,7 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event: QCloseEvent):
         self.SaveSettings()
+        self.rig.SaveDevices()
 
 
 class WindowSettings:

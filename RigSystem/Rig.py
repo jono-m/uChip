@@ -1,197 +1,157 @@
-from Device import Device
-from typing import List
 import typing
-import pickle
-import os
-
-
-class DeviceSetting:
-    def __init__(self, priority, invertA, invertB, invertC):
-        self.priority = priority
-        self.invertA = invertA
-        self.invertB = invertB
-        self.invertC = invertC
+import dill
+from pathlib import Path
 
 
 class Rig:
-    def __init__(self):
+    def __init__(self, deviceTypesToScan: typing.List[typing.Type['Rig.RigDevice']]):
         super().__init__()
-        self._connectedDevices: List[Device] = []
+        self._devices: typing.List[Rig.RigDevice] = []
 
-        self.deviceSettings: typing.Dict[str, DeviceSetting] = {}
+        self._deviceTypesToScan = deviceTypesToScan
 
-        self.solenoidStates = []
+        self._solenoidStates = []
 
-        self.lastSolenoidStates = []
+        self.LoadDevices()
 
-        self.drivenSolenoids = []
+        self.Rescan()
 
-        self.lastDrivenSolenoids = []
+    def Rescan(self):
+        for deviceType in self._deviceTypesToScan:
+            [self.AddDevice(device) for device in deviceType.SearchForDevices()]
+        for device in self._devices:
+            if device.IsActive():
+                device.TryConnect()
 
-        self.ReconnectAll()
+    def AddDevice(self, device: 'Rig.RigDevice'):
+        if device not in self._devices:
+            self._devices.append(device)
 
-    def GetConnectedDevices(self):
-        return self._connectedDevices[:]
+    def RemoveDevice(self, device: 'Rig.RigDevice'):
+        if device in self._devices:
+            self._devices.remove(device)
 
-    def ReconnectAll(self):
-        self.DisconnectAll()
+    def SetSolenoidState(self, number: int, state: bool):
+        if number < 0:
+            return
+        if number >= len(self._solenoidStates):
+            self._solenoidStates += [False] * (number - len(self._solenoidStates) + 1)
+            self._solenoidStates[-1] = state
+            self.Flush()
+            return
 
-        # Connect to all devices
-        for port in Device.FindConnectedDevices():
-            newDevice = Device(port)
-            newDevice.Connect()
+        if self._solenoidStates[number] != state:
+            self._solenoidStates[number] = state
+            self.Flush()
 
-            self._connectedDevices.append(newDevice)
+    def GetDevices(self):
+        return self._devices
 
-        # Load all device settings from memory
-        self.ReloadDeviceSettings()
-
-        # For all device settings that aren't in memory yet, create them
-        self.EnsureDeviceSettings()
-
-        # Make sure we have enough states for these devices.
-        self.EnsureSolenoids(len(self._connectedDevices) * 24)
-
-        # Make sure the devices are in order in the list
-        self.ResortDevices()
-
-        # Push the current states to the devices
+    def Promote(self, device: 'Rig.RigDevice', other: 'Rig.RigDevice'):
+        self._devices.remove(device)
+        index = self._devices.index(other)
+        self._devices.insert(index + 1, device)
         self.Flush()
 
-    def EnsureSolenoids(self, number):
-        numToAdd = number - len(self.solenoidStates)
-        self.solenoidStates += [False] * numToAdd
-        self.solenoidStates = self.solenoidStates[:number]
-
-    def DisconnectAll(self):
-        for device in self._connectedDevices:
-            device.Disconnect()
-
-        self._connectedDevices = []
-
-    def ReloadDeviceSettings(self):
-        if os.path.exists("../devicePreferences.pkl"):
-            file = open("../devicePreferences.pkl", "rb")
-            self.deviceSettings = pickle.load(file)
-            file.close()
-        else:
-            self.deviceSettings = {}
-
-    def EnsureDeviceSettings(self):
-        # Get highest priority in settings list
-        priorities = [setting.priority for setting in self.deviceSettings.values()]
-
-        if len(priorities) == 0:
-            maxPriority = -1
-        else:
-            maxPriority = max(priorities)
-
-        for device in self._connectedDevices:
-            if device.portInfo.serial_number not in self.deviceSettings:
-                self.deviceSettings[device.portInfo.serial_number] = DeviceSetting(maxPriority + 1, False, False, False)
-                maxPriority += 1
-
-        self.SaveDeviceSettings()
-
-    def SaveDeviceSettings(self):
-        file = open("../devicePreferences.pkl", "wb")
-        pickle.dump(self.deviceSettings, file)
-        file.close()
-
-    def ResortDevices(self):
-        self._connectedDevices.sort(key=lambda x: self.deviceSettings[x.portInfo.serial_number].priority)
-
-    def Promote(self, device: Device):
-        if device is None or len(self._connectedDevices) == 0:
-            return
-
-        try:
-            deviceIndex = self._connectedDevices.index(device)
-        except ValueError:
-            return
-
-        # Can't promote past end
-        if deviceIndex == len(self._connectedDevices) - 1:
-            return
-
-        myPriority = self.deviceSettings[device.portInfo.serial_number].priority
-        nextDevice = self._connectedDevices[deviceIndex + 1]
-        nextPriority = self.deviceSettings[nextDevice.portInfo.serial_number].priority
-        self.deviceSettings[nextDevice.portInfo.serial_number].priority = myPriority
-        self.deviceSettings[device.portInfo.serial_number].priority = nextPriority
-
-        self.SaveDeviceSettings()
-
-        self.ResortDevices()
+    def Demote(self, device: 'Rig.RigDevice', other: 'Rig.RigDevice'):
+        self._devices.remove(device)
+        index = self._devices.index(other)
+        self._devices.insert(index, device)
         self.Flush()
-
-    def Demote(self, device: Device):
-        if device is None or len(self._connectedDevices) == 0:
-            return
-
-        try:
-            deviceIndex = self._connectedDevices.index(device)
-        except ValueError:
-            return
-
-        # Can't demote before beginning
-        if deviceIndex == 0:
-            return
-
-        myPriority = self.deviceSettings[device.portInfo.serial_number].priority
-        previousDevice = self._connectedDevices[deviceIndex - 1]
-        nextPriority = self.deviceSettings[previousDevice.portInfo.serial_number].priority
-        self.deviceSettings[previousDevice.portInfo.serial_number].priority = myPriority
-        self.deviceSettings[device.portInfo.serial_number].priority = nextPriority
-
-        self.SaveDeviceSettings()
-
-        self.ResortDevices()
-        self.Flush()
-
-    def IsSolenoidOn(self, number):
-        if number >= len(self.solenoidStates):
-            return False
-        return self.solenoidStates[number]
-
-    def SetSolenoid(self, number, isOn):
-        if number >= len(self.solenoidStates):
-            return
-        self.solenoidStates[number] = isOn
 
     def Flush(self):
-        if self.lastSolenoidStates == self.solenoidStates and \
-                self.lastDrivenSolenoids == self.drivenSolenoids:
-            return
+        index = 0
+        for device in self.GetDevices():
+            if device.IsActive():
+                device.SetStates(self._solenoidStates[index:(index + device.GetNumSolenoids())])
+                index += device.GetNumSolenoids()
+
+    def SaveDevices(self):
+        file = open("devices.pkl", "wb")
+        dill.dump(self._devices, file)
+        file.close()
+
+    def LoadDevices(self):
+        if Path("devices.pkl").exists():
+            file = open("devices.pkl", "rb")
+            self._devices = dill.load(file)
+            file.close()
         else:
-            self.lastSolenoidStates = self.solenoidStates[:]
-            self.lastDrivenSolenoids = self.drivenSolenoids
-        # propagates solenoid state changes upwards to the delegate and down to the devices
-        # the device list should always be sorted by priority at this point.
-        for deviceIndex in range(len(self._connectedDevices)):
-            device = self._connectedDevices[deviceIndex]
-            solenoidIndexStart = deviceIndex * 24
-            solenoidIndexEnd = solenoidIndexStart + 24
-            states = self.ApplyInversion(self.solenoidStates[solenoidIndexStart:solenoidIndexEnd],
-                                         self.deviceSettings[device.portInfo.serial_number].invertA,
-                                         self.deviceSettings[device.portInfo.serial_number].invertB,
-                                         self.deviceSettings[device.portInfo.serial_number].invertC)
-            device.Flush(states)
+            self._devices = []
 
-    def GetDeviceInversion(self, serNo):
-        return (self.deviceSettings[serNo].invertA,
-                self.deviceSettings[serNo].invertB,
-                self.deviceSettings[serNo].invertC)
+    class RigDevice:
+        class DeviceError(Exception):
+            pass
 
-    def SetDeviceInversion(self, serNo, invertA, invertB, invertC):
-        self.deviceSettings[serNo].invertA = invertA
-        self.deviceSettings[serNo].invertB = invertB
-        self.deviceSettings[serNo].invertC = invertC
-        self.SaveDeviceSettings()
-        self.Flush()
+        def __init__(self):
+            self._isConnected = False
+            self._solenoidStates = [False] * self.GetNumSolenoids()
 
-    @staticmethod
-    def ApplyInversion(states, invertA, invertB, invertC):
-        return [state ^ invertA for state in states[0:8]] + \
-               [state ^ invertB for state in states[8:16]] + \
-               [state ^ invertC for state in states[16:24]]
+            self.editableProperties: typing.Dict[str, typing.Any] = {'isActive': False}
+
+        def IsActive(self):
+            return self.editableProperties['isActive']
+
+        @staticmethod
+        def GetNumSolenoids():
+            return 0
+
+        def SetStates(self, solenoidStates: typing.List[bool]):
+            if solenoidStates != self._solenoidStates[:len(solenoidStates)]:
+                self._solenoidStates[:len(solenoidStates)] = solenoidStates
+                if self.IsConnected():
+                    self.FlushStates()
+
+        def SetSolenoid(self, number: int, state: bool):
+            if 0 <= number < self.GetNumSolenoids():
+                if self._solenoidStates[number] != state:
+                    self._solenoidStates[number] = state
+                    if self.IsConnected():
+                        self.FlushStates()
+
+        def IsSameDevice(self, other: 'Rig.RigDevice'):
+            return True
+
+        def IsDeviceAvailable(self) -> bool:
+            return False
+
+        def __eq__(self, other):
+            return self.IsSameDevice(other)
+
+        def FlushStates(self):
+            pass
+
+        def GetSolenoidStates(self):
+            return self._solenoidStates
+
+        def __getstate__(self):
+            self.Disconnect()
+            return self.__dict__
+
+        def IsConnected(self):
+            return self._isConnected
+
+        def TryConnect(self):
+            if self.IsDeviceAvailable():
+                if not self.IsConnected():
+                    self.Connect()
+                    self.FlushStates()
+            else:
+                self._isConnected = False
+
+        def TryDisconnect(self):
+            if self.IsConnected():
+                self.Disconnect()
+
+        def Connect(self):
+            self._isConnected = True
+
+        def Disconnect(self):
+            self._isConnected = False
+
+        def GetName(self):
+            return "Unknown Device"
+
+        @staticmethod
+        def SearchForDevices() -> typing.List['Rig.RigDevice']:
+            return []

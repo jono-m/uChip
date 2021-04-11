@@ -1,21 +1,21 @@
 from BlockSystemEntity import BlockSystemEntity, BaseConnectableBlock
-from BlockSystem.ProjectLogicBlock import CustomLogicBlock
+from BlockSystem.ProjectBlock import ProjectBlock
 from ProjectSystem.Project import Project
 from pathlib import Path
 from FileTracker import FileTracker
 
 
-class ProjectLogicBlockFileTracker(FileTracker):
-    def __init__(self, path: Path, block: CustomLogicBlock):
-        self._projectLogicBlock = block
+class ProjectBlockFileTracker(FileTracker):
+    def __init__(self, path: Path, block: ProjectBlock):
+        self._projectBlock = block
         super().__init__(path)
 
     def ReportError(self, error: str):
         super().ReportError(error)
-        self._projectLogicBlock.SetInvalid(error)
+        self._projectBlock.SetInvalid(error)
 
-    def GetProjectLogicBlock(self):
-        return self._projectLogicBlock
+    def GetProjectBlock(self):
+        return self._projectBlock
 
     def TryReload(self) -> bool:
         if not super().TryReload():
@@ -26,7 +26,7 @@ class ProjectLogicBlockFileTracker(FileTracker):
             self.ReportError("Error loading project file: \n" + str(e))
             return False
         try:
-            self._projectLogicBlock.LoadProject(newProject)
+            self._projectBlock.LoadProject(newProject)
         except Exception as e:
             self.ReportError("Error loading project:\n" + str(e))
             return False
@@ -34,15 +34,15 @@ class ProjectLogicBlockFileTracker(FileTracker):
 
     def OnSyncedSuccessfully(self):
         super().OnSyncedSuccessfully()
-        self._projectLogicBlock.SetValid()
+        self._projectBlock.SetValid()
 
 
-class ProjectLogicBlockEntity(BlockSystemEntity):
-    def __init__(self, path: Path, block: CustomLogicBlock):
+class ProjectBlockEntity(BlockSystemEntity):
+    def __init__(self, path: Path, block: ProjectBlock):
         super().__init__(block)
 
-        self.editableProperties['blockProjectFile'] = ProjectLogicBlockFileTracker(path, block)
+        self.editableProperties['blockProjectFile'] = ProjectBlockFileTracker(path, block)
 
     def GetBlock(self) -> BaseConnectableBlock:
         self.editableProperties['blockProjectFile'].Sync()
-        return self.editableProperties['blockProjectFile'].GetProjectLogicBlock()
+        return self.editableProperties['blockProjectFile'].GetProjectBlock()

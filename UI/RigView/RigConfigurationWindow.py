@@ -1,6 +1,6 @@
 from PySide2.QtGui import *
 from RigSystem.Rig import Rig
-from RigSystem.Device import Device
+from RigSystem.Device import SolenoidDevice
 from UI.StylesheetLoader import *
 import typing
 import math
@@ -119,7 +119,7 @@ class RigConfigurationWindow(QDialog):
             self.listDisplay.item(indexToSelect).setSelected(True)
         self.OnSelectionChanged()
 
-    def CurrentSelectedDevice(self) -> typing.Optional[Device]:
+    def CurrentSelectedDevice(self) -> typing.Optional[SolenoidDevice]:
         if len(self.listDisplay.selectedItems()) == 0:
             return None
         else:

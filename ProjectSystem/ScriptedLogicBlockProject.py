@@ -1,4 +1,4 @@
-from ProjectSystem.BlockSystemProject import BlockSystemProject
+from ProjectSystem.Project import Project
 from ProjectSystem.ProjectEntity import ProjectEntity
 from BlockSystem.Data import Data, MatchData
 import typing
@@ -13,7 +13,7 @@ class ScriptEntity(ProjectEntity):
         return self.editableProperties['code']
 
 
-class ScriptedLogicBlockProject(BlockSystemProject):
+class ScriptedLogicBlockProject(Project):
     def __init__(self):
         super().__init__()
         self._executedCodeEnvironment = {}
@@ -117,4 +117,4 @@ class ScriptedLogicBlockProject(BlockSystemProject):
         return {setting.name: setting.GetValue() for setting in self.GetSettings()}
 
     def GetPackedCurrentInputs(self):
-        return {input.name: input.GetValue() for input in self.GetInputs()}
+        return {inputData.name: inputData.GetValue() for inputData in self.GetInputs()}
