@@ -78,6 +78,21 @@ class BaseStep(BaseConnectableBlock):
     def GetName(self):
         return "Unnamed Step"
 
+    def GetAllConnectedSteps(self) -> typing.List['BaseStep']:
+        visitedSteps: typing.List[BaseStep] = []
+
+        stepsToVisit = [self]
+
+        while stepsToVisit:
+            stepToVisit = stepsToVisit.pop(0)
+            visitedSteps.append(stepToVisit)
+            for completedPort in stepToVisit.GetPorts(BaseStep.CompletedPort):
+                for beginPort in completedPort.GetConnectedPorts():
+                    if isinstance(beginPort, BaseStep.BeginPort) and beginPort.GetOwnerBlock() not in visitedSteps:
+                        visitedSteps.append(beginPort.GetOwnerBlock())
+
+        return visitedSteps
+
     class BeginPort(BaseConnectableBlock.Port):
         def __init__(self, label=""):
             super().__init__()

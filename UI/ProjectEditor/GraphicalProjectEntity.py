@@ -2,7 +2,7 @@ from UI.ProjectEditor.SelectableItem import *
 from UI.StylesheetLoader import *
 
 
-class BlockItem(QGraphicsProxyWidget, SelectableItem):
+class GraphicalProjectEntity(QGraphicsProxyWidget, SelectableItem):
     def __init__(self, scene: QGraphicsScene):
         super().__init__()
 
@@ -67,7 +67,7 @@ class BlockItem(QGraphicsProxyWidget, SelectableItem):
     def IsChildFocused(widget: QWidget):
         for child in widget.children():
             if isinstance(child, QWidget):
-                if child.hasFocus() or BlockItem.IsChildFocused(child):
+                if child.hasFocus() or GraphicalProjectEntity.IsChildFocused(child):
                     return True
         return False
 
@@ -76,7 +76,7 @@ class BlockItem(QGraphicsProxyWidget, SelectableItem):
         widget.clearFocus()
         for child in widget.children():
             if isinstance(child, QWidget):
-                BlockItem.ClearFocusAll(child)
+                GraphicalProjectEntity.ClearFocusAll(child)
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         self.ClearFocusAll(self.blockWidget)

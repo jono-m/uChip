@@ -123,3 +123,12 @@ class IfStep(BaseStep):
             return self.yesPort
         else:
             return self.noPort
+
+
+class StartStep(BaseStep):
+    def GetName(self):
+        return "Start of Procedure"
+
+    def __init__(self):
+        super().__init__()
+        self.AddCompletedPort("Start")
