@@ -2,13 +2,19 @@ import time
 from BaseStep import BaseStep
 from BlockSystem.Data import Data
 from ProjectSystem import ChipProject
-from BlockSystem.DataPorts import InputPort
+from BlockSystem.DataPorts import InputPort, OutputPort
 import typing
 
 
 class ChipSettingStep(BaseStep):
+    def GetName(self):
+        return "Set Chip Settings"
+
     def __init__(self, chipProject: ChipProject):
         super().__init__()
+
+        self.AddBeginPort()
+        self.AddCompletedPort()
 
         self._chipProject = chipProject
         self._settingsPairs: typing.List[(InputPort, Data)] = []
@@ -29,6 +35,48 @@ class ChipSettingStep(BaseStep):
                 self._settingsPairs.remove(settingPair)
             else:
                 port.SetName(setting.GetName())
+
+
+class LoopStep(BaseStep):
+    def GetName(self):
+        if self.isRunning:
+            return "Repeat (" + str(self._iterationsCompleted) + "/" + str(self.timesPort.GetName()) + " times)"
+        else:
+            return "Repeat (" + str(self.timesPort.GetName()) + " times)"
+
+    def __init__(self):
+        super().__init__()
+        self._iterationsCompleted = 0
+        self.AddBeginPort()
+        self.repeatPort = self.AddCompletedPort("Repeat")
+        self.completedPort = self.AddCompletedPort("Finished")
+        self.timesPort = self.AddPort(InputPort(Data("Iterations", int)))
+        self.iterationPort = self.AddPort(OutputPort(Data("Iterations Completed", int)))
+
+        self._isLooping = False
+
+    def OnStepBegan(self):
+        super().OnStepBegan()
+        if self._isLooping:
+            self._iterationsCompleted += 1
+        else:
+            self._iterationsCompleted = 0
+            self._isLooping = True
+
+    def Update(self):
+        super().Update()
+        self.iterationPort.SetValue(self._iterationsCompleted)
+
+    def OnStepCompleted(self):
+        super().OnStepCompleted()
+        if self._iterationsCompleted >= self.timesPort.GetValue():
+            self._isLooping = False
+
+    def GetNextPorts(self) -> typing.List['BaseStep.CompletedPort']:
+        if self._iterationsCompleted >= self.timesPort.GetValue():
+            return [self.completedPort]
+        else:
+            return [self.repeatPort]
 
 
 class WaitStep(BaseStep):
@@ -58,15 +106,6 @@ class WaitStep(BaseStep):
             self.SetProgress((time.time() - self._startTime) / self.timeInput.GetValue())
 
 
-class StartStep(BaseStep):
-    def GetName(self):
-        return "Start"
-
-    def __init__(self):
-        super().__init__()
-        self.AddCompletedPort("Start")
-
-
 class IfStep(BaseStep):
     def GetName(self=None):
         return "Decision"
@@ -79,8 +118,8 @@ class IfStep(BaseStep):
         self.noPort = self.AddCompletedPort("No")
         self.conditionInput = self.AddPort(InputPort(Data("Condition", bool)))
 
-    def GetNextPorts(self) -> typing.List['BaseStep.BeginPort']:
+    def GetNextPorts(self) -> typing.List['BaseStep.CompletedPort']:
         if self.conditionInput.GetValue():
-            return self.yesPort.GetConnectedPorts()
+            return self.yesPort
         else:
-            return self.noPort.GetConnectedPorts()
+            return self.noPort
