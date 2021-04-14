@@ -2,7 +2,7 @@ from UI.ProjectEditor.BlockConnection import *
 from UI.Util import *
 
 
-class LogicBlockItem(BlockItem):
+class LogicBlockItem(GraphicalProjectEntity):
     def __init__(self, scene, b: LogicBlock):
         super().__init__(scene)
 

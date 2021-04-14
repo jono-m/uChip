@@ -1,6 +1,6 @@
 from UI.ProjectEditor.ImageItem import *
 from UI.ProjectEditor.LogicBlockItem import *
-from UI.ProjectEditor.WorldBrowser import *
+from UI.ProjectEditor.GraphicalProjectEditor import *
 
 
 class LogicBlockEditor(QFrame):
@@ -9,7 +9,7 @@ class LogicBlockEditor(QFrame):
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
-        self.worldBrowser = WorldBrowser()
+        self.worldBrowser = GraphicalProjectEditor()
         layout.addWidget(self.worldBrowser)
 
         self.currentBlock: typing.Optional[CompoundLogicBlock] = None

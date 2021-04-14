@@ -1,9 +1,9 @@
 from UI.ProjectEditor.SelectableItem import *
-from UI.ProjectEditor.BlockItem import *
+from UI.ProjectEditor.GraphicalProjectEntity import *
 
 
 class PortHoleWidget(QFrame):
-    def __init__(self, graphicsParent: BlockItem):
+    def __init__(self, graphicsParent: GraphicalProjectEntity):
         super().__init__()
 
         self._IsConnected = False

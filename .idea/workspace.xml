@@ -25,13 +25,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="99850780-df20-4af2-831c-10fab045648b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/BlockSystem/ProcedureStep.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ProjectSystem/Procedure.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlockSystem/BaseStep.py" beforeDir="false" afterPath="$PROJECT_DIR$/BlockSystem/BaseStep.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlockSystem/Procedure.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlockSystem/ProcedureStep.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/BlockSystem/Steps.py" beforeDir="false" afterPath="$PROJECT_DIR$/BlockSystem/Steps.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ProjectSystem/ChipProject.py" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSystem/ChipProject.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSystem/Procedure.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProjectEditor/BlockItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProjectEditor/GraphicalProjectEntity.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProjectEditor/ImageItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProjectEditor/ImageItem.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProjectEditor/LogicBlockEditor.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProjectEditor/LogicBlockEditor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProjectEditor/LogicBlockItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProjectEditor/LogicBlockItem.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProjectEditor/PortHoles.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProjectEditor/PortHoles.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProjectEditor/WorldBrowser.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProjectEditor/GraphicalProjectEditor.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

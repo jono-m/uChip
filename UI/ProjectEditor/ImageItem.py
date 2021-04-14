@@ -1,5 +1,5 @@
 from BlockSystem.Blocks.CompoundLogicBlock import *
-from UI.ProjectEditor.BlockItem import *
+from UI.ProjectEditor.GraphicalProjectEntity import *
 from UI.StylesheetLoader import *
 
 
@@ -15,7 +15,7 @@ class ImageWidget(QLabel):
         painter.drawPixmap(0, 0, self.pixmap())
 
 
-class ImageItem(BlockItem):
+class ImageItem(GraphicalProjectEntity):
     def __init__(self, s: QGraphicsScene, image: Image):
         super().__init__(s)
 
