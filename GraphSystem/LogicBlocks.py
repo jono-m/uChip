@@ -1,11 +1,11 @@
 import time
-from BaseConnectableBlock import BaseConnectableBlock
+from BaseConnectableBlock import GraphBlock
 from DataPorts import InputPort, OutputPort
-from BlockSystem.Data import Data, DataTypeSpec
+from GraphSystem.Data import Data, DataTypeSpec
 import math
 
 
-class ConstantBlock(BaseConnectableBlock):
+class ConstantBlock(GraphBlock):
     def __init__(self, dataType: DataTypeSpec):
         super().__init__()
 
@@ -20,7 +20,7 @@ class ConstantBlock(BaseConnectableBlock):
         self.output.SetValue(self.value.GetValue())
 
 
-class UnaryOperationBlock(BaseConnectableBlock):
+class UnaryOperationBlock(GraphBlock):
     def __init__(self, operation, dataType=float, outDataType=None):
         super().__init__()
         if outDataType is None:
@@ -37,7 +37,7 @@ class UnaryOperationBlock(BaseConnectableBlock):
             self.output.SetValue(0)
 
 
-class BinaryOperationBlock(BaseConnectableBlock):
+class BinaryOperationBlock(GraphBlock):
     def __init__(self, operation, dataType=float, outDataType=None):
         super().__init__()
         if outDataType is None:
@@ -184,7 +184,7 @@ class ComparisonOperation(BinaryOperationBlock):
         return eval(self.modeParameter.dataType[self.modeParameter.GetValue()], {'A': A, 'B': B})
 
 
-class IfLogicBlock(BaseConnectableBlock):
+class IfLogicBlock(GraphBlock):
     def GetName(self):
         return "If/Else (Branch)"
 
@@ -203,7 +203,7 @@ class IfLogicBlock(BaseConnectableBlock):
             self.output.SetValue(self.falseInput.GetValue())
 
 
-class TimeLogicBlock(BaseConnectableBlock):
+class TimeLogicBlock(GraphBlock):
     def GetName(self):
         return "Time"
 
@@ -219,7 +219,7 @@ class TimeLogicBlock(BaseConnectableBlock):
 
 
 # Logic block that represents an input to a project
-class InputBlock(BaseConnectableBlock):
+class InputBlock(GraphBlock):
     def __init__(self, inputData: Data):
         super().__init__()
         self._outputPort = self.AddPort(OutputPort(Data("Value", inputData.dataType)))
@@ -234,7 +234,7 @@ class InputBlock(BaseConnectableBlock):
 
 
 # Logic block that represents an output from a project
-class SettingBlock(BaseConnectableBlock):
+class SettingBlock(GraphBlock):
     def __init__(self, setting: Data):
         super().__init__()
         self._outputPort = self.AddPort(OutputPort(Data("Value", setting.dataType)))
@@ -249,7 +249,7 @@ class SettingBlock(BaseConnectableBlock):
 
 
 # Logic block that represents an output from a project
-class OutputLogicBlock(BaseConnectableBlock):
+class OutputLogicBlock(GraphBlock):
     def __init__(self, output: Data):
         super().__init__()
         self._output = output
@@ -268,7 +268,7 @@ class OutputLogicBlock(BaseConnectableBlock):
         self._output.SetValue(self._inputPort.GetValue())
 
 
-class ValveLogicBlock(BaseConnectableBlock):
+class ValveLogicBlock(GraphBlock):
     def GetName(self):
         if self.nicknameParameter.GetValue() == "":
             return "Valve " + self.solenoidNumberInput.GetValue()

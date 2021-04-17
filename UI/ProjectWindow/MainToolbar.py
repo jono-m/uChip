@@ -1,10 +1,10 @@
-from BlockSystem.Blocks.BooleanBlocks import *
-from BlockSystem.Blocks.ConditionalBlocks import *
-from BlockSystem.Blocks.NumberBlocks import *
-from BlockSystem.Blocks.ScriptedBlock import *
+from GraphSystem.Blocks.BooleanBlocks import *
+from GraphSystem.Blocks.ConditionalBlocks import *
+from GraphSystem.Blocks.NumberBlocks import *
+from GraphSystem.Blocks.ScriptedBlock import *
 from UI.Procedure.ProcedureMenu import *
 from UI.Procedure.ProcedureSelectionBox import *
-from UI.ProjectEditor.StatusBar import *
+from UI.ProjectWindow.StatusBar import *
 
 
 class ToolbarSection:

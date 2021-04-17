@@ -1,12 +1,12 @@
 from UI.Chip.ChipEditorFrame import *
 from UI.Procedure.ProcedureEditorFrame import *
-from UI.ProjectEditor.CustomLogicBlockEditorFrame import *
-from UI.ProjectEditor.MainToolbar import *
+from UI.ProjectWindow.CustomLogicBlockEditorFrame import *
+from UI.ProjectWindow.MainToolbar import *
 from UI.RigView.RigViewWidget import *
-from BlockSystem.Procedures.ProcedureRunner import *
+from GraphSystem.Procedures.ProcedureRunner import *
 from UI.ProceduresDialog import *
 from UI.Chip.ChipParametersList import *
-from UI.ProjectEditor.StatusBar import *
+from UI.ProjectWindow.StatusBar import *
 
 
 class MainWorkArea(QFrame):

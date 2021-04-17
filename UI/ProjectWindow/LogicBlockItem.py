@@ -1,4 +1,4 @@
-from UI.ProjectEditor.BlockConnection import *
+from UI.ProjectWindow.BlockConnection import *
 from UI.Util import *
 
 

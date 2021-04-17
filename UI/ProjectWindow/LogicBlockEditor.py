@@ -1,6 +1,6 @@
-from UI.ProjectEditor.ImageItem import *
-from UI.ProjectEditor.LogicBlockItem import *
-from UI.ProjectEditor.GraphicalProjectEditor import *
+from UI.ProjectWindow.ImageItem import *
+from UI.ProjectWindow.LogicBlockItem import *
+from UI.ProjectWindow.GraphicalProjectEditor import *
 
 
 class LogicBlockEditor(QFrame):

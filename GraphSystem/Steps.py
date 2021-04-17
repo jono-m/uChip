@@ -1,12 +1,12 @@
 import time
-from BaseStep import BaseStep
-from BlockSystem.Data import Data
+from BaseStep import ProcedureStep
+from GraphSystem.Data import Data
 from ProjectSystem import ChipProject
-from BlockSystem.DataPorts import InputPort, OutputPort
+from GraphSystem.DataPorts import InputPort, OutputPort
 import typing
 
 
-class ChipSettingStep(BaseStep):
+class ChipSettingStep(ProcedureStep):
     def GetName(self):
         return "Set Chip Settings"
 
@@ -37,7 +37,7 @@ class ChipSettingStep(BaseStep):
                 port.SetName(setting.GetName())
 
 
-class LoopStep(BaseStep):
+class LoopStep(ProcedureStep):
     def GetName(self):
         if self.isRunning:
             return "Repeat (" + str(self._iterationsCompleted) + "/" + str(self.timesPort.GetName()) + " times)"
@@ -72,14 +72,14 @@ class LoopStep(BaseStep):
         if self._iterationsCompleted >= self.timesPort.GetValue():
             self._isLooping = False
 
-    def GetNextPorts(self) -> typing.List['BaseStep.CompletedPort']:
+    def GetNextPorts(self) -> typing.List['ProcedureStep.CompletedPort']:
         if self._iterationsCompleted >= self.timesPort.GetValue():
             return [self.completedPort]
         else:
             return [self.repeatPort]
 
 
-class WaitStep(BaseStep):
+class WaitStep(ProcedureStep):
     def GetName(self):
         return "Wait"
 
@@ -106,7 +106,7 @@ class WaitStep(BaseStep):
             self.SetProgress((time.time() - self._startTime) / self.timeInput.GetValue())
 
 
-class IfStep(BaseStep):
+class IfStep(ProcedureStep):
     def GetName(self=None):
         return "Decision"
 
@@ -118,14 +118,14 @@ class IfStep(BaseStep):
         self.noPort = self.AddCompletedPort("No")
         self.conditionInput = self.AddPort(InputPort(Data("Condition", bool)))
 
-    def GetNextPorts(self) -> typing.List['BaseStep.CompletedPort']:
+    def GetNextPorts(self) -> typing.List['ProcedureStep.CompletedPort']:
         if self.conditionInput.GetValue():
             return self.yesPort
         else:
             return self.noPort
 
 
-class StartStep(BaseStep):
+class StartStep(ProcedureStep):
     def GetName(self):
         return "Start of Procedure"
 

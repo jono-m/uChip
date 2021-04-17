@@ -1,5 +1,5 @@
-from BlockSystem.Blocks.CompoundLogicBlock import *
-from UI.ProjectEditor.GraphicalProjectEntity import *
+from GraphSystem.Blocks.CompoundLogicBlock import *
+from UI.ProjectWindow.GraphicalProjectEntity import *
 from UI.StylesheetLoader import *
 
 

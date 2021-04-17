@@ -1,6 +1,6 @@
 from enum import Enum
 from ProjectSystem.Project import Project
-from UI.ProjectEditor.GraphicalProjectEntity import GraphicalProjectEntity
+from UI.ProjectWindow.GraphicalProjectEntity import GraphicalProjectEntity
 from PySide2.QtWidgets import *
 from PySide2.QtCore import *
 from PySide2.QtGui import *

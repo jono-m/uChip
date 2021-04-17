@@ -1,5 +1,5 @@
-from BlockSystemEntity import BlockSystemEntity, BaseConnectableBlock
-from BlockSystem.ProjectBlock import ProjectBlock
+from BlockSystemEntity import BlockSystemEntity, GraphBlock
+from GraphSystem.ProjectBlock import ProjectBlock
 from ProjectSystem.Project import Project
 from pathlib import Path
 from FileTracker import FileTracker
@@ -43,6 +43,6 @@ class ProjectBlockEntity(BlockSystemEntity):
 
         self.editableProperties['blockProjectFile'] = ProjectBlockFileTracker(path, block)
 
-    def GetBlock(self) -> BaseConnectableBlock:
+    def GetBlock(self) -> GraphBlock:
         self.editableProperties['blockProjectFile'].Sync()
         return self.editableProperties['blockProjectFile'].GetProjectBlock()

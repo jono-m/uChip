@@ -1,8 +1,7 @@
-from PySide2.QtCore import *
-from PySide2.QtWidgets import *
-from PySide2.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtWidgets import *
+from PySide6.QtGui import *
 from UI.StylesheetLoader import StylesheetLoader
-from RigSystem.CreateRig import CreateRig
 import dill
 from pathlib import Path
 
@@ -18,8 +17,6 @@ class MainWindow(QMainWindow):
 
         icon = QIcon("Images/icon.png")
         self.setWindowIcon(icon)
-
-        self.rig = CreateRig()
 
     def SaveSettings(self):
         windowSettings = WindowSettings()
@@ -46,7 +43,6 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event: QCloseEvent):
         self.SaveSettings()
-        self.rig.SaveDevices()
 
 
 class WindowSettings:

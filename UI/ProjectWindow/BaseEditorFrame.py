@@ -1,4 +1,4 @@
-from UI.ProjectEditor.LogicBlockEditor import *
+from UI.ProjectWindow.LogicBlockEditor import *
 
 
 class BaseEditorFrame(QFrame):
