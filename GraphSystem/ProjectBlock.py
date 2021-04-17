@@ -1,12 +1,12 @@
 from ProjectSystem.Project import Project
-from BlockSystem.BaseConnectableBlock import BaseConnectableBlock
-from BlockSystem.DataPorts import InputPort, OutputPort, DataPort
-from BlockSystem.Data import Data, MatchData
+from GraphSystem.BaseConnectableBlock import GraphBlock
+from GraphSystem.DataPorts import InputPort, OutputPort, DataPort
+from GraphSystem.Data import Data, MatchData
 import typing
 
 
 # A Block that internally executes a block system project.
-class ProjectBlock(BaseConnectableBlock):
+class ProjectBlock(GraphBlock):
     def GetName(self):
         if not self.IsValid():
             return "Invalid Project Block"
@@ -40,23 +40,23 @@ class ProjectBlock(BaseConnectableBlock):
         self._outputPairs.clear()
 
         (matchedInputs, newSettings, oldInputs) = MatchData(self._project.GetInputs().copy(),
-                                                            [port.GetData() for port in
+                                                            [port.GetDataReference() for port in
                                                              self.GetPorts(InputPort)])
         (matchedSettings, newSettings, oldSettings) = MatchData(self._project.GetSettings().copy(),
                                                                 self.GetSettings().copy())
         (matchedOutputs, newOutputs, oldOutputs) = MatchData(self._project.GetOutputs().copy(),
-                                                             [port.GetData() for port in
+                                                             [port.GetDataReference() for port in
                                                               self.GetPorts(OutputPort)])
 
-        [self.RemovePort(port) for port in self.GetPorts(DataPort) if port.GetData() in (oldInputs + oldOutputs)]
+        [self.RemovePort(port) for port in self.GetPorts(DataPort) if port.GetDataReference() in (oldInputs + oldOutputs)]
         [self.RemoveSetting(setting) for setting in self.GetSettings().copy() if setting in oldSettings]
 
         for (projectInput, portData) in matchedInputs:
-            port = [port for port in self.GetPorts(DataPort) if port.GetData() == portData][0]
+            port = [port for port in self.GetPorts(DataPort) if port.GetDataReference() == portData][0]
             self._inputPairs.append((port, projectInput))
 
         for (projectOutput, portData) in matchedOutputs:
-            port = [port for port in self.GetPorts(OutputPort) if port.GetData() == portData][0]
+            port = [port for port in self.GetPorts(OutputPort) if port.GetDataReference() == portData][0]
             self._outputPairs.append((port, projectOutput))
 
         for (projectSetting, blockSetting) in matchedSettings:

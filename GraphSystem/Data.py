@@ -6,9 +6,8 @@ DataTypeSpec = typing.Union[typing.Type, typing.List, None]
 
 
 class Data:
-    def __init__(self, name: str, dataType: DataTypeSpec, initialValue=None):
+    def __init__(self, dataType: DataTypeSpec, initialValue=None):
         self.dataType = dataType
-        self._name = name
 
         if type(self.dataType) == list or self.dataType is None:
             self._value = 0
@@ -19,13 +18,7 @@ class Data:
             self.SetValue(initialValue)
 
     def Copy(self):
-        return Data(self.GetName(), self.dataType, self.GetValue())
-
-    def SetName(self, name: str):
-        self._name = name
-
-    def GetName(self):
-        return self._name
+        return Data(self.dataType, self.GetValue())
 
     def GetValue(self):
         return self._value
@@ -52,17 +45,3 @@ class Data:
             return "True/False"
         else:
             return str(self.dataType).split('\'')[1].capitalize()
-
-
-def MatchData(newDataList: typing.List[Data], oldDataList: typing.List[Data]) -> \
-        (typing.List[(Data, Data)], typing.List[Data], typing.List[Data]):
-    matches = []
-    for newData in newDataList.copy():
-        for oldData in oldDataList:
-            if newData.GetName() == oldData.GetName() and newData.dataType == oldData.dataType:
-                matches.append((newData, oldData))
-                newDataList.remove(newData)
-                oldDataList.remove(oldData)
-                break
-
-    return matches, newDataList, oldDataList

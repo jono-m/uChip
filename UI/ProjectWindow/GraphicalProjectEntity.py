@@ -1,4 +1,4 @@
-from UI.ProjectEditor.SelectableItem import *
+from UI.ProjectWindow.SelectableItem import *
 from UI.StylesheetLoader import *
 
 

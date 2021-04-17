@@ -3,10 +3,10 @@ import typing
 from ProjectSystem.Project import Project
 from ProjectSystem.ProjectEntity import ProjectEntity
 from ProjectSystem.BlockSystemEntity import BlockSystemEntity
-from BlockSystem.LogicBlocks import ValveLogicBlock
+from GraphSystem.LogicBlocks import ValveLogicBlock
 from RigSystem.Rig import Rig
-from BlockSystem.Steps import StartStep
-from BlockSystem.BaseStep import BaseStep
+from GraphSystem.Steps import StartStep
+from GraphSystem.BaseStep import ProcedureStep
 
 
 class ChipProject(Project):
@@ -24,13 +24,13 @@ class ChipProject(Project):
         return self._currentProcedure
 
     def StartProcedure(self):
-        [block.Reset() for block in self.GetProjectBlocks() if isinstance(block, BaseStep)]
+        [block.Reset() for block in self.GetProjectBlocks() if isinstance(block, ProcedureStep)]
         
         if self._currentProcedure is not None:
             self._currentProcedure.Start()
 
     def StopProcedure(self):
-        [block.Stop() for block in self.GetProjectBlocks() if isinstance(block, BaseStep)]
+        [block.Stop() for block in self.GetProjectBlocks() if isinstance(block, ProcedureStep)]
 
     def IsProcedureRunnable(self, procedure: 'ChipProject.Procedure'):
         return all(entity.GetBlock().IsValid() for entity in self.GetEntitiesInProcedure(procedure)

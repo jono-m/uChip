@@ -1,4 +1,4 @@
-from UI.ProjectEditor.BaseEditorFrame import *
+from UI.ProjectWindow.BaseEditorFrame import *
 
 
 class CustomLogicBlockEditorFrame(BaseEditorFrame):

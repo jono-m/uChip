@@ -1,5 +1,5 @@
-from UI.ProjectEditor.SelectableItem import *
-from UI.ProjectEditor.GraphicalProjectEntity import *
+from UI.ProjectWindow.SelectableItem import *
+from UI.ProjectWindow.GraphicalProjectEntity import *
 
 
 class PortHoleWidget(QFrame):

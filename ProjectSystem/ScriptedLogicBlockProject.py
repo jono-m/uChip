@@ -1,6 +1,6 @@
 from ProjectSystem.Project import Project
 from ProjectSystem.ProjectEntity import ProjectEntity
-from BlockSystem.Data import Data, MatchData
+from GraphSystem.Data import Data, MatchData
 import typing
 
 

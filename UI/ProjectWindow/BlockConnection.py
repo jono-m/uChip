@@ -1,4 +1,4 @@
-from UI.ProjectEditor.PortHoles import *
+from UI.ProjectWindow.PortHoles import *
 
 
 class InputPortHole(PortHoleWidget):

@@ -1,16 +1,16 @@
 from ProjectEntity import ProjectEntity
-from BlockSystem.BaseConnectableBlock import BaseConnectableBlock
+from GraphSystem.BaseConnectableBlock import GraphBlock
 
 
 class BlockSystemEntity(ProjectEntity):
-    def __init__(self, block: BaseConnectableBlock):
+    def __init__(self, block: GraphBlock):
         super().__init__()
         self._block = block
 
-    def GetBlock(self) -> BaseConnectableBlock:
+    def GetBlock(self) -> GraphBlock:
         return self._block
 
-    def SetBlock(self, block: BaseConnectableBlock):
+    def SetBlock(self, block: GraphBlock):
         self._block = block
 
     def OnEntityRemoved(self):
