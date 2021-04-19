@@ -1,7 +1,10 @@
-from PySide6.QtCore import *
-from PySide6.QtWidgets import *
-from PySide6.QtGui import *
+from PySide6.QtWidgets import QMainWindow, QFrame, QFileDialog, QVBoxLayout
+from PySide6.QtGui import QIcon, QCloseEvent
+from PySide6.QtCore import QSize, QPoint
 from UI.StylesheetLoader import StylesheetLoader
+from UI.Main.MenuBar import MenuBar, MenuHandler
+from UI.Main.NewDialog import NewDialog, ProjectType
+from UI.ProjectWindow.ProjectWindow import ProjectWindow
 import dill
 from pathlib import Path
 
@@ -13,10 +16,27 @@ class MainWindow(QMainWindow):
         StylesheetLoader.GetInstance().RegisterWidget(self)
 
         container = QFrame()
+        layout = QVBoxLayout()
+        container.setLayout(layout)
         self.setCentralWidget(container)
+
+        self.projectWindow = ProjectWindow()
+        layout.addWidget(self.projectWindow)
+
+        menuHandler = MenuHandler()
+        menuHandler.OnNew = lambda: NewDialog(self).exec_()
+        menuHandler.OnOpen = lambda: self.DoOpen(
+            QFileDialog.getOpenFileName(self, filter=ProjectType.allFilter()))
+        menuBar = MenuBar(self, menuHandler)
+        self.setMenuBar(menuBar)
 
         icon = QIcon("Images/icon.png")
         self.setWindowIcon(icon)
+
+    def DoOpen(self, result):
+        filenameOpen = Path(result[0])
+        newType = [newType for newType in ProjectType if (newType.fileExtension()) == filenameOpen.suffix]
+        print(str(newType) + "-" + str(filenameOpen.absolute().resolve()))
 
     def SaveSettings(self):
         windowSettings = WindowSettings()

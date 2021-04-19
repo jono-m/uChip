@@ -1,6 +1,7 @@
 from PySide6.QtCore import *
 from PySide6.QtWidgets import *
-from shiboken2 import *
+import typing
+import os
 
 
 class StylesheetLoader:
@@ -41,6 +42,6 @@ class StylesheetLoader:
         f = open(self.scriptFilename)
         self.stylesheet = f.read()
 
-        self.widgetsList: typing.List[QWidget] = [widget for widget in self.widgetsList if isValid(widget)]
+        self.widgetsList: typing.List[QWidget] = [widget for widget in self.widgetsList if widget]
         for widget in self.widgetsList:
             widget.setStyleSheet(self.stylesheet)
