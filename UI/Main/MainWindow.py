@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QMainWindow, QFrame, QFileDialog, QVBoxLayout
+from PySide6.QtWidgets import QMainWindow, QFrame, QFileDialog, QVBoxLayout, QLabel
 from PySide6.QtGui import QIcon, QCloseEvent
 from PySide6.QtCore import QSize, QPoint
 from UI.StylesheetLoader import StylesheetLoader
@@ -24,7 +24,8 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.projectWindow)
 
         menuHandler = MenuHandler()
-        menuHandler.OnNew = lambda: NewDialog(self).exec_()
+        # menuHandler.OnNew = lambda: NewDialog(self).exec_()
+        menuHandler.OnNew = lambda: self.projectWindow.AddTab(QLabel("Hello!"), "Test")
         menuHandler.OnOpen = lambda: self.DoOpen(
             QFileDialog.getOpenFileName(self, filter=ProjectType.allFilter()))
         menuBar = MenuBar(self, menuHandler)
@@ -32,6 +33,8 @@ class MainWindow(QMainWindow):
 
         icon = QIcon("Images/icon.png")
         self.setWindowIcon(icon)
+
+        self.ReloadSettings()
 
     def DoOpen(self, result):
         filenameOpen = Path(result[0])
