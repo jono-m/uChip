@@ -1,6 +1,6 @@
 from BlockSystemEntity import BlockSystemEntity, GraphBlock
 from GraphSystem.ProjectBlock import ProjectBlock
-from ProjectSystem.Project import Project
+from ProjectTypes.Project import Project
 from pathlib import Path
 from FileTracker import FileTracker
 

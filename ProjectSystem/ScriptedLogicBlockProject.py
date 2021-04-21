@@ -1,5 +1,5 @@
-from ProjectSystem.Project import Project
-from ProjectSystem.ProjectEntity import ProjectEntity
+from ProjectTypes.Project import Project
+from ProjectTypes.ProjectEntity import ProjectEntity
 from GraphSystem.Data import Data, MatchData
 import typing
 

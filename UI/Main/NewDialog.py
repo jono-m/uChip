@@ -1,40 +1,12 @@
 from PySide6.QtWidgets import QDialog, QPushButton, QLabel, QVBoxLayout, QButtonGroup, QLineEdit, QFileDialog, \
-    QHBoxLayout, QRadioButton
+    QHBoxLayout
 from pathlib import Path
-from enum import Enum, auto
-
-
-class ProjectType(Enum):
-    CHIP_PROJECT = auto()
-    BLOCK_GRAPH = auto()
-    BLOCK_SCRIPT = auto()
-
-    def typeName(self):
-        return {ProjectType.CHIP_PROJECT: "Chip Project",
-                ProjectType.BLOCK_GRAPH: "Block Graph Project",
-                ProjectType.BLOCK_SCRIPT: "Block Script Project"}[self]
-
-    def description(self):
-        return {ProjectType.CHIP_PROJECT: "A project to control a microfluidic chip with valves and procedures.",
-                ProjectType.BLOCK_GRAPH: "A custom logic block based on a block graph.",
-                ProjectType.BLOCK_SCRIPT: "A custom logic block based on a script."}[self]
-
-    def fileExtension(self):
-        return {ProjectType.CHIP_PROJECT: ".ucc",
-                ProjectType.BLOCK_GRAPH: ".ucg",
-                ProjectType.BLOCK_SCRIPT: ".ucs"}[self]
-
-    def fileFilter(self):
-        return self.typeName() + "(*." + self.fileExtension() + ")"
-
-    @staticmethod
-    def allFilter():
-        return "uChip Files (" + " ".join(["*" + newType.fileExtension() for newType in ProjectType]) + ")"
+from ProjectSystem.ProjectTypes import ProjectType
 
 
 class NewHandler:
-    def OnNewRequest(self, newType: ProjectType, path: Path):
-        print("Request new " + str(newType) + " at " + str(path.resolve()))
+    def OnNewRequest(self, path: Path):
+        print("Request new " + str(ProjectType.TypeFromPath(path)) + " at " + str(path.resolve()))
 
 
 class NewDialog(QDialog):
@@ -52,7 +24,7 @@ class NewDialog(QDialog):
             self._buttonGroup.addButton(NewProjectOptionButton(newType))
         self._buttonGroup.buttons()[0].setChecked(True)
 
-        self._buttonGroup.buttonClicked.connect(self.Clear)
+        self._buttonGroup.buttonClicked.connect(self.TypeChange)
 
         fileLabel = QLabel("Location for new project:")
         self._fileField = QLineEdit()
@@ -85,10 +57,12 @@ class NewDialog(QDialog):
 
         self.setLayout(layout)
 
-    def Clear(self):
-        print("Clear" + str(self._buttonGroup.checkedButton()) + str(self._buttonGroup.checkedId()))
-        self._okButton.setEnabled(False)
-        self._fileField.setText("")
+    def TypeChange(self):
+        existingText = self._fileField.text()
+        if existingText:
+            corrected = Path(existingText).absolute().with_suffix(
+                self._buttonGroup.checkedButton().newType.fileExtension())
+            self._fileField.setText(str(corrected))
 
     def OnOK(self):
         path = Path(self._fileField.text())
@@ -99,18 +73,25 @@ class NewDialog(QDialog):
             self._errorField.setText("Path does not exist.")
             return
 
-        self._handler.OnNewRequest(self._buttonGroup.checkedButton().newType, path)
+        self._handler.OnNewRequest(path)
 
         self.accept()
 
     def BrowseForFile(self):
-        saveRoot, extension = QFileDialog.getSaveFileName(self,
-                                                          "Location for new " + self._buttonGroup.checkedButton().newType.typeName(),
-                                                          filter=self._buttonGroup.checkedButton().newType.fileFilter())
-        saveFileName = saveRoot + extension
-        if saveFileName:
-            self._fileField.setText(saveFileName)
+        saveFilename = NewDialog.BrowseForLocation(self)
+        if saveFilename:
+            self._fileField.setText(str(saveFilename.absolute()))
             self._okButton.setEnabled(True)
+            self.TypeChange()
+
+    @staticmethod
+    def BrowseForLocation(parent):
+        saveFilename, _ = QFileDialog.getSaveFileName(parent, "New File Location", filter=ProjectType.allFilter(),
+                                                      options=QFileDialog.DontConfirmOverwrite)
+        if saveFilename:
+            return Path(saveFilename)
+        else:
+            return None
 
 
 class NewProjectOptionButton(QPushButton):
