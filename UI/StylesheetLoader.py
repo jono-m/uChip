@@ -1,5 +1,5 @@
-from PySide6.QtCore import *
-from PySide6.QtWidgets import *
+from PySide6.QtCore import QTimer
+from PySide6.QtWidgets import QApplication, QWidget
 import typing
 import os
 
@@ -13,11 +13,13 @@ class StylesheetLoader:
             StylesheetLoader._instance = StylesheetLoader()
         return StylesheetLoader._instance
 
-    def RegisterWidget(self, widget: QWidget):
-        if self.stylesheet is None:
-            self.ReloadSS()
-        self.widgetsList.append(widget)
-        widget.setStyleSheet(self.stylesheet)
+    @staticmethod
+    def RegisterWidget(widget: QWidget):
+        instance = StylesheetLoader.GetInstance()
+        if instance.stylesheet is None:
+            instance.ReloadSS()
+        instance.widgetsList.append(widget)
+        widget.setStyleSheet(instance.stylesheet)
 
     def __init__(self):
         self.widgetsList: typing.List[QWidget] = []

@@ -11,8 +11,9 @@ class MenuHandler:
     def OnOpen(self):
         print("Open")
 
-    def OnOpenRecent(self, filePath: Path):
-        print("Open " + str(filePath.resolve()))
+    def OnOpenRecent(self, filePath: typing.Optional[str]):
+        if filePath is not None:
+            print("Open " + str(filePath.resolve()))
 
     def OnSave(self):
         print("Save")
@@ -34,6 +35,7 @@ class MenuBar(QMenuBar):
     def __init__(self, parent, handler: typing.Optional[MenuHandler] = MenuHandler()):
         super().__init__(parent)
 
+        self._handler = handler
         fileMenu = self.addMenu("File")
 
         newAction = fileMenu.addAction("New...")
@@ -45,19 +47,19 @@ class MenuBar(QMenuBar):
         openAction.triggered.connect(handler.OnOpen)
 
         self._recentMenu = fileMenu.addMenu("Open Recent")
-        self._recentMenu.triggered.connect(lambda action: handler.OnOpenRecent(Path(action.typeName())))
+        self._recentMenu.triggered.connect(self.OnOpenRecent)
 
-        saveAction = fileMenu.addAction("Save")
-        saveAction.setShortcut(QKeySequence.Save)
-        saveAction.triggered.connect(handler.OnSave)
+        self._saveAction = fileMenu.addAction("Save")
+        self._saveAction.setShortcut(QKeySequence.Save)
+        self._saveAction.triggered.connect(handler.OnSave)
 
-        saveAsAction = fileMenu.addAction("Save As...")
-        saveAsAction.setShortcut(QKeySequence.SaveAs)
-        saveAsAction.triggered.connect(handler.OnSaveAs)
+        self._saveAsAction = fileMenu.addAction("Save As...")
+        self._saveAsAction.setShortcut(QKeySequence.SaveAs)
+        self._saveAsAction.triggered.connect(handler.OnSaveAs)
 
-        closeAction = fileMenu.addAction("Close")
-        closeAction.setShortcut(QKeySequence.Close)
-        closeAction.triggered.connect(handler.OnClose)
+        self._closeAction = fileMenu.addAction("Close")
+        self._closeAction.setShortcut(QKeySequence.Close)
+        self._closeAction.triggered.connect(handler.OnClose)
 
         exitAction = fileMenu.addAction("Exit")
         exitAction.setShortcut(QKeySequence.Quit)
@@ -70,4 +72,16 @@ class MenuBar(QMenuBar):
     def PopulateRecentList(self, paths: typing.List[Path]):
         self._recentMenu.clear()
         for path in paths:
-            self._recentMenu.addAction(str(path.resolve()))
+            self._recentMenu.addAction(str(path.absolute().resolve()))
+        self._recentMenu.addAction("Clear Recent Files")
+
+    def OnOpenRecent(self, action):
+        if action.text() == "Clear Recent Files":
+            self._handler.OnOpenRecent(None)
+        else:
+            self._handler.OnOpenRecent(action.text())
+
+    def SetState(self, saveEnable: bool, saveAsEnable: bool, closeEnable):
+        self._saveAction.setEnabled(saveEnable)
+        self._saveAsAction.setEnabled(saveAsEnable)
+        self._closeAction.setEnabled(closeEnable)

@@ -53,7 +53,7 @@ class RigViewWidget(QDialog):
 
     def Repopulate(self):
         for i in reversed(range(self.solenoidsLayout.count())):
-            self.solenoidsLayout.itemAt(i).widget().deleteLater()
+            self.solenoidsLayout.itemAt(i)._projectTab().deleteLater()
 
         self.solenoidButtons = []
 
