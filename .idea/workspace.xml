@@ -25,40 +25,45 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="99850780-df20-4af2-831c-10fab045648b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/ProjectSystem/BlockScriptProject.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ProjectSystem/ProjectTypes.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/UI/ProjectTabs/BlockGraphTab.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/UI/ProjectTabs/BlockScriptTab.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/UI/ProjectTabs/ChipProgramTab.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/UI/ProjectTabs/ChipProjectTab.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/UI/ProjectTabs/ProjectTab.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/UI/ProjectTabs/ProjectTabArea.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Model/Chip.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Model/Image.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Model/Parameter.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Model/ParameterValue.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Model/Program.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Model/ProgramButton.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Model/Valve.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSystem/ChipProject.py" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSystem/ChipProject.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSystem/Project.py" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSystem/Project.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSystem/ProjectBlockEntity.py" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSystem/ProjectBlockEntity.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSystem/ScriptedLogicBlockProject.py" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSystem/ScriptedLogicBlockProject.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/Main/MainWindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Main/MainWindow.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/Main/MenuBar.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Main/MenuBar.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/Main/NewDialog.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Main/NewDialog.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProjectWindow/BaseEditorFrame.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProjectWindow/BlockConnection.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProjectWindow/CustomLogicBlockEditorFrame.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProjectWindow/GraphicalProjectEditor.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProjectWindow/GraphicalProjectEntity.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProjectWindow/ImageItem.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProjectWindow/LogicBlockEditor.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProjectWindow/LogicBlockItem.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProjectWindow/MainToolbar.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProjectWindow/MainWorkArea.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProjectWindow/PortHoles.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProjectWindow/ProjectWindow.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProjectWindow/SelectableItem.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProjectWindow/StatusBar.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/RigView/RigViewWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/RigView/RigViewWidget.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/StylesheetLoader.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/StylesheetLoader.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.ucc" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSystem/BlockGraphProject.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GraphSystem/Data.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GraphSystem/Graph.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GraphSystem/GraphBlock.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GraphSystem/GraphConnection.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GraphSystem/LogicBlocks.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GraphSystem/ProcedureStep.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GraphSystem/ProjectBlock.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GraphSystem/Steps.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GraphSystem/ValveLogicBlock.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Annotation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSystem/BlockGraphProject.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSystem/BlockScriptProject.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSystem/BlockSystemEntity.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSystem/ChipProject.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSystem/FileTracker.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSystem/ImageEntity.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSystem/Project.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSystem/ProjectBlockEntity.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSystem/ProjectEntity.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSystem/ProjectTypes.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSystem/ScriptedLogicBlockProject.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/Main/MainWindow.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/Main/MenuBar.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/Main/NewDialog.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProjectTabs/BlockGraphTab.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProjectTabs/BlockScriptTab.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProjectTabs/ChipProgramTab.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProjectTabs/ChipProjectTab.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProjectTabs/ProjectTab.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProjectTabs/ProjectTabArea.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/RigView/RigConfigurationWindow.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/RigView/RigViewWidget.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
