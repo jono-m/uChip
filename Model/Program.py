@@ -16,5 +16,5 @@ class ScriptedProgram(Program):
     def __init__(self):
         super().__init__()
 
-        # Signature: Parameters(
+        # Signature: Parameters() -> List[]
         self.parametersScript

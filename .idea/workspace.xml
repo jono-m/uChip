@@ -25,45 +25,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="99850780-df20-4af2-831c-10fab045648b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Model/Chip.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Model/Image.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Model/Parameter.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Model/ParameterValue.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Model/Program.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Model/ProgramButton.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Model/Valve.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GraphSystem/Data.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GraphSystem/Graph.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GraphSystem/GraphBlock.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GraphSystem/GraphConnection.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GraphSystem/LogicBlocks.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GraphSystem/ProcedureStep.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GraphSystem/ProjectBlock.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GraphSystem/Steps.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GraphSystem/ValveLogicBlock.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Annotation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSystem/BlockGraphProject.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSystem/BlockScriptProject.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSystem/BlockSystemEntity.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSystem/ChipProject.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSystem/FileTracker.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSystem/ImageEntity.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSystem/Project.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSystem/ProjectBlockEntity.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSystem/ProjectEntity.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSystem/ProjectTypes.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSystem/ScriptedLogicBlockProject.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/Main/MainWindow.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/Main/MenuBar.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/Main/NewDialog.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProjectTabs/BlockGraphTab.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProjectTabs/BlockScriptTab.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProjectTabs/ChipProgramTab.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProjectTabs/ChipProjectTab.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProjectTabs/ProjectTab.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProjectTabs/ProjectTabArea.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/RigView/RigConfigurationWindow.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/RigView/RigViewWidget.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Parameter.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Parameter.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/ParameterValue.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/ParameterValue.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Program.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
