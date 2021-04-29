@@ -1,58 +1,103 @@
 import typing
-
-Parameters = typing.List[typing.Tuple[str, 'ParameterDescription']]
-ParameterValues = typing.List[typing.Tuple[str, 'ParameterValue']]
+from enum import Enum, auto
 
 
 class Program:
     def __init__(self):
-        self.name = "Unnamed Program"
-        self.parameters: Parameters = []
+        self.parameters = []
+        self.name = "New Program"
+        self.logicBlocks = []
+        self.steps = []
+        self.startStep = StartStep()
+        self.endStep = EndStep()
 
 
-class ProgramInstance:
-    def __init__(self, program: Program):
-        self.program = program
-        self.parameterValues = 
-        self.isRunning = False
-
-
-class ProgramButton:
-    def __init__(self, program: Program):
-        self.programInstance = ProgramInstance(program)
-
-
-class ParameterDescription:
-    def __init__(self, initialDefaultValue):
-        self.defaultValue = initialDefaultValue
-
-
-class BooleanParameterDescription(ParameterDescription):
+class Step:
     def __init__(self):
-        super().__init__(False)
+        self.name = "Step"
+        self.completedPorts = []
+        self.inputPorts = []
 
 
-class NumberParameterDescription(ParameterDescription):
+class StartStep(Step):
     def __init__(self):
-        super().__init__(0)
-        self.minimum = None
-        self.maximum = None
-        self.step = None
-        self.isInteger = False
+        super().__init__()
+        self.name = "Start"
+        self.completedPorts.append(CompletedPort())
 
 
-class ValveParameterDescription(ParameterDescription):
+class EndStep(Step):
     def __init__(self):
-        super().__init__(None)
+        super().__init__()
+        self.name = "Stop"
+        self.completedPorts.append(CompletedPort())
 
 
-class OptionParameterDescription(ParameterDescription):
+class WaitStep(Step):
     def __init__(self):
-        super().__init__(0)
-        self.options = ["Option 1"]
+        super().__init__()
+        self.name = "Wait"
+        self.completedPorts.append(CompletedPort())
+        self.waitingInput = InputPort()
+        self.waitingInput.dataType = Data.DataType.NUMBER
+        self.inputPorts.append()
 
 
-class ParameterValue:
-    def __init__(self, value, description: ParameterDescription):
+class LogicBlock:
+    def __init__(self):
+        self.name = "Logic Block"
+        self.inputPorts = []
+        self.outputPorts = []
+
+
+class InputPort:
+    def __init__(self):
+        self.name = "Input"
+        self.parameter = Data.DataType.NUMBER
+        self.connectedOutput = None
+
+
+class OutputPort:
+    def __init__(self):
+        self.name = "Output"
+        self.dataType = Data.DataType.NUMBER
+        self.connectedInputs = []
+
+
+class CompletedPort:
+    def __init__(self):
+        self.name = "Completed"
+        self.nextSteps = []
+
+
+class Data:
+    class DataType(Enum):
+        NUMBER = auto()
+        BOOLEAN = auto()
+        OPTION = auto()
+        VALVE = auto()
+
+    def __init__(self, value):
         self.value = value
-        self.description = description
+
+
+class Input:
+    def __init__(self):
+        self.name = "New Input"
+        self.defaultNumber = 0
+        self.defaultBoolean = False
+        self.defaultOption = 0
+
+        self.type = Data.DataType.NUMBER
+
+        self.minimumValue = None
+        self.valueStep = 0
+        self.maximumValue = None
+        self.integersOnly = False
+
+        self.options = ["New Option"]
+
+
+class InputValue:
+    def __init__(self, value):
+        self.value = value
