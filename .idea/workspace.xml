@@ -25,10 +25,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="99850780-df20-4af2-831c-10fab045648b" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model/Parameter.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Parameter.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model/ParameterValue.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/ParameterValue.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Parameter.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/ParameterValue.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Model/Program.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/ProgramButton.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
