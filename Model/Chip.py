@@ -1,7 +1,8 @@
 import typing
 
 from Valve import Valve
-from Program import Program, ProgramButton
+from Program.Program import Program
+from ProgramButton import ProgramButton
 from Image import Image
 from Annotation import Annotation
 

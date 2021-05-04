@@ -1,6 +1,6 @@
 from serial import Serial
 from serial.tools import list_ports
-from RigSystem.Rig import Rig
+from Rig import Rig
 import typing
 from serial.tools.list_ports_common import ListPortInfo
 

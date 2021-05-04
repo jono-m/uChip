@@ -1,3 +1,0 @@
-PySide6~=6.0.3
-dill~=0.3.3
-pyserial~=3.5

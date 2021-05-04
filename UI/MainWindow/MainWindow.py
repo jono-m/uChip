@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import QMainWindow
+from UI.ChipEditor.ChipEditor import ChipEditor
 
 
 class MainWindow(QMainWindow):
