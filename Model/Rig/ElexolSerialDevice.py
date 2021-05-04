@@ -1,5 +1,5 @@
-from RigSystem.SerialSolenoidDevice import SerialSolenoidDevice
-from RigSystem.Rig import Rig
+from SerialSolenoidDevice import SerialSolenoidDevice
+from Rig import Rig
 import typing
 
 
