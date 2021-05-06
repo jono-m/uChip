@@ -38,12 +38,16 @@ class ScriptedProgram(Program):
         super().__init__()
         self.name = "New Scripted Program"
 
+        self.computeOutputs = """"""
         self.startScript = """"""  # Called on start
         self.tickScript = """"""  # Called once per tick
         self.stopScript = """"""  # Called when the program is stopped or finishes
 
     def OnStart(self, instance: 'ScriptedProgramInstance'):
         exec(self.startScript, self.MakeScriptGlobals(instance), instance.localEnv)
+
+    def OnComputeOutputs(self, instance: 'ProgramInstance'):
+        exec
 
     def OnTick(self, instance: 'ScriptedProgramInstance'):
         exec(self.tickScript, self.MakeScriptGlobals(instance), instance.localEnv)
