@@ -9,6 +9,9 @@ class Program:
         self.outputs: typing.List[Output] = []
         self.name = "New Program"
 
+    def OnComputeOutputs(self, instance: 'ProgramInstance'):
+        pass
+
     def OnStart(self, instance: 'ProgramInstance'):
         pass
 
@@ -124,6 +127,9 @@ class ProgramInstance:
             self._parent = parentInstance
         self._isRunning = True
         self._program.OnStart(self)
+
+    def ComputeOutputs(self):
+        self._program.OnComputeOutputs(self)
 
     def Tick(self):
         if not self.IsRunning():

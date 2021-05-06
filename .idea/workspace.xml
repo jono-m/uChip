@@ -28,30 +28,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="99850780-df20-4af2-831c-10fab045648b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Model/Program/GraphProgramBlocks.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Model/Program/Program.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Model/Program/ScriptedProgram.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Model/ProgramButton.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/1KChip/1kChip.ucc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/1KChip/CombinatorialMultiplexer.usb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/1KChip/Multiplexer8.usb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/1KChip/chip.PNG" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/1KChip/dilutor.ulb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model/Chip.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Chip.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model/Program.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model/Valve.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Valve.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RigSystem/CreateRig.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Rig/CreateRig.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RigSystem/ElexolSerialDevice.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Rig/ElexolSerialDevice.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RigSystem/Rig.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Rig/Rig.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RigSystem/SerialSolenoidDevice.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Rig/SerialSolenoidDevice.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ChipEditor.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ChipEditor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.spec" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.ucc" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program/GraphProgram.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Program/GraphProgramBlocks.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program/GraphProgramBlocks.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Program/Program.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program/Program.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Program/ScriptedProgram.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program/ScriptedProgram.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

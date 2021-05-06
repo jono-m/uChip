@@ -10,4 +10,8 @@ class ParameterBlock(GraphBlock):
         super().__init__()
 
         self.parameter = parameter
+        self.parameterOutputPort = OutputPort("Value", self, parameter.dataType, )
+        self.outputPorts +=
 
+    def ComputeOutputs(self, inputData: typing.Dict['InputPort', typing.Any], instance: ProgramInstance) -> typing.Dict[
+        'OutputPort', typing.Any]:
