@@ -1,102 +1,67 @@
 import time
-import typing
+from typing import Dict
 
-from Program import Program, ProgramInstance, ProgramChipInterface
+from ProgramInstanceState import ProgramInstanceState, ParameterValuesType
+from Program import Program, ProgramChipInterface, OutputValuesType
+from Data import DataValueType
 from Model.Valve import ValveState
 
 
-class ScriptedProgram(Program):
-    class Timer:
-        def __init__(self, duration: float, delegate: typing.Optional[typing.Callable] = None,
-                     repeated=False):
-            self.startTime = time.time()
-            self.duration = duration
-            self.delegate = delegate
-            self.repeated = repeated
-            self._isRunning = False
-
-        def Start(self):
-            self.startTime = time.time()
-            self._isRunning = True
-
-        def Stop(self):
-            self._isRunning = False
-
-        def IsRunning(self):
-            return self._isRunning
-
-        def Tick(self):
-            if time.time() - self.startTime >= self.duration:
-                if self.delegate:
-                    self.delegate()
-                if self.repeated:
-                    self.Start()
-                else:
-                    self.Stop()
-
+class ScriptedProgramInstanceState(ProgramInstanceState):
     def __init__(self):
         super().__init__()
+        self.localEnv = {}
+
+
+class ScriptedProgram(Program):
+    def __init__(self):
+        super().__init__("New Scripted Program")
         self.name = "New Scripted Program"
 
-        self.computeOutputs = """"""
+        self.computeOutputsScript = """"""
         self.startScript = """"""  # Called on start
         self.tickScript = """"""  # Called once per tick
         self.stopScript = """"""  # Called when the program is stopped or finishes
 
-    def OnStart(self, instance: 'ScriptedProgramInstance'):
-        exec(self.startScript, self.MakeScriptGlobals(instance), instance.localEnv)
+    def ComputeOutputs(self, parameters: ParameterValuesType) -> OutputValuesType:
+        outputs: Dict[str, DataValueType] = exec(self.computeOutputsScript,
+                                                 {'GetParameter': lambda parameterName: parameters[
+                                                     self.GetParameterWithName(parameterName)]},
+                                                 {})
+        if not isinstance(outputs, dict):
+            raise Exception("Outputs should be a dictionary of output names to values.")
 
-    def OnComputeOutputs(self, instance: 'ProgramInstance'):
-        exec
+        extracted = {}
+        for outputName in outputs:
+            output = self.GetOutputWithName(outputName)
+            extracted[output] = output.GetDataType().Cast(outputs[outputName])
 
-    def OnTick(self, instance: 'ScriptedProgramInstance'):
-        exec(self.tickScript, self.MakeScriptGlobals(instance), instance.localEnv)
-        for timer in instance.timers:
-            if timer.IsRunning():
-                timer.Tick()
-        instance.lastTickTime = time.time()
-        for subDelegate in instance.subDelegates.keys():
-            if not subDelegate.IsRunning():
-                instance.subDelegates[subDelegate]()
-                del instance.subDelegates[subDelegate]
+        return extracted
 
-    def OnStop(self, instance: 'ScriptedProgramInstance'):
-        exec(self.stopScript, self.MakeScriptGlobals(instance), instance.localEnv)
+    def OnStart(self, state: ScriptedProgramInstanceState, interface: 'ProgramChipInterface'):
+        self.RunWithEnvironment(self.startScript, state, interface)
 
-    @staticmethod
-    def MakeScriptGlobals(instance: 'ScriptedProgramInstance'):
-        return {"GetParameter": lambda name: instance.GetParameterValue(name),
-                "SetOutput": lambda name, value: instance.SetOutputValue(name, value),
-                "GetValveState": lambda name: instance.GetChipInterface().GetValveWithName(name).GetState(),
-                "SetValveState": lambda name, state: instance.GetChipInterface().GetValveWithName(name).SetState(state),
-                "Program": lambda name: instance.GetChipInterface().GetProgramWithName(name).CreateInstance(
-                    instance.GetChipInterface()),
-                "Run": lambda programInstance, onFinish=None: ScriptedProgram.StartSubProgram(instance, programInstance,
-                                                                                              onFinish),
-                "Stop": lambda: instance.Stop(),
-                "OPEN": ValveState.OPEN,
-                "CLOSED": ValveState.CLOSED,
-                "Timer": ScriptedProgram.Timer,
-                "deltaTime": time.time() - instance.lastTickTime,
-                "timeSinceStart": time.time() - instance.startTime}
+    def OnTick(self, state: ScriptedProgramInstanceState, interface: 'ProgramChipInterface'):
+        self.RunWithEnvironment(self.tickScript, state, interface)
 
-    @staticmethod
-    def StartSubProgram(instance: 'ScriptedProgramInstance', subInstance: ProgramInstance,
-                        onFinish: typing.Optional[typing.Callable]):
-        subInstance.Start(instance)
-        if onFinish:
-            instance.subDelegates[subInstance] = onFinish
+    def OnStop(self, state: ScriptedProgramInstanceState, interface: 'ProgramChipInterface'):
+        self.RunWithEnvironment(self.stopScript, state, interface)
 
-    def CreateInstance(self, chipInterface: 'ProgramChipInterface') -> 'ProgramInstance':
-        return ScriptedProgramInstance(self, chipInterface)
+    def RunWithEnvironment(self, script, state: ScriptedProgramInstanceState, interface: ProgramChipInterface):
+        globalEnv = {"GetParameter": lambda name: state.GetParameterValue(self.GetParameterWithName(name)),
+                     "GetValveState": lambda name: interface.GetValveWithName(name),
+                     "SetValveState": lambda name, valveState: interface.GetValveWithName(name).SetState(valveState),
+                     "Program": lambda name: instance.GetChipInterface().GetProgramWithName(name).CreateInstance(
+                         instance.GetChipInterface()),
+                     "Run": lambda programInstance, onFinish=None: ScriptedProgram.StartSubProgram(instance,
+                                                                                                   programInstance,
+                                                                                                   onFinish),
+                     "Stop": lambda: instance.Stop(),
+                     "OPEN": ValveState.OPEN,
+                     "CLOSED": ValveState.CLOSED,
+                     "Timer": ScriptedProgram.Timer,
+                     "deltaTime": time.time() - instance.lastTickTime,
+                     "timeSinceStart": time.time() - instance.startTime}
 
-
-class ScriptedProgramInstance(ProgramInstance):
-    def __init__(self, program: ScriptedProgram, chipInterface: ProgramChipInterface):
-        super().__init__(program, chipInterface)
-        self.startTime = time.time()
-        self.lastTickTime = time.time()
-        self.localEnv = {}
-        self.subDelegates: typing.Dict[ProgramInstance, typing.Callable] = {}
-        self.timers: typing.List[ScriptedProgram.Timer] = []
-        self.finishing = False
+    def CreateInstance(self) -> ProgramInstanceState:
+        return ScriptedProgramInstanceState()
