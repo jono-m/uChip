@@ -1,6 +1,6 @@
 import typing
 
-from Program import Program, ProgramInstance, ProgramChipInterface
+from Program import Program, ProgramInstanceState, ProgramChipInterface
 
 
 class GraphProgram(Program):
@@ -17,14 +17,14 @@ class GraphProgram(Program):
     def GetBlocks(self):
         return self.blocks.copy()
 
-    def OnStart(self, instance: 'GraphProgramInstance'):
+    def OnStart(self, instance: 'GraphProgramInstanceState'):
         instance.activeSteps = [self.startBlock]
         self.UpdateGraph(instance)
 
-    def OnTick(self, instance: 'GraphProgramInstance'):
+    def OnTick(self, instance: 'GraphProgramInstanceState'):
         self.UpdateGraph(instance)
 
-    def UpdateGraph(self, instance: 'GraphProgramInstance'):
+    def UpdateGraph(self, instance: 'GraphProgramInstanceState'):
         updatedLogicBlocks = []
 
         logicBlocksToUpdate = self.blocks.copy()
@@ -47,20 +47,19 @@ class GraphProgram(Program):
         if instance.IsRunning() and not instance.activeSteps:
             instance.Stop()
 
-    def OnStop(self, instance: 'GraphProgramInstance'):
+    def OnStop(self, instance: 'GraphProgramInstanceState'):
         instance.activeSteps = [self.stopBlock]
         self.UpdateGraph(instance)
 
-    def CreateInstance(self, chipInterface: 'ProgramChipInterface') -> 'ProgramInstance':
-        return GraphProgramInstance(self, chipInterface)
+    def CreateInstance(self, chipInterface: 'ProgramChipInterface') -> 'ProgramInstanceState':
+        return GraphProgramInstanceState(self, chipInterface)
 
 
-class GraphProgramInstance(ProgramInstance):
+class GraphProgramInstanceState(ProgramInstanceState):
     def __init__(self, program: GraphProgram, chipInterface: ProgramChipInterface):
         super().__init__(program, chipInterface)
         self.graphProgram = program
-        self.inputPortData: typing.Dict[InputPort, typing.Any] = {}
-        self.outputPortData: typing.Dict[OutputPort, typing.Any] = {}
+        self.portData: typing.Dict[Port, typing.Any] = {}
         self.activeSteps: typing.List[GraphBlock] = []
 
         self.SyncWithProgram()
@@ -68,32 +67,29 @@ class GraphProgramInstance(ProgramInstance):
     def SyncWithProgram(self):
         super().SyncWithProgram()
 
-        oldInputPortData = self.inputPortData
-        oldOutputPortData = self.outputPortData
+        oldPortData = self.portData
 
-        self.inputPortData = {}
-        self.outputPortData = {}
+        self.portData = {}
 
         for block in self.graphProgram.GetBlocks():
             for inputPort in block.inputPorts:
-                if inputPort in oldInputPortData:
-                    self.inputPortData[inputPort] = oldInputPortData[inputPort]
+                if inputPort in oldPortData:
+                    self.portData[inputPort] = oldPortData[inputPort]
                 else:
-                    self.inputPortData[inputPort] = inputPort.valueWhenNoOutputConnected
+                    self.portData[inputPort] = inputPort.valueWhenNoOutputConnected
             for outputPort in block.outputPorts:
-                if outputPort in oldOutputPortData:
-                    self.outputPortData[outputPort] = oldOutputPortData[outputPort]
+                if outputPort in oldPortData:
+                    self.portData[outputPort] = oldPortData[outputPort]
                 else:
-                    self.outputPortData[outputPort] = outputPort.initialValue
+                    self.portData[outputPort] = outputPort.initialValue
 
 
 class GraphBlock:
-    def GetName(self):
-        return "Graph Block"
-
-    def __init__(self):
+    def __init__(self, name="Graph Block"):
         self.xPosition = 0
         self.yPosition = 0
+
+        self.name = name
 
         self.inputPorts = []
         self.outputPorts = []
@@ -105,31 +101,31 @@ class GraphBlock:
         return [inputPort.GetConnectedOutput().block for inputPort in self.inputPorts if
                 inputPort.GetConnectedOutput()]
 
-    def UpdateLogic(self, instance: GraphProgramInstance):
+    def UpdateLogic(self, instance: GraphProgramInstanceState):
         outputData = self.ComputeOutputs(self.PackageInputs(instance), instance)
         for outputPort in outputData:
-            instance.outputPortData[outputPort] = outputData[outputPort]
+            instance.portData[outputPort] = outputData[outputPort]
 
-    def PackageInputs(self, instance: GraphProgramInstance):
+    def PackageInputs(self, instance: GraphProgramInstanceState):
         inputData = {}
         for inputPort in self.inputPorts:
             if inputPort.connectedOutput:
-                inputData[inputPort] = instance.outputPortData[inputPort.connectedOutput]
+                inputData[inputPort] = instance.portData[inputPort.connectedOutput]
             else:
                 inputData[inputPort] = inputPort.valueWhenNoOutputConnected
         return inputData
 
-    def ComputeOutputs(self, inputData: typing.Dict['InputPort', typing.Any], instance: ProgramInstance) \
+    def ComputeOutputs(self, inputData: typing.Dict['InputPort', typing.Any], instance: ProgramInstanceState) \
             -> typing.Dict['OutputPort', typing.Any]:
         pass
 
-    def UpdateStep(self, instance: GraphProgramInstance):
+    def UpdateStep(self, instance: GraphProgramInstanceState):
         completedPorts = self.ExecuteStep(self.PackageInputs(instance), instance)
         if completedPorts:
             instance.activeSteps += completedPorts
             instance.activeSteps.remove(self)
 
-    def ExecuteStep(self, inputData: typing.Dict['InputPort', typing.Any], instance: ProgramInstance) \
+    def ExecuteStep(self, inputData: typing.Dict['InputPort', typing.Any], instance: ProgramInstanceState) \
             -> typing.Optional[typing.List['CompletedPort']]:
         return self.completedPorts[:1]
 

@@ -3,9 +3,6 @@ from Program import Parameter
 
 
 class ParameterBlock(GraphBlock):
-    def GetName(self):
-        return "Parameter: " + self.parameter.name
-
     def __init__(self, parameter: Parameter):
         super().__init__()
 
