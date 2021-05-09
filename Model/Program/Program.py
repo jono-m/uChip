@@ -1,12 +1,47 @@
-from typing import List, Dict, Any, Optional
+from typing import List, Type, Optional, Callable
+
 from Parameter import Parameter
-from ProgramInstanceState import ProgramInstanceState, ParameterValuesType
+from ProgramInstanceState import ProgramInstanceState
 from Output import Output
-from Data import DataValueType
 from abc import ABC, abstractmethod
 from Model.Valve import Valve
 
-OutputValuesType = Dict[Output, DataValueType]
+
+class ProgramChipInterface(ABC):
+    @abstractmethod
+    def GetValves(self) -> List[Valve]:
+        pass
+
+    @abstractmethod
+    def GetPrograms(self) -> List['Program']:
+        pass
+
+
+class ProgramRunnerInterface(ABC):
+    @abstractmethod
+    def StartProgram(self, program: 'Program', state: ProgramInstanceState, parentState: ProgramInstanceState,
+                     finishedDelegate: Optional[Callable] = None):
+        pass
+
+    @abstractmethod
+    def PauseProgram(self, state: ProgramInstanceState):
+        pass
+
+    @abstractmethod
+    def ResumeProgram(self, state: ProgramInstanceState):
+        pass2
+
+    @abstractmethod
+    def FinishProgram(self, state: ProgramInstanceState):
+        pass
+
+    @abstractmethod
+    def StopProgram(self, state: ProgramInstanceState):
+        pass
+
+    @abstractmethod
+    def GetChildPrograms(self, state: ProgramInstanceState) -> List[ProgramInstanceState]:
+        pass
 
 
 class Program:
@@ -20,91 +55,75 @@ class Program:
         self._outputs = outputs
         self._name = name
 
-    def SetName(self, name: str):
-        self._name = name
-
     def GetName(self):
         return self._name
+
+    def SetName(self, name: str):
+        self._name = name
 
     def GetOutputs(self):
         return self._outputs
 
-    def GetOutputNames(self):
-        return [output.GetName() for output in self._outputs]
-
-    def GetOutputWithName(self, outputName: str):
-        if not isinstance(outputName, str):
-            raise Exception("Outputs should be referenced by a string.")
-        matches = [output for output in self._outputs if outputName == output.GetName()]
-        if matches:
-            return matches[0]
-        else:
-            raise Exception("Could not find output with name '" + outputName + "'.")
-
     def AddOutput(self, output: Output):
+        if output in self._outputs:
+            raise Exception("Output already added.")
         self._outputs.append(output)
 
     def RemoveOutput(self, output: Output):
+        if output not in self._outputs:
+            raise Exception("Output was not in collection.")
         self._outputs.remove(output)
 
     def GetParameters(self):
         return self._parameters
 
-    def GetParameterNames(self):
-        return [parameter.GetName() for parameter in self._parameters]
-
-    def GetParameterWithName(self, parameterName: str):
-        if not isinstance(parameterName, str):
-            raise Exception("Parameters should be referenced by a string.")
-        matches = [parameter for parameter in self._parameters if parameterName == parameter.GetName()]
-        if matches:
-            return matches[0]
-        else:
-            raise Exception("Could not find parameter with name '" + parameterName + "'.")
-
     def AddParameter(self, parameter: Parameter):
+        if parameter in self._parameters:
+            raise Exception("Parameter already added.")
         self._parameters.append(parameter)
 
     def RemoveParameter(self, parameter: Parameter):
+        if parameter not in self._parameters:
+            raise Exception("Parameter was not in collection")
         self._parameters.remove(parameter)
 
-    def ComputeOutputs(self, parameters: ParameterValuesType) -> OutputValuesType:
-        return {}
-
-    def OnStart(self, state: ProgramInstanceState, interface: 'ProgramChipInterface'):
+    def ComputeOutputs(self, state: ProgramInstanceState, programRunnerInterface: ProgramRunnerInterface):
         pass
 
-    def OnTick(self, state: ProgramInstanceState, interface: 'ProgramChipInterface'):
+    def OnStart(self, state: ProgramInstanceState, chipInterface: ProgramChipInterface,
+                programRunnerInterface: ProgramRunnerInterface):
         pass
 
-    def OnStop(self, state: ProgramInstanceState, interface: 'ProgramChipInterface'):
+    def OnPause(self, state: ProgramInstanceState, chipInterface: ProgramChipInterface,
+                programRunnerInterface: ProgramRunnerInterface):
         pass
+
+    def OnResume(self, state: ProgramInstanceState, chipInterface: ProgramChipInterface,
+                 programRunnerInterface: ProgramRunnerInterface):
+        pass
+
+    def OnTick(self, state: ProgramInstanceState, chipInterface: ProgramChipInterface,
+               programRunnerInterface: ProgramRunnerInterface):
+        pass
+
+    def OnFinish(self, state: ProgramInstanceState, chipInterface: ProgramChipInterface,
+                 programRunnerInterface: ProgramRunnerInterface):
+        pass
+
+    def OnStop(self, state: ProgramInstanceState, chipInterface: ProgramChipInterface,
+               programRunnerInterface: ProgramRunnerInterface):
+        pass
+
+    @staticmethod
+    def GetStateType() -> Type[ProgramInstanceState]:
+        return ProgramInstanceState
 
     def CreateInstance(self) -> ProgramInstanceState:
-        newInstance = ProgramInstanceState()
-        newInstance.SyncParameters(self._parameters)
+        newInstance = self.GetStateType()()
+        self.InitializeInstance(newInstance)
         return newInstance
 
-
-class ProgramChipInterface(ABC):
-    @abstractmethod
-    def GetValves(self) -> List[Valve]:
-        pass
-
-    def GetValveWithName(self, valveName: str):
-        matches = [valve for valve in self.GetValves() if valve.GetName() == valveName]
-        if matches:
-            return matches[0]
-        else:
-            raise Exception("Could not find valve with name '" + valveName + "'.")
-
-    @abstractmethod
-    def GetPrograms(self) -> List[Program]:
-        pass
-
-    def GetProgramWithName(self, programName: str):
-        matches = [program for program in self.GetPrograms() if program.GetName() == programName]
-        if matches:
-            return matches[0]
-        else:
-            raise Exception("Could not find program with name '" + programName + "'.")
+    def InitializeInstance(self, newInstance: ProgramInstanceState):
+        newInstance.SyncParameters(self._parameters)
+        newInstance.SyncOutputs(self._outputs)
+        return newInstance
