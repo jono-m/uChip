@@ -8,25 +8,8 @@ class ValveState(Enum):
 
 
 class Valve:
-    def __init__(self, name="Valve", position=QPointF(), state=ValveState.OPEN):
-        self._name = name
-        self._position = position
-        self._state = state
-
-    def GetName(self):
-        return self._name
-
-    def SetName(self, name: str):
-        self._name = name
-
-    def GetPosition(self):
-        return self._position
-
-    def SetPosition(self, position: QPointF):
-        self._position = position
-
-    def GetState(self):
-        return self._state
-
-    def SetState(self, state: 'ValveState'):
-        self._state = state
+    def __init__(self):
+        self.name = "Valve"
+        self.position = QPointF(0, 0)
+        self.solenoidNumber = 0
+        self.state = ValveState.OPEN
