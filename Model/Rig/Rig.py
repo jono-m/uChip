@@ -32,14 +32,8 @@ class Rig:
             self._devices.remove(device)
 
     def SetSolenoidState(self, number: int, state: bool):
-        if number < 0:
+        if 0 < number <= len(self._solenoidStates):
             return
-        if number >= len(self._solenoidStates):
-            self._solenoidStates += [False] * (number - len(self._solenoidStates) + 1)
-            self._solenoidStates[-1] = state
-            self.Flush()
-            return
-
         if self._solenoidStates[number] != state:
             self._solenoidStates[number] = state
             self.Flush()

@@ -1,6 +1,6 @@
 from typing import Optional, Dict
 
-from Data import DataType, DataValueType
+from Model.Program.Data import DataType, DataValueType
 
 
 class Parameter:
@@ -56,14 +56,6 @@ class Parameter:
     def Validate(self):
         self._defaultValue[DataType.INTEGER] = self.ClampInteger(self._defaultValue[DataType.INTEGER])
         self._defaultValue[DataType.FLOAT] = self.ClampFloat(self._defaultValue[DataType.FLOAT])
-
-    def CastClamped(self, value: DataValueType):
-        casted = self._dataType.Cast(value)
-        if self._dataType is DataType.INTEGER:
-            return self.ClampInteger(casted)
-        if self._dataType is DataType.FLOAT:
-            return self.ClampFloat(casted)
-        return casted
 
     def ClampInteger(self, integer: int):
         if self._minimumInteger:

@@ -8,13 +8,12 @@ class DataType(Enum):
     INTEGER = auto()
     FLOAT = auto()
     BOOLEAN = auto()
-    UNKNOWN = auto()
+    STRING = auto()
+    VALVE = auto()
 
     def GetDefaultValue(self):
-        return self.Cast(0)
-
-    def Cast(self, value: DataValueType):
-        return {DataType.INTEGER: int(value),
-                DataType.FLOAT: float(value),
-                DataType.BOOLEAN: bool(value),
-                DataType.UNKNOWN: value}[self]
+        return {DataType.INTEGER: 0,
+                DataType.FLOAT: 0.0,
+                DataType.BOOLEAN: False,
+                DataType.STRING: "",
+                DataType.VALVE: None}[self]
