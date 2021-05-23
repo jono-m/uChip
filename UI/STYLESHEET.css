@@ -1,0 +1,24 @@
+WidgetChipItemContainer[state='None'] {
+	background-color: white;
+}
+WidgetChipItemContainer[state='Hover'] {
+	background-color: red;
+}
+WidgetChipItemContainer[state='Select'] {
+	background-color: blue;
+}
+WidgetChipItemContainer[state='HoverAndSelect'] {
+	background-color: yellow;
+}
+QToolButton[valveState='OPEN'] {
+	background-color: green;
+}
+QToolButton[valveState='CLOSED']{
+	background-color: red;
+}
+ChipEditor QToolButton {
+	min-width: 50;
+	min-height: 50;
+	max-width: 50;
+	max-height: 50;
+}

@@ -8,18 +8,24 @@ class StylesheetLoader:
     _instance = None
 
     @staticmethod
-    def GetInstance():
+    def _GetInstance():
         if StylesheetLoader._instance is None:
             StylesheetLoader._instance = StylesheetLoader()
         return StylesheetLoader._instance
 
     @staticmethod
     def RegisterWidget(widget: QWidget):
-        instance = StylesheetLoader.GetInstance()
+        instance = StylesheetLoader._GetInstance()
         if instance.stylesheet is None:
             instance.ReloadSS()
         instance.widgetsList.append(widget)
         widget.setStyleSheet(instance.stylesheet)
+
+    @staticmethod
+    def UnregisterWidget(widget: QWidget):
+        instance = StylesheetLoader._GetInstance()
+        if widget in instance.widgetsList:
+            instance.widgetsList.remove(widget)
 
     def __init__(self):
         self.widgetsList: typing.List[QWidget] = []
@@ -47,3 +53,4 @@ class StylesheetLoader:
         self.widgetsList: typing.List[QWidget] = [widget for widget in self.widgetsList if widget]
         for widget in self.widgetsList:
             widget.setStyleSheet(self.stylesheet)
+            widget.setStyle(widget.style())
