@@ -94,7 +94,7 @@ class ProgramRunner:
         }
 
         localEnv = {}
-        exec(instance.program.FormatScript(), globalEnv, localEnv)
+        exec(self.FormatScript(instance.program.script), globalEnv, localEnv)
         Execute = localEnv['Execute']
         iterator = Execute()
         if isinstance(iterator, types.GeneratorType):
@@ -112,7 +112,7 @@ class ProgramRunner:
         return instance
 
     def GetValveWithName(self, valveName: str):
-        matches = [valve for valve in self.chip.valves if valve.GetName() == valveName]
+        matches = [valve for valve in self.chip.valves if valve.name == valveName]
         if matches:
             return matches[0]
         else:
@@ -124,3 +124,12 @@ class ProgramRunner:
             return matches[0]
         else:
             raise Exception("Could not find program with name '" + programName + "'.")
+
+    @staticmethod
+    def FormatScript(script):
+        header = "def Execute():\n    "
+
+        if script:
+            return header + script.replace("\n", "\n    ").replace("\t", "    ")
+        else:
+            return header + "pass"

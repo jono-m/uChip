@@ -9,11 +9,3 @@ class Program:
         self.name = "New Program"
 
         self.script = """"""
-
-    def FormatScript(self):
-        header = "def Execute():\n    "
-
-        if self.script:
-            return header + self.script.replace("\n", "\n    ").replace("\t", "    ")
-        else:
-            return header + "pass"
