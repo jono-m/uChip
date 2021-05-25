@@ -9,27 +9,18 @@ class ChipItem(ABC):
         self._chip = chip
         self._graphicsObject = graphicsObject
 
-        self._inspectorWidget = QWidget()
-        self._inspectorLayout = QVBoxLayout()
-        self._inspectorWidget.setLayout(self._inspectorWidget)
-
-        self._inspectorWidget.setVisible(False)
-
         timer = QTimer(self.GraphicsObject())
         timer.timeout.connect(self.Update)
         timer.start(30)
-
-    def InspectorLayout(self):
-        return self._inspectorLayout
-
-    def InspectorWidget(self):
-        return self._inspectorWidget
     
     def GraphicsObject(self):
         return self._graphicsObject
 
     def Chip(self):
         return self._chip
+
+    def SetEditDisplay(self, editing: bool):
+        pass
 
     @abstractmethod
     def CanSelect(self) -> bool:

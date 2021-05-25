@@ -22,3 +22,7 @@ ChipEditor QToolButton {
 	max-width: 50;
 	max-height: 50;
 }
+ChipInspector {
+    min-width: 200;
+    max-width: 200;
+}

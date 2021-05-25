@@ -1,10 +1,10 @@
-from typing import Optional
+from typing import Optional, List
 
 import PySide6
 from PySide6.QtGui import QKeyEvent, Qt
 from PySide6.QtCore import QPointF
 from PySide6.QtWidgets import QWidget, QToolButton, QMenu, QHBoxLayout, QFileDialog
-from UI.ChipEditor.ChipSceneViewer import ChipSceneViewer
+from UI.ChipEditor.ChipSceneViewer import ChipSceneViewer, ChipItem
 from UI.ChipEditor.ValveChipItem import ValveChipItem, Valve
 from UI.ChipEditor.ImageChipItem import ImageChipItem, Image
 from Model.Chip import Chip
@@ -24,18 +24,17 @@ class ChipEditor(QWidget):
         self._chip: Optional[Chip] = None
 
         self._viewer = ChipSceneViewer()
-        self._viewer.setParent(self)
 
         actionsLayout = QHBoxLayout()
-        self._actionsWidget = QWidget(self)
+        self._actionsWidget = QWidget(self._viewer)
         self._actionsWidget.setLayout(actionsLayout)
 
         self._lockButton = QToolButton()
-        self._lockButton.setText("Lock")
-        self._lockButton.clicked.connect(lambda: self.SetMode(Mode.VIEWING))
+        self._lockButton.setText("Done")
+        self._lockButton.clicked.connect(lambda: self.SetEditing(False))
         self._editButton = QToolButton()
         self._editButton.setText("Edit")
-        self._editButton.clicked.connect(lambda: self.SetMode(Mode.EDITING))
+        self._editButton.clicked.connect(lambda: self.SetEditing(True))
 
         self._plusButton = QToolButton()
         self._plusButton.setText("+")
@@ -60,21 +59,9 @@ class ChipEditor(QWidget):
 
         self._mode = Mode.VIEWING
 
-        self.SetMode(Mode.VIEWING)
+        self.SetEditing(False)
 
         self.LoadChip(Chip())
-
-    def SetMode(self, mode: Mode):
-        self._mode = mode
-        self._lockButton.setVisible(self._mode is Mode.EDITING)
-        self._plusButton.setVisible(self._mode is Mode.EDITING)
-        self._editButton.setVisible(self._mode is Mode.VIEWING)
-
-        self._viewer.selectionEnabled = self._mode is Mode.EDITING
-        if self._mode is Mode.VIEWING:
-            self._viewer.DeselectAll()
-
-        self.FloatActionsWidget()
 
     def AddValve(self):
         newValve = Valve()
@@ -92,13 +79,22 @@ class ChipEditor(QWidget):
             self._chip.images.append(newImage)
             self._viewer.CenterItem(self._viewer.AddItem(ImageChipItem(self._chip, newImage)))
 
+    def SetEditing(self, editing):
+        self._viewer.SetEditing(editing)
+
+        self._lockButton.setVisible(editing)
+        self._plusButton.setVisible(editing)
+        self._editButton.setVisible(not editing)
+
+        self.FloatActionsWidget()
+
     def resizeEvent(self, event: PySide6.QtGui.QResizeEvent) -> None:
         super().resizeEvent(event)
         self.FloatActionsWidget()
 
     def FloatActionsWidget(self):
         self._actionsWidget.adjustSize()
-        self._actionsWidget.move(self.rect().topRight() - self._actionsWidget.rect().topRight())
+        self._actionsWidget.move(self._viewer.rect().topRight() - self._actionsWidget.rect().topRight())
 
     def LoadChip(self, chip: Chip):
         self._viewer.RemoveAll()
@@ -110,30 +106,3 @@ class ChipEditor(QWidget):
             self._viewer.AddItem(ImageChipItem(self._chip, image))
 
         self._viewer.Recenter()
-
-    def keyReleaseEvent(self, event: QKeyEvent):
-        if event.key() == Qt.Key.Key_Delete:
-            self.DeleteSelected()
-
-        if event.key() == Qt.Key.Key_D and event.modifiers() == Qt.Modifier.CTRL:
-            self.DuplicateSelected()
-
-        super().keyReleaseEvent(event)
-
-    def DeleteSelected(self):
-        for item in self._viewer.GetSelectedItems():
-            if item.CanDelete():
-                item.Delete()
-                self._viewer.RemoveItem(item)
-
-    def DuplicateSelected(self):
-        newItems = []
-        for item in self._viewer.GetSelectedItems():
-            if item.CanDuplicate():
-                newItem = item.Duplicate()
-                newItem.Move(QPointF(50, 50))
-                self._viewer.AddItem(newItem)
-                newItems.append(newItem)
-        if newItems:
-            self._viewer.DeselectAll()
-            [self._viewer.SelectItem(item) for item in newItems]
