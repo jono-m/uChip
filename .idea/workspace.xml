@@ -28,25 +28,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="99850780-df20-4af2-831c-10fab045648b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/UI/ChipEditor/ChipInspector.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/UI/ChipEditor/ChipItem.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/UI/ChipEditor/ChipSceneViewer.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/UI/ChipEditor/ImageChipItem.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/UI/ChipEditor/ValveChipItem.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/UI/ChipEditor/WidgetChipItem.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model/Chip.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Chip.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model/Image.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Image.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model/Program/Data.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program/Data.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model/Program/Program.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program/Program.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model/Program/ProgramRunner.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program/ProgramRunner.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model/ProgramButton.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/ProgramButton.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model/Valve.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Valve.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ChipEditor.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ChipEditor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ChipInspector.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ChipItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ChipItem.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ChipSceneViewer.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ChipSceneViewer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ValveChipItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ValveChipItem.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/STYLESHEET.css" beforeDir="false" afterPath="$PROJECT_DIR$/UI/STYLESHEET.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/StylesheetLoader.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/StylesheetLoader.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testYield.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import QMainWindow
+from PySide6.QtGui import QIcon
 from UI.ChipEditor.ChipEditor import ChipEditor
 from UI.StylesheetLoader import StylesheetLoader
 
@@ -15,3 +16,6 @@ class MainWindow(QMainWindow):
 
         self.resize(self.screen().size() / 2)
         self.move(self.screen().size().width() / 2, 0)
+
+        self.setWindowTitle("uChip")
+        self.setWindowIcon(QIcon("Images/UCIcon.png"))

@@ -1,7 +1,7 @@
 import PySide6.QtGui
 
 from PySide6.QtCore import QPointF
-from PySide6.QtWidgets import QToolButton, QVBoxLayout
+from PySide6.QtWidgets import QToolButton, QVBoxLayout, QSpinBox, QLabel, QHBoxLayout
 
 from UI.ChipEditor.WidgetChipItem import WidgetChipItem, Chip, ChipItem
 from Model.Valve import Valve, ValveState
