@@ -28,12 +28,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="99850780-df20-4af2-831c-10fab045648b" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/Model/Rig/MockRigDevice.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Model/Rig/RigDevice.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/UI/AppGlobals.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/UI/MainWindow/MenuBar.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/UI/ProgramEditor/ProgramEditor.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/UI/ProgramEditor/ProgramList.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/UI/RigViewer/RigViewer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/jonoj.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/jonoj.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Chip.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Chip.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Program/ProgramRunner.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program/ProgramRunner.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Rig/ElexolSerialDevice.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Rig/Rig.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Rig/Rig.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Rig/RigUpdater.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Rig/SerialSolenoidDevice.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Valve.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Valve.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ChipEditor.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ChipEditor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ChipInspector.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ChipItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ChipItem.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ChipSceneViewer.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ChipSceneViewer.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ValveChipItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ValveChipItem.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/WidgetChipItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/WidgetChipItem.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/STYLESHEET.css" beforeDir="false" afterPath="$PROJECT_DIR$/UI/STYLESHEET.css" afterDir="false" />
     </list>
@@ -82,7 +96,7 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$/UI/ChipEditor" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PythonContentEntriesConfigurable" />
   </component>
   <component name="PyConsoleOptionsProvider">
     <option name="myPythonConsoleState">
@@ -195,6 +209,16 @@
           <url>file://$USER_HOME$/AppData/Local/Programs/Python/Python39/Lib/pickle.py</url>
           <line>214</line>
           <option name="timeStamp" value="94" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/UI/ProgramEditor/ProgramList.py</url>
+          <line>148</line>
+          <option name="timeStamp" value="109" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/UI/ProgramEditor/ProgramList.py</url>
+          <line>50</line>
+          <option name="timeStamp" value="112" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

@@ -26,3 +26,27 @@ ChipInspector {
     min-width: 200;
     max-width: 200;
 }
+SolenoidButton QToolButton {
+	min-width: 30;
+	min-height: 30;
+	max-width: 30;
+	max-height: 30;
+    background-color: red;
+    background-repeat: false;
+}
+SolenoidButton QToolButton:checked {
+    background-color: green;
+    qproperty-autoRaise: false;
+}
+ProgramContextDisplay > QWidget {
+    border: 1px solid rgba(40, 40, 40, 1);
+    border-width: 1px 1px 1px 0px;
+}
+
+ProgramContextDisplay QLineEdit {
+    background-color: transparent;
+    border-color: red;
+}
+ProgramContextDisplay QLineEdit:focus {
+    background-color: white;
+}

@@ -1,151 +1,69 @@
-import typing
+from typing import Set, Dict
 import dill
 from pathlib import Path
+from Model.Rig.RigDevice import RigDevice
+from Model.Rig.MockRigDevice import MockRigDevice
 
 
 class Rig:
-    def __init__(self, deviceTypesToScan: typing.List[typing.Type['Rig.RigDevice']]):
+    def __init__(self):
         super().__init__()
-        self._devices: typing.List[Rig.RigDevice] = []
+        self.savedDevices: Set[RigDevice] = set()
 
-        self._deviceTypesToScan = deviceTypesToScan
-
-        self._solenoidStates = []
-
-        self.LoadDevices()
+        self.solenoidStates: Dict[int, bool] = {}
 
         self.Rescan()
 
+        self.LoadDevices()
+
     def Rescan(self):
-        for deviceType in self._deviceTypesToScan:
-            [self.AddDevice(device) for device in deviceType.SearchForDevices()]
-        for device in self._devices:
-            if device.IsActive():
-                device.TryConnect()
+        foundSerialNumbers = RigDevice.Rescan()
+        foundDevices = [device for device in self.savedDevices if device.IsDeviceAvailable() and device.isEnabled]
+        if foundDevices:
+            highestNumber = max(sum([device.startNumber for device in foundDevices], []))
+        else:
+            highestNumber = 0
 
-    def AddDevice(self, device: 'Rig.RigDevice'):
-        if device not in self._devices:
-            self._devices.append(device)
+        for foundSerialNumber in foundSerialNumbers:
+            if foundSerialNumber not in [device.serialNumber for device in self.savedDevices]:
+                newDevice = RigDevice(highestNumber, foundSerialNumber)
+                newDevice.Connect()
+                self.savedDevices.add(newDevice)
+                highestNumber += 24
 
-    def RemoveDevice(self, device: 'Rig.RigDevice'):
-        if device in self._devices:
-            self._devices.remove(device)
+    def AddMock(self, start: int, serialNo: str):
+        newDevice = MockRigDevice(start, serialNo)
+        newDevice.Connect()
+        self.savedDevices.add(newDevice)
 
     def SetSolenoidState(self, number: int, state: bool):
-        if 0 < number <= len(self._solenoidStates):
-            return
-        if self._solenoidStates[number] != state:
-            self._solenoidStates[number] = state
-            self.Flush()
+        self.solenoidStates[number] = state
 
-    def GetDevices(self):
-        return self._devices
+    def GetSolenoidState(self, number: int):
+        if number not in self.solenoidStates:
+            self.solenoidStates[number] = False
+        return self.solenoidStates[number]
 
-    def Promote(self, device: 'Rig.RigDevice', other: 'Rig.RigDevice'):
-        self._devices.remove(device)
-        index = self._devices.index(other)
-        self._devices.insert(index + 1, device)
-        self.Flush()
-
-    def Demote(self, device: 'Rig.RigDevice', other: 'Rig.RigDevice'):
-        self._devices.remove(device)
-        index = self._devices.index(other)
-        self._devices.insert(index, device)
-        self.Flush()
-
-    def Flush(self):
-        index = 0
-        for device in self.GetDevices():
-            if device.IsActive():
-                device.SetStates(self._solenoidStates[index:(index + device.GetNumSolenoids())])
-                index += device.GetNumSolenoids()
+    def FlushStates(self):
+        for device in self.savedDevices:
+            if device.isConnected and device.isEnabled:
+                states = [self.GetSolenoidState(i) for i in
+                          range(device.startNumber, device.startNumber + len(device.solenoidPolarities))]
+                device.SetStates(states)
 
     def SaveDevices(self):
         file = open("devices.pkl", "wb")
-        dill.dump(self._devices, file)
+        dill.dump(self.savedDevices, file)
         file.close()
 
     def LoadDevices(self):
         if Path("devices.pkl").exists():
             file = open("devices.pkl", "rb")
-            self._devices = dill.load(file)
+            self.savedDevices = dill.load(file)
             file.close()
         else:
-            self._devices = []
+            self.savedDevices = set()
 
-    class RigDevice:
-        class DeviceError(Exception):
-            pass
-
-        def __init__(self):
-            self._isConnected = False
-            self._solenoidStates = [False] * self.GetNumSolenoids()
-
-            self.editableProperties: typing.Dict[str, typing.Any] = {'isActive': False}
-
-        def IsActive(self):
-            return self.editableProperties['isActive']
-
-        @staticmethod
-        def GetNumSolenoids():
-            return 0
-
-        def SetStates(self, solenoidStates: typing.List[bool]):
-            if solenoidStates != self._solenoidStates[:len(solenoidStates)]:
-                self._solenoidStates[:len(solenoidStates)] = solenoidStates
-                if self.IsConnected():
-                    self.FlushStates()
-
-        def SetSolenoid(self, number: int, state: bool):
-            if 0 <= number < self.GetNumSolenoids():
-                if self._solenoidStates[number] != state:
-                    self._solenoidStates[number] = state
-                    if self.IsConnected():
-                        self.FlushStates()
-
-        def IsSameDevice(self, other: 'Rig.RigDevice'):
-            return True
-
-        def IsDeviceAvailable(self) -> bool:
-            return False
-
-        def __eq__(self, other):
-            return self.IsSameDevice(other)
-
-        def FlushStates(self):
-            pass
-
-        def GetSolenoidStates(self):
-            return self._solenoidStates
-
-        def __getstate__(self):
-            self.Disconnect()
-            return self.__dict__
-
-        def IsConnected(self):
-            return self._isConnected
-
-        def TryConnect(self):
-            if self.IsDeviceAvailable():
-                if not self.IsConnected():
-                    self.Connect()
-                    self.FlushStates()
-            else:
-                self._isConnected = False
-
-        def TryDisconnect(self):
-            if self.IsConnected():
-                self.Disconnect()
-
-        def Connect(self):
-            self._isConnected = True
-
-        def Disconnect(self):
-            self._isConnected = False
-
-        def GetName(self):
-            return "Unknown Device"
-
-        @staticmethod
-        def SearchForDevices() -> typing.List['Rig.RigDevice']:
-            return []
+        for device in self.savedDevices:
+            if device.IsDeviceAvailable() and device.isEnabled:
+                device.Connect()

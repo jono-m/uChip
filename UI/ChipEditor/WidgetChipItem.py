@@ -5,10 +5,10 @@ from UI.StylesheetLoader import StylesheetLoader
 
 
 class WidgetChipItem(ChipItem):
-    def __init__(self, chip: Chip):
+    def __init__(self):
         self.graphicsWidget = ClearingProxy()
 
-        super().__init__(chip, self.graphicsWidget)
+        super().__init__(self.graphicsWidget)
 
         self.containerWidget = WidgetChipItemContainer()
         self.graphicsWidget.setWidget(self.containerWidget)
