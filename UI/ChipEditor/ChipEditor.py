@@ -3,13 +3,16 @@ from typing import Optional, List
 import PySide6
 from PySide6.QtGui import QKeyEvent, Qt
 from PySide6.QtCore import QPointF
-from PySide6.QtWidgets import QWidget, QToolButton, QMenu, QHBoxLayout, QFileDialog
+from PySide6.QtWidgets import QWidget, QToolButton, QMenu, QHBoxLayout, QFileDialog, QSplitter
 from UI.ChipEditor.ChipSceneViewer import ChipSceneViewer, ChipItem
 from UI.ChipEditor.ValveChipItem import ValveChipItem, Valve
 from UI.ChipEditor.ImageChipItem import ImageChipItem, Image
 from Model.Chip import Chip
+from UI.AppGlobals import AppGlobals
 
 from enum import Enum, auto
+
+from UI.ProgramEditor.ProgramEditor import ProgramEditor
 
 
 class Mode(Enum):
@@ -20,9 +23,6 @@ class Mode(Enum):
 class ChipEditor(QWidget):
     def __init__(self):
         super().__init__()
-
-        self._chip: Optional[Chip] = None
-
         self._viewer = ChipSceneViewer()
 
         actionsLayout = QHBoxLayout()
@@ -61,13 +61,13 @@ class ChipEditor(QWidget):
 
         self.SetEditing(False)
 
-        self.LoadChip(Chip())
+        AppGlobals.onChipOpened().connect(self.LoadChip)
 
     def AddValve(self):
         newValve = Valve()
-        newValve.solenoidNumber = self._chip.NextSolenoidNumber()
-        self._chip.valves.append(newValve)
-        self._viewer.CenterItem(self._viewer.AddItem(ValveChipItem(self._chip, newValve)))
+        newValve.solenoidNumber = AppGlobals.Chip().NextSolenoidNumber()
+        AppGlobals.Chip().valves.append(newValve)
+        self._viewer.CenterItem(self._viewer.AddItem(ValveChipItem(newValve)))
 
     def BrowseForImage(self):
         filename, filterType = QFileDialog.getOpenFileName(self, "Browse for Image",
@@ -96,13 +96,14 @@ class ChipEditor(QWidget):
         self._actionsWidget.adjustSize()
         self._actionsWidget.move(self._viewer.rect().topRight() - self._actionsWidget.rect().topRight())
 
-    def LoadChip(self, chip: Chip):
+    def LoadChip(self):
         self._viewer.RemoveAll()
-        self._chip = chip
 
-        for valve in self._chip.valves:
-            self._viewer.AddItem(ValveChipItem(self._chip, valve))
-        for image in self._chip.images:
-            self._viewer.AddItem(ImageChipItem(self._chip, image))
+        for valve in AppGlobals.Chip().valves:
+            self._viewer.AddItem(ValveChipItem(valve))
+        for image in AppGlobals.Chip().images:
+            self._viewer.AddItem(ImageChipItem(image))
 
         self._viewer.Recenter()
+
+        self.SetEditing(AppGlobals.Chip().editingMode)

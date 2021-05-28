@@ -2,22 +2,23 @@ from Model.Chip import Chip
 from PySide6.QtWidgets import QGraphicsObject, QWidget, QVBoxLayout
 from PySide6.QtCore import QPointF, QTimer
 from abc import ABC, abstractmethod
+from UI.AppGlobals import AppGlobals
 
 
 class ChipItem(ABC):
-    def __init__(self, chip: Chip, graphicsObject: QGraphicsObject):
-        self._chip = chip
+    def __init__(self, graphicsObject: QGraphicsObject):
         self._graphicsObject = graphicsObject
 
         timer = QTimer(self.GraphicsObject())
         timer.timeout.connect(self.Update)
         timer.start(30)
-    
+
     def GraphicsObject(self):
         return self._graphicsObject
 
-    def Chip(self):
-        return self._chip
+    @staticmethod
+    def Chip():
+        return AppGlobals.Chip()
 
     def SetEditDisplay(self, editing: bool):
         pass

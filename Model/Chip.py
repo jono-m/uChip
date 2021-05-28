@@ -14,6 +14,7 @@ class Chip:
         self.programButtons: typing.List[ProgramButton] = []
         self.images: typing.List[Image] = []
         self.annotations: typing.List[Annotation] = []
+        self.editingMode = True
 
     def NextSolenoidNumber(self):
         number = 0

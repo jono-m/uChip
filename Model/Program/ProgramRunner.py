@@ -2,8 +2,6 @@ import time
 import types
 from typing import Optional, Dict
 
-from Model.Valve import ValveState
-
 from Model.Program.Data import DataValueType
 from Model.Program.ProgramInstance import ProgramInstance
 from Model.Chip import Chip
@@ -89,8 +87,8 @@ class ProgramRunner:
             "IsPaused": lambda programInstance: self.IsPaused(programInstance),
             "Resume": lambda programInstance: self.Resume(programInstance),
             "WaitForSeconds": ProgramRunner.WaitForSeconds,
-            "OPEN": ValveState.OPEN,
-            "CLOSED": ValveState.CLOSED
+            "OPEN": True,
+            "CLOSED": False
         }
 
         localEnv = {}
