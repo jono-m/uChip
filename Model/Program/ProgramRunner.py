@@ -8,7 +8,7 @@ from Model.Rig import Rig
 
 
 class ProgramRunner:
-    def __init__(self):
+    def __init__(self, logConsole=True):
         # Info about each running program
         self.runningPrograms: Dict[ProgramInstance, RunningProgramInfo] = {}
 
@@ -18,8 +18,10 @@ class ProgramRunner:
         self._lastTickTime = time.time()
         self._errorList: List[ProgramRunnerError] = []
 
-        self.chip = None
-        self.rig = None
+        self.chip: Optional[Chip] = None
+        self.rig: Optional[Rig] = None
+
+        self._logConsole = logConsole
 
     def GetTickDelta(self):
         return time.time() - self._lastTickTime
@@ -31,6 +33,11 @@ class ProgramRunner:
 
     def GetErrors(self):
         return self._errorList
+
+    def ReportError(self, error: 'ProgramRunnerError'):
+        self._errorList.append(error)
+        if self._logConsole:
+            print("Error in " + error.programInstance.program.name + ": " + str(error.exception))
 
     def ClearErrors(self):
         self._errorList.clear()
@@ -52,7 +59,7 @@ class ProgramRunner:
             try:
                 yieldValue = next(self.runningPrograms[programInstance].iterator, None)
             except Exception as e:
-                self._errorList.append(ProgramRunnerError(programInstance, info, e))
+                self.ReportError(ProgramRunnerError(programInstance, info, e))
                 self.Stop(programInstance)
                 continue
             if isinstance(yieldValue, ProgramInstance):
@@ -63,7 +70,7 @@ class ProgramRunner:
             elif yieldValue is None:
                 self.Stop(programInstance)
             else:
-                self._errorList.append(
+                self.ReportError(
                     ProgramRunnerError(programInstance, info, Exception(
                         "Yielded object must be of type WaitForSeconds, ProgramInstance, or NoneType.")))
                 self.Stop(programInstance)
@@ -131,7 +138,7 @@ class ProgramRunner:
             Execute = localEnv['Execute']
             iterator = Execute()
         except Exception as e:
-            self._errorList.append(ProgramRunnerError(instance, runInfo, e))
+            self.ReportError(ProgramRunnerError(instance, runInfo, e))
             return
 
         if isinstance(iterator, types.GeneratorType):

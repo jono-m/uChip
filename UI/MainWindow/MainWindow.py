@@ -34,7 +34,7 @@ class MainWindow(QMainWindow):
 
         self._rigViewer = RigViewer()
         self._editorWindow = ProgramEditorWindow()
-        self._programList = ProgramList(self, self.programRunner)
+        self._programList = ProgramList(self)
         self._programList.onProgramEditRequest.connect(self.EditProgram)
         self._editorWindow.setVisible(False)
 
@@ -42,7 +42,7 @@ class MainWindow(QMainWindow):
         menuBar.showRigView.connect(self.ShowRigWidget)
         menuBar.showProgramList.connect(self.ShowProgramList)
 
-        self.updateWorker = ProgramRunnerWorker(self, self.programRunner)
+        self.updateWorker = ProgramRunnerWorker(self)
         self.updateWorker.start()
 
         killTimer = QTimer(self)
@@ -56,15 +56,15 @@ class MainWindow(QMainWindow):
         self._editorWindow.close()
 
     def CheckForKill(self):
-        if self.programRunner.GetTickDelta() > 2:
+        if AppGlobals.ProgramRunner().GetTickDelta() > 2:
             self.updateWorker.terminate()
             self.updateWorker.wait()
-            self.programRunner.StopAll()
+            AppGlobals.ProgramRunner().StopAll()
             self.updateWorker.start()
             QMessageBox.critical(self, "Timeout", "Program timed out.")
 
     def closeEvent(self, event):
-        if self.programRunner.runningPrograms:
+        if AppGlobals.ProgramRunner().runningPrograms:
             status = QMessageBox.question(self, "Confirm", "There is a program running. Are you sure you want to quit?")
             if status is not QMessageBox.Yes:
                 event.ignore()

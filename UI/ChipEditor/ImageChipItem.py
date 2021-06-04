@@ -19,6 +19,8 @@ class ImageChipItem(WidgetChipItem):
 
         self.image = QLabel()
 
+        AppGlobals.Instance().onChipModified.connect(self.CheckForImage)
+
         layout = QVBoxLayout()
         layout.addWidget(self.image)
         self.containerWidget.setLayout(layout)
@@ -32,12 +34,15 @@ class ImageChipItem(WidgetChipItem):
         self.Update()
         self.Move(QPointF())
 
+    def CheckForImage(self):
+        if self._image not in AppGlobals.Chip().images:
+            self.RemoveItem()
+
     def Move(self, delta: QPointF):
         self._image.position += delta
         self.GraphicsObject().setPos(self._image.position)
 
-    def Delete(self):
-        super().Delete()
+    def RequestDelete(self):
         AppGlobals.Chip().images.remove(self._image)
         AppGlobals.Instance().onChipModified.emit()
 

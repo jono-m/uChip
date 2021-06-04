@@ -73,6 +73,7 @@ class ChipSceneViewer(QGraphicsView):
         if item not in self._sceneItems:
             self._sceneItems.add(item)
             item.Move(QPointF())
+            item.onRemoved.connect(self.RemoveItem)
             self.scene().addItem(item.GraphicsObject())
         item.SetEditDisplay(self._editing)
         return item
@@ -307,8 +308,7 @@ class ChipSceneViewer(QGraphicsView):
     def DeleteSelected(self):
         for item in self.GetSelectedItems().copy():
             if item.CanDelete():
-                item.Delete()
-                self.RemoveItem(item)
+                item.RequestDelete()
 
     def DuplicateSelected(self):
         newItems = []

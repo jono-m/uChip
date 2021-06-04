@@ -1,18 +1,16 @@
 from PySide6.QtCore import QThread
-from Model.Program.ProgramRunner import ProgramRunner
+from UI.AppGlobals import AppGlobals
 
 
 class ProgramRunnerWorker(QThread):
-    def __init__(self, parent, programRunner: ProgramRunner):
-        super().__init__(parent, )
-
-        self._programRunner = programRunner
+    def __init__(self, parent):
+        super().__init__(parent)
         self._isRunning = False
 
     def run(self) -> None:
         self._isRunning = True
         while self._isRunning:
-            self._programRunner.Tick()
+            AppGlobals.ProgramRunner().Tick()
             self.msleep(10)
 
     def stop(self):

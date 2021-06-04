@@ -15,6 +15,8 @@ class CodeTextEditor(QFrame):
         self.textEdit.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
         self.textEdit.textChanged.connect(self.codeChanged.emit)
 
+        self.textEdit.setAcceptRichText(False)
+
         layout = QHBoxLayout()
         self.setLayout(layout)
         layout.addWidget(self.textEdit)

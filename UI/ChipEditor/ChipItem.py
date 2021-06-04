@@ -1,10 +1,13 @@
 from PySide6.QtWidgets import QGraphicsObject
-from PySide6.QtCore import QPointF, QTimer
+from PySide6.QtCore import QPointF, QTimer, Signal, QObject
 from abc import ABC, abstractmethod
 
 
-class ChipItem(ABC):
+class ChipItem(QObject):
+    onRemoved = Signal(QObject)
+
     def __init__(self, graphicsObject: QGraphicsObject):
+        super().__init__()
         self._graphicsObject = graphicsObject
 
         timer = QTimer(self.GraphicsObject())
@@ -38,8 +41,12 @@ class ChipItem(ABC):
     def CanDelete(self) -> bool:
         pass
 
-    def Delete(self):
+    def RequestDelete(self):
         pass
+
+    def RemoveItem(self):
+        self.GraphicsObject().deleteLater()
+        self.onRemoved.emit(self)
 
     @abstractmethod
     def CanDuplicate(self) -> bool:
