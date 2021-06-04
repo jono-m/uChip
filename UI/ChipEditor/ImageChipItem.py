@@ -4,15 +4,16 @@ from PySide6.QtGui import QPixmap, QImage, Qt
 from PySide6.QtCore import QPointF, QSize
 from PySide6.QtWidgets import QLabel, QVBoxLayout
 
-from UI.ChipEditor.WidgetChipItem import WidgetChipItem, Chip, ChipItem
+from UI.ChipEditor.WidgetChipItem import WidgetChipItem, ChipItem
 from Model.Image import Image
+from UI.AppGlobals import AppGlobals
 
 from pathlib import Path
 
 
 class ImageChipItem(WidgetChipItem):
-    def __init__(self, chip: Chip, image: Image):
-        super().__init__(chip)
+    def __init__(self, image: Image):
+        super().__init__()
 
         self._image = image
 
@@ -37,7 +38,8 @@ class ImageChipItem(WidgetChipItem):
 
     def Delete(self):
         super().Delete()
-        self.Chip().images.remove(self._image)
+        AppGlobals.Chip().images.remove(self._image)
+        AppGlobals.Instance().onChipModified.emit()
 
     def Duplicate(self) -> 'ChipItem':
         newImage = Image()
@@ -45,8 +47,9 @@ class ImageChipItem(WidgetChipItem):
         newImage.size = QSize(self._image.size)
         newImage.filename = self._image.filename
 
-        self.Chip().images.append(newImage)
-        return ImageChipItem(self.Chip(), newImage)
+        AppGlobals.Chip().images.append(newImage)
+        AppGlobals.Instance().onChipModified.emit()
+        return ImageChipItem(newImage)
 
     def Update(self):
         mTime = Path(self._image.filename).stat().st_mtime

@@ -1,4 +1,3 @@
-from enum import Enum, auto
 from PySide6.QtCore import QPointF
 
 

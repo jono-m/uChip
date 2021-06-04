@@ -1,18 +1,13 @@
-from typing import Optional, List
-
 import PySide6
-from PySide6.QtGui import QKeyEvent, Qt
-from PySide6.QtCore import QPointF
-from PySide6.QtWidgets import QWidget, QToolButton, QMenu, QHBoxLayout, QFileDialog, QSplitter
-from UI.ChipEditor.ChipSceneViewer import ChipSceneViewer, ChipItem
+from PySide6.QtGui import QKeyEvent
+from PySide6.QtWidgets import QWidget, QToolButton, QMenu, QHBoxLayout, QFileDialog, QInputDialog
+from UI.ChipEditor.ChipSceneViewer import ChipSceneViewer
 from UI.ChipEditor.ValveChipItem import ValveChipItem, Valve
 from UI.ChipEditor.ImageChipItem import ImageChipItem, Image
-from Model.Chip import Chip
+from UI.ChipEditor.ProgramPresetItem import ProgramPresetItem, ProgramPreset
 from UI.AppGlobals import AppGlobals
 
 from enum import Enum, auto
-
-from UI.ProgramEditor.ProgramEditor import ProgramEditor
 
 
 class Mode(Enum):
@@ -46,6 +41,7 @@ class ChipEditor(QWidget):
 
         menu = QMenu(self._plusButton)
         menu.addAction("Valve").triggered.connect(self.AddValve)
+        menu.addAction("Program Preset...").triggered.connect(self.SelectProgramPreset)
         menu.addAction("Image...").triggered.connect(self.BrowseForImage)
 
         self._plusButton.setMenu(menu)
@@ -61,12 +57,13 @@ class ChipEditor(QWidget):
 
         self.SetEditing(False)
 
-        AppGlobals.onChipOpened().connect(self.LoadChip)
+        AppGlobals.Instance().onChipOpened.connect(self.LoadChip)
 
     def AddValve(self):
         newValve = Valve()
         newValve.solenoidNumber = AppGlobals.Chip().NextSolenoidNumber()
         AppGlobals.Chip().valves.append(newValve)
+        AppGlobals.Instance().onChipModified.emit()
         self._viewer.CenterItem(self._viewer.AddItem(ValveChipItem(newValve)))
 
     def BrowseForImage(self):
@@ -76,8 +73,23 @@ class ChipEditor(QWidget):
             newImage = Image()
             newImage.filename = filename
             newImage.InitializeSize()
-            self._chip.images.append(newImage)
-            self._viewer.CenterItem(self._viewer.AddItem(ImageChipItem(self._chip, newImage)))
+            AppGlobals.Chip().images.append(newImage)
+            AppGlobals.Instance().onChipModified.emit()
+            self._viewer.CenterItem(self._viewer.AddItem(ImageChipItem(newImage)))
+
+    def SelectProgramPreset(self):
+        if not AppGlobals.Chip().programs:
+            return
+
+        presetSelection, confirmed = QInputDialog.getItem(self, "Program Preset", "Program",
+                                                          [program.name for program in AppGlobals.Chip().programs], 0,
+                                                          False)
+        if confirmed:
+            selected = [program for program in AppGlobals.Chip().programs if program.name == presetSelection][0]
+            newPreset = ProgramPreset(selected)
+            AppGlobals.Chip().programPresets.append(newPreset)
+            AppGlobals.Instance().onChipModified.emit()
+            self._viewer.CenterItem(self._viewer.AddItem(ProgramPresetItem(newPreset, self._programRunner)))
 
     def SetEditing(self, editing):
         self._viewer.SetEditing(editing)
@@ -86,15 +98,20 @@ class ChipEditor(QWidget):
         self._plusButton.setVisible(editing)
         self._editButton.setVisible(not editing)
 
-        self.FloatActionsWidget()
+        AppGlobals.Chip().editingMode = editing
+        
+        self.FloatWidgets()
 
     def resizeEvent(self, event: PySide6.QtGui.QResizeEvent) -> None:
         super().resizeEvent(event)
-        self.FloatActionsWidget()
+        self.FloatWidgets()
 
-    def FloatActionsWidget(self):
+    def FloatWidgets(self):
         self._actionsWidget.adjustSize()
         self._actionsWidget.move(self._viewer.rect().topRight() - self._actionsWidget.rect().topRight())
+
+        self._programsListWidget.adjustSize()
+        self._programsListWidget.move(self._viewer.rect().bottomLeft() - self._programsListWidget.rect().bottomLeft())
 
     def LoadChip(self):
         self._viewer.RemoveAll()

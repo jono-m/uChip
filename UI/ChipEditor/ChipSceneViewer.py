@@ -1,4 +1,4 @@
-from typing import Set, Optional, List
+from typing import Set, List
 
 from PySide6.QtWidgets import QGraphicsView, QGraphicsScene, QApplication
 from PySide6.QtGui import QPainter, QBrush, QColor, QTransform, QWheelEvent, QMouseEvent, QPen, QKeyEvent
@@ -9,25 +9,12 @@ from UI.ChipEditor.ChipItem import ChipItem
 from enum import Enum, auto
 
 
-class State(Enum):
-    IDLE = auto()
-    PANNING = auto()
-    SELECTING = auto()
-    MOVING = auto()
-
-
-class SelectionMode:
-    NORMAL = auto()
-    MODIFY = auto()
-
-
 class ChipSceneViewer(QGraphicsView):
     selectionChanged = Signal(list)
 
     def __init__(self):
         super().__init__()
 
-        # Set up scene
         scene = QGraphicsScene()
         self.setScene(scene)
 
@@ -85,6 +72,7 @@ class ChipSceneViewer(QGraphicsView):
     def AddItem(self, item: ChipItem):
         if item not in self._sceneItems:
             self._sceneItems.add(item)
+            item.Move(QPointF())
             self.scene().addItem(item.GraphicsObject())
         item.SetEditDisplay(self._editing)
         return item
@@ -317,20 +305,32 @@ class ChipSceneViewer(QGraphicsView):
         super().keyReleaseEvent(event)
 
     def DeleteSelected(self):
-        for item in self._viewer.GetSelectedItems().copy():
+        for item in self.GetSelectedItems().copy():
             if item.CanDelete():
                 item.Delete()
-                self._viewer.RemoveItem(item)
+                self.RemoveItem(item)
 
     def DuplicateSelected(self):
         newItems = []
-        for item in self._viewer.GetSelectedItems():
+        for item in self.GetSelectedItems():
             if item.CanDuplicate():
                 newItem = item.Duplicate()
                 newItem.Move(QPointF(50, 50))
-                self._viewer.AddItem(newItem)
+                self.AddItem(newItem)
                 newItems.append(newItem)
         if newItems:
-            self._viewer.DeselectAll()
-            [self._viewer.SelectItem(item) for item in newItems]
-            self._viewer.selectionChanged.emit(self._viewer.GetSelectedItems())
+            self.DeselectAll()
+            [self.SelectItem(item) for item in newItems]
+            self.selectionChanged.emit(self.GetSelectedItems())
+
+
+class State(Enum):
+    IDLE = auto()
+    PANNING = auto()
+    SELECTING = auto()
+    MOVING = auto()
+
+
+class SelectionMode:
+    NORMAL = auto()
+    MODIFY = auto()

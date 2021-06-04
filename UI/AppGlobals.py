@@ -1,5 +1,6 @@
 from Model.Rig.Rig import Rig
 from Model.Chip import Chip
+from Model.Program.ProgramRunner import ProgramRunner
 from PySide6.QtCore import QObject, Signal
 
 
@@ -15,23 +16,27 @@ class AppGlobals(QObject):
     def __init__(self):
         super().__init__()
         self.rig = Rig()
+        self.programRunner = ProgramRunner()
+        self.programRunner.rig = self.rig
         self.chip = None
 
-    chipOpened = Signal(Chip)
+    onChipOpened = Signal()  # Invoked whenever a new chip is opened
+    onChipModified = Signal()  # Invoked whenever the chip lists change
 
     @staticmethod
-    def Rig():
+    def Rig() -> Rig:
         return AppGlobals.Instance().rig
 
     @staticmethod
     def OpenChip(chip: Chip):
         AppGlobals.Instance().chip = chip
-        AppGlobals.Instance().chipOpened.emit(chip)
+        AppGlobals.Instance().onChipOpened.emit()
+        AppGlobals.Instance().programRunner.chip = chip
 
     @staticmethod
-    def onChipOpened():
-        return AppGlobals.Instance().chipOpened
+    def ProgramRunner() -> ProgramRunner:
+        return AppGlobals.Instance().programRunner
 
     @staticmethod
-    def Chip():
+    def Chip() -> Chip:
         return AppGlobals.Instance().chip

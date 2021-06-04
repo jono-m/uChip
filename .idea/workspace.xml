@@ -28,27 +28,35 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="99850780-df20-4af2-831c-10fab045648b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Model/Rig/MockRigDevice.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Model/Rig/RigDevice.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/UI/AppGlobals.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/UI/MainWindow/MenuBar.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/UI/ProgramEditor/ProgramEditor.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/UI/ProgramEditor/ProgramList.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/UI/RigViewer/RigViewer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/jonoj.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/jonoj.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/UI/ChipEditor/ProgramPresetItem.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/UI/MainWindow/ProgramRunnerWorker.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/UI/ProgramEditor/CodeTextEditor.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/UI/ProgramEditor/MenuBar.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/UI/ProgramEditor/ProgramEditorWindow.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/UI/ProgramViews/ProgramParameterList.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/UI/ProgramViews/RunningProgramsList.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Model/Chip.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Chip.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Program/Data.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program/Data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Program/Parameter.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program/Parameter.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Program/Program.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program/Program.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Program/ProgramInstance.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program/ProgramInstance.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Model/Program/ProgramRunner.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program/ProgramRunner.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model/Rig/ElexolSerialDevice.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/ProgramButton.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program/ProgramPreset.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Rig/CreateRig.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Model/Rig/Rig.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Rig/Rig.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model/Rig/RigUpdater.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model/Rig/SerialSolenoidDevice.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Model/Valve.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Valve.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/AppGlobals.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/AppGlobals.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ChipEditor.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ChipEditor.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ChipItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ChipItem.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ChipSceneViewer.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ChipSceneViewer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ImageChipItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ImageChipItem.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ValveChipItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ValveChipItem.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/ChipEditor/WidgetChipItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/WidgetChipItem.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramEditor/ProgramEditor.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramEditor/ProgramEditorTab.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramEditor/ProgramList.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramViews/ProgramList.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/RigViewer/RigViewer.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/RigViewer/RigViewer.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/STYLESHEET.css" beforeDir="false" afterPath="$PROJECT_DIR$/UI/STYLESHEET.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -78,7 +86,7 @@
     <scope name="NoBuild" pattern="file[uChip]:GraphSystem/*||file[uChip]:ProjectSystem/*||file[uChip]:Model/Rig/*" />
   </component>
   <component name="ProblemsViewState">
-    <option name="selectedIndex" value="3" />
+    <option name="selectedIndex" value="2" />
   </component>
   <component name="ProjectId" id="1cuOmrgug4l6Eixe1FT2QnQmHbY" />
   <component name="ProjectLevelVcsManager">
@@ -111,11 +119,11 @@
       <recent name="C:\Users\jonoj\Repositories\uChip\500KChip" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\jonoj\Repositories\uChip\Model" />
+      <recent name="C:\Users\jonoj\Repositories\uChip\UI\ProgramViews" />
       <recent name="C:\Users\jonoj\Repositories\uChip\Model\Program" />
+      <recent name="C:\Users\jonoj\Repositories\uChip\Model" />
       <recent name="C:\Users\jonoj\Repositories\uChip\ProjectSystem" />
       <recent name="C:\Users\jonoj\Repositories\uChip\UI\Main" />
-      <recent name="C:\Users\jonoj\Repositories\uChip\UI" />
     </key>
   </component>
   <component name="RunManager">
@@ -211,14 +219,19 @@
           <option name="timeStamp" value="94" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/UI/ProgramEditor/ProgramList.py</url>
-          <line>148</line>
+          <url>file://$PROJECT_DIR$/UI/ProgramViews/ProgramList.py</url>
+          <line>191</line>
           <option name="timeStamp" value="109" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/UI/ProgramEditor/ProgramList.py</url>
-          <line>50</line>
-          <option name="timeStamp" value="112" />
+          <url>file://$PROJECT_DIR$/Model/Program/ProgramRunner.py</url>
+          <line>116</line>
+          <option name="timeStamp" value="126" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/UI/ProgramViews/ProgramParameterList.py</url>
+          <line>88</line>
+          <option name="timeStamp" value="128" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
