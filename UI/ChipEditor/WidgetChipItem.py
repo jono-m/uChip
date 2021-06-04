@@ -5,6 +5,7 @@ from UI.StylesheetLoader import StylesheetLoader
 
 
 class WidgetChipItem(ChipItem):
+
     def __init__(self):
         self.graphicsWidget = ClearingProxy()
 
@@ -38,7 +39,8 @@ class WidgetChipItem(ChipItem):
     def CanDelete(self) -> bool:
         return True
 
-    def Delete(self):
+    def RemoveItem(self):
+        super().RemoveItem()
         StylesheetLoader.UnregisterWidget(self.containerWidget)
 
     def CanDuplicate(self) -> bool:

@@ -89,7 +89,7 @@ class ChipEditor(QWidget):
             newPreset = ProgramPreset(selected)
             AppGlobals.Chip().programPresets.append(newPreset)
             AppGlobals.Instance().onChipModified.emit()
-            self._viewer.CenterItem(self._viewer.AddItem(ProgramPresetItem(newPreset, self._programRunner)))
+            self._viewer.CenterItem(self._viewer.AddItem(ProgramPresetItem(newPreset)))
 
     def SetEditing(self, editing):
         self._viewer.SetEditing(editing)
@@ -99,7 +99,7 @@ class ChipEditor(QWidget):
         self._editButton.setVisible(not editing)
 
         AppGlobals.Chip().editingMode = editing
-        
+
         self.FloatWidgets()
 
     def resizeEvent(self, event: PySide6.QtGui.QResizeEvent) -> None:
@@ -109,9 +109,6 @@ class ChipEditor(QWidget):
     def FloatWidgets(self):
         self._actionsWidget.adjustSize()
         self._actionsWidget.move(self._viewer.rect().topRight() - self._actionsWidget.rect().topRight())
-
-        self._programsListWidget.adjustSize()
-        self._programsListWidget.move(self._viewer.rect().bottomLeft() - self._programsListWidget.rect().bottomLeft())
 
     def LoadChip(self):
         self._viewer.RemoveAll()

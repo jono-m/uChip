@@ -10,6 +10,8 @@ class ValveChipItem(WidgetChipItem):
     def __init__(self, valve: Valve):
         super().__init__()
 
+        AppGlobals.Instance().onChipModified.connect(self.CheckForValve)
+
         self._valve = valve
 
         self.valveToggleButton = QToolButton()
@@ -36,6 +38,10 @@ class ValveChipItem(WidgetChipItem):
         self.Update()
         self.Move(QPointF())
 
+    def CheckForValve(self):
+        if self._valve not in AppGlobals.Chip().valves:
+            self.RemoveItem()
+
     def Move(self, delta: QPointF):
         self._valve.position += delta
         self.GraphicsObject().setPos(self._valve.position)
@@ -55,8 +61,7 @@ class ValveChipItem(WidgetChipItem):
         AppGlobals.Rig().SetSolenoidState(self._valve.solenoidNumber,
                                           not AppGlobals.Rig().GetSolenoidState(self._valve.solenoidNumber))
 
-    def Delete(self):
-        super().Delete()
+    def RequestDelete(self):
         AppGlobals.Chip().valves.remove(self._valve)
         AppGlobals.Instance().onChipModified.emit()
 

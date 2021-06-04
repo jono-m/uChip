@@ -60,15 +60,15 @@ ProgramEditorTab QTextEdit {
 RunningProgramsList QLabel {
     color: white;
 }
-ParametersPanel QScrollArea {
+ParameterEditor QScrollArea {
     min-width: 240px;
 }
-ParameterItem {
+ParameterEditorItem {
     min-width: 220px;
     max-width: 220px;
     border: 5px solid transparent;
     border-width: 0 0 20px 0;
 }
-ParameterItem QLabel {
+ParameterEditorItem QLabel {
     padding-right: 15px;
 }
