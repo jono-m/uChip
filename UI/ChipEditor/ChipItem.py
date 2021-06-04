@@ -1,8 +1,6 @@
-from Model.Chip import Chip
-from PySide6.QtWidgets import QGraphicsObject, QWidget, QVBoxLayout
+from PySide6.QtWidgets import QGraphicsObject
 from PySide6.QtCore import QPointF, QTimer
 from abc import ABC, abstractmethod
-from UI.AppGlobals import AppGlobals
 
 
 class ChipItem(ABC):
@@ -15,10 +13,6 @@ class ChipItem(ABC):
 
     def GraphicsObject(self):
         return self._graphicsObject
-
-    @staticmethod
-    def Chip():
-        return AppGlobals.Chip()
 
     def SetEditDisplay(self, editing: bool):
         pass

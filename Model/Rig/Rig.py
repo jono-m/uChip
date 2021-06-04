@@ -36,8 +36,10 @@ class Rig:
         newDevice.Connect()
         self.savedDevices.add(newDevice)
 
-    def SetSolenoidState(self, number: int, state: bool):
+    def SetSolenoidState(self, number: int, state: bool, flush=False):
         self.solenoidStates[number] = state
+        if flush:
+            self.FlushStates()
 
     def GetSolenoidState(self, number: int):
         if number not in self.solenoidStates:

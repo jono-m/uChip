@@ -1,17 +1,24 @@
-from PySide6.QtWidgets import QMainWindow, QDockWidget
-from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QMainWindow, QDockWidget, QMessageBox
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QIcon
 from UI.ChipEditor.ChipEditor import ChipEditor
-from UI.ProgramEditor.ProgramList import ProgramList
+from UI.ProgramViews.ProgramList import ProgramList, Program
 from UI.StylesheetLoader import StylesheetLoader
 from UI.MainWindow.MenuBar import MenuBar
 from UI.RigViewer.RigViewer import RigViewer
 from UI.AppGlobals import AppGlobals, Chip
+from UI.ProgramEditor.ProgramEditorWindow import ProgramEditorWindow
+from UI.MainWindow.ProgramRunnerWorker import ProgramRunnerWorker
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        AppGlobals.Rig().AddMock(0, "Mock A")
+        AppGlobals.Rig().AddMock(24, "Mock B")
+        AppGlobals.Rig().AddMock(48, "Mock C")
+        AppGlobals.OpenChip(Chip())
 
         StylesheetLoader.RegisterWidget(self)
 
@@ -25,20 +32,53 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("uChip")
         self.setWindowIcon(QIcon("Images/UCIcon.png"))
 
-        AppGlobals.Rig().AddMock(0, "Mock A")
-        AppGlobals.Rig().AddMock(24, "Mock B")
-        AppGlobals.Rig().AddMock(48, "Mock C")
-        AppGlobals.OpenChip(Chip())
-
         self._rigViewer = RigViewer()
-        self._programList = ProgramList(self)
+        self._editorWindow = ProgramEditorWindow()
+        self._programList = ProgramList(self, self.programRunner)
+        self._programList.onProgramEditRequest.connect(self.EditProgram)
+        self._editorWindow.setVisible(False)
 
         menuBar = MenuBar()
         menuBar.showRigView.connect(self.ShowRigWidget)
         menuBar.showProgramList.connect(self.ShowProgramList)
+
+        self.updateWorker = ProgramRunnerWorker(self, self.programRunner)
+        self.updateWorker.start()
+
+        killTimer = QTimer(self)
+        killTimer.timeout.connect(self.CheckForKill)
+        killTimer.start(1000)
+
         self.setMenuBar(menuBar)
         self.ShowRigWidget()
         self.ShowProgramList()
+        self.ShowProgramEditorWindow()
+        self._editorWindow.close()
+
+    def CheckForKill(self):
+        if self.programRunner.GetTickDelta() > 2:
+            self.updateWorker.terminate()
+            self.updateWorker.wait()
+            self.programRunner.StopAll()
+            self.updateWorker.start()
+            QMessageBox.critical(self, "Timeout", "Program timed out.")
+
+    def closeEvent(self, event):
+        if self.programRunner.runningPrograms:
+            status = QMessageBox.question(self, "Confirm", "There is a program running. Are you sure you want to quit?")
+            if status is not QMessageBox.Yes:
+                event.ignore()
+                return
+        if self._editorWindow.isVisible():
+            if not self._editorWindow.RequestCloseAll():
+                event.ignore()
+                return
+        self.updateWorker.stop()
+        super().closeEvent(event)
+
+    def EditProgram(self, program: Program):
+        self.ShowProgramEditorWindow()
+        self._editorWindow.OpenProgram(program)
 
     def ShowRigWidget(self):
         if self._rigViewer.isVisible():
@@ -60,3 +100,8 @@ class MainWindow(QMainWindow):
         dock.setWidget(self._programList)
         dock.setFeatures(QDockWidget.DockWidgetClosable)
         self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, dock)
+
+    def ShowProgramEditorWindow(self):
+        self._editorWindow.setVisible(True)
+        self._editorWindow.activateWindow()
+        self._editorWindow.setFocus()

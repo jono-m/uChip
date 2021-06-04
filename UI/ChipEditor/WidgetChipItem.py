@@ -1,6 +1,6 @@
 from PySide6.QtCore import QPointF
 from PySide6.QtWidgets import QGraphicsProxyWidget, QLabel, QWidget
-from UI.ChipEditor.ChipItem import ChipItem, Chip
+from UI.ChipEditor.ChipItem import ChipItem
 from UI.StylesheetLoader import StylesheetLoader
 
 

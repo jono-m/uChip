@@ -96,7 +96,7 @@ class DeviceItem(QWidget):
     def ToggleSolenoid(self, button: 'SolenoidButton'):
         index = self._solenoidButtons.index(button)
         AppGlobals.Rig().SetSolenoidState(self.device.startNumber + index,
-                                        not AppGlobals.Rig().GetSolenoidState(self.device.startNumber + index))
+                                          not AppGlobals.Rig().GetSolenoidState(self.device.startNumber + index))
         AppGlobals.Rig().FlushStates()
         self.Update()
 

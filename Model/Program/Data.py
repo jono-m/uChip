@@ -1,7 +1,7 @@
 from enum import Enum, auto
-from typing import Union
+from typing import Any
 
-DataValueType = Union[int, float, bool]
+DataValueType = Any
 
 
 class DataType(Enum):
@@ -21,3 +21,12 @@ class DataType(Enum):
                 DataType.VALVE: None,
                 DataType.PROGRAM: None,
                 DataType.PROGRAM_PRESET: None}[self]
+
+    def ToString(self):
+        return {DataType.INTEGER: "Integer",
+                DataType.FLOAT: "Float",
+                DataType.BOOLEAN: "Boolean",
+                DataType.STRING: "String",
+                DataType.VALVE: "Valve",
+                DataType.PROGRAM: "Program",
+                DataType.PROGRAM_PRESET: "Program Preset"}[self]

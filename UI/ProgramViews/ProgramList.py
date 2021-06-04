@@ -1,19 +1,26 @@
-from typing import Optional
+from typing import Optional, Dict
 from PySide6.QtWidgets import QWidget, QLabel, QListWidget, QPushButton, QMessageBox, QListWidgetItem, QVBoxLayout, \
     QApplication, QLineEdit
-from PySide6.QtCore import Signal, Qt, QTimer, QEvent, QRect
+from PySide6.QtCore import Signal, Qt, QTimer, QEvent
 from Model.Program.Program import Program
+from Model.Program.ProgramRunner import ProgramRunner
+from Model.Program.ProgramInstance import ProgramInstance
 from UI.AppGlobals import AppGlobals
+from UI.ProgramViews.ProgramParameterList import ProgramParameterList
 
 
 class ProgramList(QWidget):
-    onProgramOpened = Signal()
+    onProgramEditRequest = Signal(Program)
 
-    def __init__(self, parent):
+    def __init__(self, parent, programRunner: ProgramRunner):
         super().__init__(parent)
         self._programsLabel = QLabel("Programs")
         self._programsList = QListWidget()
         self._programsList.itemClicked.connect(self.SelectProgram)
+
+        AppGlobals.Instance().onChipModified.connect(self.SyncInstances)
+
+        self._instances: Dict[Program, ProgramInstance] = {}
 
         self._newButton = QPushButton("Create New Program")
         self._newButton.clicked.connect(self.NewProgram)
@@ -25,21 +32,38 @@ class ProgramList(QWidget):
 
         self.setLayout(layout)
 
-        AppGlobals.onChipOpened().connect(self.RefreshList)
+        self._programRunner = programRunner
+
+        AppGlobals.Instance().onChipOpened.connect(self.RefreshList)
 
         self._contextView = ProgramContextDisplay(self.topLevelWidget())
         self._contextView.onProgramDelete.connect(self.RefreshList)
+        self._contextView.onProgramEditRequest.connect(self.onProgramEditRequest.emit)
+        self._contextView.onProgramRun.connect(lambda instance: self._programRunner.Run(instance))
 
     def SelectProgram(self, selectedProgram: 'ProgramListItem'):
         self._contextView.SetProgramItem(selectedProgram)
 
+    def SyncInstances(self):
+        for program in AppGlobals.Chip().programs:
+            if program not in self._instances:
+                self._instances[program] = ProgramInstance(program)
+        for program in self._instances.copy():
+            if program not in AppGlobals.Chip().programs:
+                del self._instances[program]
+            else:
+                self._instances[program].SyncParameters()
+        self.RefreshList()
+
     def NewProgram(self):
         newProgram = Program()
         AppGlobals.Chip().programs.append(newProgram)
-        self.RefreshList()
-        programItem = self.ProgramItem(newProgram)
-        self._programsList.setCurrentItem(programItem)
-        self._contextView.SetProgramItem(programItem, True)
+        AppGlobals.Instance().onChipModified.emit()
+        for item in [self._programsList.item(row) for row in self._programsList.count()]:
+            if item.program is newProgram:
+                self._programsList.setCurrentItem(item)
+                self._contextView.SetProgramItem(item, True)
+                return
 
     def ProgramItem(self, program: Program):
         matches = [item for item in [self._programsList.item(row) for row in range(self._programsList.count())] if
@@ -52,21 +76,23 @@ class ProgramList(QWidget):
 
         self._programsList.clear()
         for program in AppGlobals.Chip().programs:
-            self._programsList.addItem(ProgramListItem(program))
+            self._programsList.addItem(ProgramListItem(program, self._instances[program]))
 
         self._programsList.blockSignals(False)
 
 
 class ProgramListItem(QListWidgetItem):
-    def __init__(self, program: Program):
+    def __init__(self, program: Program, instance: ProgramInstance):
         super().__init__(program.name)
         self.program = program
+        self.instance = instance
 
 
 class ProgramContextDisplay(QWidget):
+    onProgramRun = Signal(ProgramInstance)
     onProgramDelete = Signal()
-
     onProgramChanged = Signal()
+    onProgramEditRequest = Signal(Program)
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -85,15 +111,27 @@ class ProgramContextDisplay(QWidget):
         layout.addWidget(self._nameField)
         self.raise_()
 
+        runButton = QPushButton("Run")
+        runButton.clicked.connect(self.RunProgram)
+
+        editButton = QPushButton("Edit")
+        editButton.clicked.connect(self.EditProgram)
+
         deleteButton = QPushButton("Delete")
         deleteButton.clicked.connect(self.DeleteProgram)
 
+        self._parameterList = ProgramParameterList()
+
         QApplication.instance().installEventFilter(self)
 
+        layout.addWidget(self._parameterList)
+        layout.addWidget(runButton)
+        layout.addWidget(editButton)
         layout.addWidget(deleteButton)
 
         self._program = None
         self._programItem: Optional[ProgramListItem] = None
+        self._instance: Optional[ProgramInstance] = None
 
         self.setFocusPolicy(Qt.ClickFocus)
         self.Clear()
@@ -105,6 +143,10 @@ class ProgramContextDisplay(QWidget):
     def SetProgramItem(self, programItem: ProgramListItem, focusText=False):
         self._program = programItem.program
         self._programItem = programItem
+        self._instance = programItem.instance
+        self._instance.SyncParameters()
+
+        self._parameterList.SetProgramInstance(programItem.instance)
 
         self._nameField.setText(self._program.name)
 
@@ -115,6 +157,7 @@ class ProgramContextDisplay(QWidget):
         else:
             self.setFocus()
         self.Reposition()
+        self.raise_()
 
     def Clear(self):
         self._program = None
@@ -149,8 +192,16 @@ class ProgramContextDisplay(QWidget):
             AppGlobals.Chip().programs.remove(self._program)
             self.onProgramDelete.emit()
             self.Clear()
+            AppGlobals.Instance().onChipModified.emit()
 
     def UpdateProgram(self):
         self._program.name = self._nameField.text()
         self._programItem.setText(self._program.name)
         self.onProgramChanged.emit()
+        AppGlobals.Instance().onChipModified.emit()
+
+    def EditProgram(self):
+        self.onProgramEditRequest.emit(self._program)
+
+    def RunProgram(self):
+        self.onProgramRun.emit(self._instance.Clone())
