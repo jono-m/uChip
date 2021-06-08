@@ -8,7 +8,7 @@ from Model.Rig import Rig
 
 
 class ProgramRunner:
-    def __init__(self, logConsole=True):
+    def __init__(self):
         # Info about each running program
         self.runningPrograms: Dict[ProgramInstance, RunningProgramInfo] = {}
 
@@ -16,12 +16,10 @@ class ProgramRunner:
         self.queuedPrograms: List[ProgramInstance] = []
 
         self._lastTickTime = time.time()
-        self._errorList: List[ProgramRunnerError] = []
+        self._messageList: List[ProgramRunnerMessage] = []
 
         self.chip: Optional[Chip] = None
         self.rig: Optional[Rig] = None
-
-        self._logConsole = logConsole
 
     def GetTickDelta(self):
         return time.time() - self._lastTickTime
@@ -31,16 +29,17 @@ class ProgramRunner:
             self.Stop(program)
         self.queuedPrograms.clear()
 
-    def GetErrors(self):
-        return self._errorList
+    def GetMessages(self):
+        return self._messageList
 
-    def ReportError(self, error: 'ProgramRunnerError'):
-        self._errorList.append(error)
-        if self._logConsole:
-            print("Error in " + error.programInstance.program.name + ": " + str(error.exception))
+    def Report(self, message: 'ProgramRunnerMessage'):
+        self._messageList.append(message)
+        if message.isError:
+            if self.IsRunning(message.programInstance):
+                self.StopAtRoot(message.programInstance)
 
-    def ClearErrors(self):
-        self._errorList.clear()
+    def ClearMessages(self):
+        self._messageList.clear()
 
     def Tick(self):
         self._lastTickTime = time.time()
@@ -49,6 +48,8 @@ class ProgramRunner:
         self.queuedPrograms.clear()
 
         for programInstance in self.runningPrograms.copy():
+            if programInstance not in self.runningPrograms:
+                continue
             info = self.runningPrograms[programInstance]
             if info.isPaused or (time.time() - info.waitStartTime) < info.waitDuration:
                 continue
@@ -59,8 +60,7 @@ class ProgramRunner:
             try:
                 yieldValue = next(self.runningPrograms[programInstance].iterator, None)
             except Exception as e:
-                self.ReportError(ProgramRunnerError(programInstance, info, e))
-                self.Stop(programInstance)
+                self.Report(ProgramRunnerMessage(programInstance, info, True, str(e)))
                 continue
             if isinstance(yieldValue, ProgramInstance):
                 info.waitingForProgram = yieldValue
@@ -70,10 +70,9 @@ class ProgramRunner:
             elif yieldValue is None:
                 self.Stop(programInstance)
             else:
-                self.ReportError(
-                    ProgramRunnerError(programInstance, info, Exception(
+                self.Report(
+                    ProgramRunnerMessage(programInstance, info, Exception(
                         "Yielded object must be of type WaitForSeconds, ProgramInstance, or NoneType.")))
-                self.Stop(programInstance)
 
     def IsPaused(self, instance: ProgramInstance):
         return instance in self.runningPrograms and self.runningPrograms[instance].isPaused
@@ -90,6 +89,12 @@ class ProgramRunner:
                 self.Stop(programInstance)
         # Remove it from the list
         del self.runningPrograms[instance]
+
+    def StopAtRoot(self, instance: ProgramInstance):
+        toStop = instance
+        while self.runningPrograms[toStop].parentProgram:
+            toStop = self.runningPrograms[toStop].parentProgram
+        self.Stop(toStop)
 
     def Pause(self, instance: ProgramInstance):
         if not self.IsRunning(instance):
@@ -122,6 +127,8 @@ class ProgramRunner:
             "IsRunning": lambda programInstance: self.IsRunning(programInstance),
             "Stop": lambda programInstance: self.Stop(programInstance),
             "Pause": lambda programInstance: self.Pause(programInstance),
+            "print": lambda text: self.Report(
+                ProgramRunnerMessage(instance, self.runningPrograms[instance], False, text)),
             "IsPaused": lambda programInstance: self.IsPaused(programInstance),
             "Resume": lambda programInstance: self.Resume(programInstance),
             "WaitForSeconds": WaitForSeconds,
@@ -138,7 +145,7 @@ class ProgramRunner:
             Execute = localEnv['Execute']
             iterator = Execute()
         except Exception as e:
-            self.ReportError(ProgramRunnerError(instance, runInfo, e))
+            self.Report(ProgramRunnerMessage(instance, runInfo, True, str(e)))
             return
 
         if isinstance(iterator, types.GeneratorType):
@@ -149,12 +156,12 @@ class ProgramRunner:
         return instance
 
 
-class ProgramRunnerError:
-    def __init__(self, programInstance: ProgramInstance, info: 'RunningProgramInfo',
-                 exception: Exception):
+class ProgramRunnerMessage:
+    def __init__(self, programInstance: ProgramInstance, info: 'RunningProgramInfo', isError: bool, text: str):
         self.programInstance = programInstance
         self.info = info
-        self.exception = exception
+        self.isError = isError
+        self.text = text
 
 
 class WaitForSeconds:

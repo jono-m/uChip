@@ -32,7 +32,6 @@ class ValveChipItem(WidgetChipItem):
         layout.addWidget(self.valveNumberLabel, 2, 0)
         layout.addWidget(self.valveNumberDial, 2, 1)
         self.containerWidget.setLayout(layout)
-        self.containerWidget.adjustSize()
         self.valveToggleButton.clicked.connect(self.Toggle)
 
         self.Update()
@@ -51,7 +50,7 @@ class ValveChipItem(WidgetChipItem):
         self.valveNameLabel.setVisible(editing)
         self.valveNumberLabel.setVisible(editing)
         self.valveNumberDial.setVisible(editing)
-        self.containerWidget.adjustSize()
+        super().SetEditDisplay(editing)
 
     def UpdateValve(self):
         self._valve.solenoidNumber = self.valveNumberDial.value()

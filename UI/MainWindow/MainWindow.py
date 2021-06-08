@@ -9,6 +9,7 @@ from UI.RigViewer.RigViewer import RigViewer
 from UI.AppGlobals import AppGlobals, Chip
 from UI.ProgramEditor.ProgramEditorWindow import ProgramEditorWindow
 from UI.MainWindow.ProgramRunnerWorker import ProgramRunnerWorker
+from UI.ProgramViews.RunningProgramsList import RunningProgramsList
 
 
 class MainWindow(QMainWindow):
@@ -36,6 +37,7 @@ class MainWindow(QMainWindow):
         self._editorWindow = ProgramEditorWindow()
         self._programList = ProgramList(self)
         self._programList.onProgramEditRequest.connect(self.EditProgram)
+        self._runningProgramsList = RunningProgramsList()
         self._editorWindow.setVisible(False)
 
         menuBar = MenuBar()
@@ -53,6 +55,7 @@ class MainWindow(QMainWindow):
         self.ShowRigWidget()
         self.ShowProgramList()
         self.ShowProgramEditorWindow()
+        self.ShowRunningProgramsList()
         self._editorWindow.close()
 
     def CheckForKill(self):
@@ -100,6 +103,17 @@ class MainWindow(QMainWindow):
         dock.setWidget(self._programList)
         dock.setFeatures(QDockWidget.DockWidgetClosable)
         self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, dock)
+
+    def ShowRunningProgramsList(self):
+        if self._runningProgramsList.isVisible():
+            return
+
+        dock = QDockWidget()
+        dock.setWindowTitle("Running Programs")
+        dock.setAllowedAreas(Qt.RightDockWidgetArea)
+        dock.setWidget(self._runningProgramsList)
+        dock.setFeatures(QDockWidget.NoDockWidgetFeatures)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock)
 
     def ShowProgramEditorWindow(self):
         self._editorWindow.setVisible(True)

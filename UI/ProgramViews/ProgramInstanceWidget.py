@@ -21,6 +21,8 @@ class ProgramInstanceWidget(QWidget):
         self._programNameWidget = QLabel()
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         self.setLayout(layout)
 
         self.runButton = QPushButton("Run")
@@ -32,6 +34,7 @@ class ProgramInstanceWidget(QWidget):
         self._parameterItems: List[ProgramParameterItem] = []
 
         self._parametersLayout = QVBoxLayout()
+        self._parametersLayout.setContentsMargins(0, 0, 0, 0)
 
         layout.addWidget(self._programNameWidget)
         layout.addLayout(self._parametersLayout)

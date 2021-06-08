@@ -29,6 +29,16 @@
   <component name="ChangeListManager">
     <list default="true" id="99850780-df20-4af2-831c-10fab045648b" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Program/ProgramRunner.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program/ProgramRunner.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ImageChipItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ImageChipItem.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ProgramPresetItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ProgramPresetItem.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ValveChipItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ValveChipItem.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/WidgetChipItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/WidgetChipItem.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramEditor/ParameterEditor.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramEditor/ParameterEditor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramViews/ProgramInstanceWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramViews/ProgramInstanceWidget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramViews/RunningProgramsList.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramViews/RunningProgramsList.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/STYLESHEET.css" beforeDir="false" afterPath="$PROJECT_DIR$/UI/STYLESHEET.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -191,7 +201,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Model/Program/ProgramRunner.py</url>
-          <line>123</line>
+          <line>128</line>
           <option name="timeStamp" value="126" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -206,8 +216,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/UI/ChipEditor/ValveChipItem.py</url>
-          <line>41</line>
+          <line>40</line>
           <option name="timeStamp" value="131" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/UI/ChipEditor/WidgetChipItem.py</url>
+          <line>23</line>
+          <option name="timeStamp" value="133" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
