@@ -47,47 +47,55 @@ class ParameterEditor(QFrame):
 
         self._temporaryParameters = program.parameters.copy()
 
-        self.Update()
+        self.Populate()
 
     def AddParameter(self):
-        self._temporaryParameters.append(Parameter())
+        newParameter = Parameter()
+        self._temporaryParameters.append(newParameter)
         self.onParametersChanged.emit()
-        self.Update()
+        self.AddToList(newParameter)
 
-    def Update(self):
-        lastPos = self._listArea.verticalScrollBar().sliderPosition()
-        for item in self.items:
-            item.deleteLater()
-        self.items.clear()
+    def Populate(self):
         for parameter in self._temporaryParameters:
-            newItem = ParameterEditorItem(parameter)
-            newItem.onRemoveParameter.connect(self.RemoveParameter)
-            newItem.onMoveParameterUp.connect(self.MoveParameterUp)
-            newItem.onMoveParameterDown.connect(self.MoveParameterDown)
-            newItem.onChanged.connect(self.onParametersChanged.emit)
-            self._itemLayout.addWidget(newItem)
-            self.items.append(newItem)
-        self._listArea.verticalScrollBar().setSliderPosition(lastPos)
+            self.AddToList(parameter)
         self._listArea.updateGeometry()
+
+    def AddToList(self, parameter: Parameter):
+        newItem = ParameterEditorItem(parameter)
+        newItem.onRemoveParameter.connect(self.RemoveParameter)
+        newItem.onMoveParameterUp.connect(self.MoveParameterUp)
+        newItem.onMoveParameterDown.connect(self.MoveParameterDown)
+        newItem.onChanged.connect(self.onParametersChanged.emit)
+        self._itemLayout.addWidget(newItem)
+        self.items.append(newItem)
+
+    def RemoveFromList(self, parameter: Parameter):
+        item = [item for item in self.items if item.parameter is parameter]
+        item[0].deleteLater()
+        self.items.remove(item[0])
 
     def RemoveParameter(self, parameter: Parameter):
         self._temporaryParameters.remove(parameter)
         self.onParametersChanged.emit()
-        self.Update()
+        self.RemoveFromList(parameter)
+
+    def Reorder(self, parameter: Parameter, newPosition: int):
+        item = [item for item in self.items if item.parameter is parameter][0]
+        self._itemLayout.removeWidget(item)
+        self._itemLayout.insertWidget(newPosition, item)
+        self.items.remove(item)
+        self.items.insert(newPosition, item)
+        self._temporaryParameters.remove(parameter)
+        self._temporaryParameters.insert(newPosition, parameter)
+        self.onParametersChanged.emit()
 
     def MoveParameterUp(self, parameter: Parameter):
         index = self._temporaryParameters.index(parameter)
-        self._temporaryParameters.remove(parameter)
-        self._temporaryParameters.insert(index - 1, parameter)
-        self.onParametersChanged.emit()
-        self.Update()
+        self.Reorder(parameter, index-1)
 
     def MoveParameterDown(self, parameter: Parameter):
         index = self._temporaryParameters.index(parameter)
-        self._temporaryParameters.remove(parameter)
-        self._temporaryParameters.insert(index + 1, parameter)
-        self.onParametersChanged.emit()
-        self.Update()
+        self.Reorder(parameter, index+1)
 
     def Save(self):
         self._program.parameters = self._temporaryParameters
@@ -150,15 +158,6 @@ class ParameterEditorItem(QFrame):
         self._defaultString = QLineEdit()
         self._defaultString.textChanged.connect(self.OnChanged)
 
-        self._defaultValve = ChipDataSelection(DataType.VALVE)
-        self._defaultValve.currentIndexChanged.connect(self.OnChanged)
-
-        self._defaultProgram = ChipDataSelection(DataType.PROGRAM)
-        self._defaultProgram.currentIndexChanged.connect(self.OnChanged)
-
-        self._defaultProgramPreset = ChipDataSelection(DataType.PROGRAM_PRESET)
-        self._defaultProgramPreset.currentIndexChanged.connect(self.OnChanged)
-
         self._minimumLabel = QLabel("Minimum")
         self._minimumFloat = QDoubleSpinBox()
         self._minimumFloat.valueChanged.connect(self.OnChanged)
@@ -181,8 +180,7 @@ class ParameterEditorItem(QFrame):
         gridLayout.addWidget(self._dataTypeField, 1, 1)
         gridLayout.addWidget(self._defaultValueLabel, 2, 0)
 
-        for defaultField in [self._defaultInteger, self._defaultFloat, self._defaultBoolean, self._defaultString,
-                             self._defaultValve, self._defaultProgram, self._defaultProgramPreset]:
+        for defaultField in [self._defaultInteger, self._defaultFloat, self._defaultBoolean, self._defaultString]:
             gridLayout.addWidget(defaultField, 2, 1)
 
         gridLayout.addWidget(self._minimumLabel, 3, 0)
@@ -234,10 +232,6 @@ class ParameterEditorItem(QFrame):
         if self._defaultString.text() != self.parameter.defaultValueDict[DataType.STRING]:
             self._defaultString.setText(self.parameter.defaultValueDict[DataType.STRING])
 
-        self._defaultValve.Select(self.parameter.defaultValueDict[DataType.VALVE])
-        self._defaultProgram.Select(self.parameter.defaultValueDict[DataType.PROGRAM])
-        self._defaultProgramPreset.Select(self.parameter.defaultValueDict[DataType.PROGRAM_PRESET])
-
         self.UpdateVisibility()
 
     def UpdateVisibility(self):
@@ -245,9 +239,6 @@ class ParameterEditorItem(QFrame):
         self._defaultFloat.setVisible(self._dataTypeField.currentData() is DataType.FLOAT)
         self._defaultBoolean.setVisible(self._dataTypeField.currentData() is DataType.BOOLEAN)
         self._defaultString.setVisible(self._dataTypeField.currentData() is DataType.STRING)
-        self._defaultValve.setVisible(self._dataTypeField.currentData() is DataType.VALVE)
-        self._defaultProgram.setVisible(self._dataTypeField.currentData() is DataType.PROGRAM)
-        self._defaultProgramPreset.setVisible(self._dataTypeField.currentData() is DataType.PROGRAM_PRESET)
 
         self._minimumLabel.setVisible(self._dataTypeField.currentData() in [DataType.INTEGER, DataType.FLOAT])
         self._maximumLabel.setVisible(self._dataTypeField.currentData() in [DataType.INTEGER, DataType.FLOAT])
@@ -257,6 +248,9 @@ class ParameterEditorItem(QFrame):
         self._maximumFloat.setVisible(self._dataTypeField.currentData() is DataType.FLOAT)
         self._minimumLabel.setVisible(self._dataTypeField.currentData() in [DataType.INTEGER, DataType.FLOAT])
         self._maximumLabel.setVisible(self._dataTypeField.currentData() in [DataType.INTEGER, DataType.FLOAT])
+
+        self._defaultValueLabel.setVisible(
+            self._dataTypeField.currentData() not in [DataType.VALVE, DataType.PROGRAM, DataType.PROGRAM_PRESET])
 
     def OnChanged(self):
         self.UpdateVisibility()
@@ -276,9 +270,6 @@ class ParameterEditorItem(QFrame):
         self.parameter.defaultValueDict[DataType.FLOAT] = self._defaultFloat.value()
         self.parameter.defaultValueDict[DataType.BOOLEAN] = self._defaultBoolean.currentData()
         self.parameter.defaultValueDict[DataType.STRING] = self._defaultString.text()
-        self.parameter.defaultValueDict[DataType.VALVE] = self._defaultValve.currentData()
-        self.parameter.defaultValueDict[DataType.PROGRAM] = self._defaultProgram.currentData()
-        self.parameter.defaultValueDict[DataType.PROGRAM_PRESET] = self._defaultProgramPreset.currentData()
 
         self.parameter.minimumInteger = self._minimumInteger.value()
         self.parameter.maximumInteger = self._maximumInteger.value()

@@ -69,4 +69,3 @@ class ImageChipItem(WidgetChipItem):
         if self._image.size != self._lastSize:
             self.image.setPixmap(QPixmap(self._rawImage).scaled(self._image.size, Qt.AspectRatioMode.IgnoreAspectRatio))
             self.image.setFixedSize(self._image.size)
-            self.containerWidget.adjustSize()

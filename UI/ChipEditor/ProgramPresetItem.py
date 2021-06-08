@@ -1,5 +1,5 @@
 from PySide6.QtCore import QPointF
-from PySide6.QtWidgets import QLineEdit, QVBoxLayout
+from PySide6.QtWidgets import QLineEdit, QVBoxLayout, QLabel
 
 from UI.ChipEditor.WidgetChipItem import WidgetChipItem, ChipItem
 from UI.ProgramViews.ProgramInstanceWidget import ProgramInstanceWidget
@@ -18,16 +18,23 @@ class ProgramPresetItem(WidgetChipItem):
         self._presetNameField = QLineEdit()
         self._presetNameField.textChanged.connect(self.UpdatePreset)
 
-        self._instanceWidget = ProgramInstanceWidget(preset.instance, False)
+        self._presetNameLabel = QLabel()
+
+        self._instanceWidget = ProgramInstanceWidget(preset.instance, True)
 
         layout = QVBoxLayout()
         layout.addWidget(self._presetNameField)
+        layout.addWidget(self._presetNameLabel)
         layout.addWidget(self._instanceWidget)
         self.containerWidget.setLayout(layout)
 
-        self.containerWidget.adjustSize()
         self.Update()
         self.CheckForPreset()
+
+    def SetEditDisplay(self, editing: bool):
+        self._presetNameField.setVisible(editing)
+        self._presetNameLabel.setVisible(not editing)
+        super().SetEditDisplay(editing)
 
     def Move(self, delta: QPointF):
         self._preset.position += delta
@@ -58,6 +65,7 @@ class ProgramPresetItem(WidgetChipItem):
     def Update(self):
         if self._presetNameField.text() != self._preset.name:
             self._presetNameField.setText(self._preset.name)
+        self._presetNameLabel.setText(self._preset.name)
 
     def RunPreset(self):
         AppGlobals.ProgramRunner().Run(self._preset.instance)
