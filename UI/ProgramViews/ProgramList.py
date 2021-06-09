@@ -58,6 +58,7 @@ class ProgramList(QWidget):
         for item in [self._programsList.item(row) for row in range(self._programsList.count())]:
             if item.program is newProgram:
                 self._programsList.setCurrentItem(item)
+                self.onProgramEditRequest.emit(newProgram)
                 return
 
     def ProgramItem(self, program: Program):

@@ -14,15 +14,30 @@ class RunningProgramsList(QWidget):
         super().__init__()
 
         self.runningProgramsListLayout = QVBoxLayout()
-        self.setLayout(self.runningProgramsListLayout)
+
+        self._console = QLabel()
 
         self.runningProgramListItems: List[RunningProgramItem] = []
+
+        layout = QVBoxLayout()
+        layout.addLayout(self.runningProgramsListLayout)
+        clearButton = QPushButton("Clear")
+        clearButton.clicked.connect(lambda: AppGlobals.ProgramRunner().ClearMessages())
+        layout.addWidget(clearButton)
+        layout.addWidget(self._console)
+        self.setLayout(layout)
 
         timer = QTimer(self)
         timer.timeout.connect(self.Update)
         timer.start(30)
 
     def Update(self):
+        text = ""
+        for message in AppGlobals.ProgramRunner().GetMessages():
+            text += message.text + "\n"
+        if self._console.text() != text:
+            self._console.setText(text)
+
         for runningProgramListItem in self.runningProgramListItems.copy():
             if not AppGlobals.ProgramRunner().IsRunning(runningProgramListItem.instance):
                 self.runningProgramListItems.remove(runningProgramListItem)
@@ -38,6 +53,7 @@ class RunningProgramsList(QWidget):
                         # Add it later, once the parent item has been added
                         continue
                 newItem = RunningProgramItem(runningProgram)
+                newItem.onStopClicked.connect(lambda instance: AppGlobals.ProgramRunner().Stop(instance))
                 self.runningProgramListItems.append(newItem)
                 if parentListItem:
                     parentListItem.runningChildrenListLayout.addWidget(newItem)
@@ -45,7 +61,8 @@ class RunningProgramsList(QWidget):
                     self.runningProgramsListLayout.addWidget(newItem)
 
     def FindItem(self, programInstance: ProgramInstance):
-        matches = [programItem for programItem in self.runningProgramListItems if programItem.instance is programInstance]
+        matches = [programItem for programItem in self.runningProgramListItems if
+                   programItem.instance is programInstance]
         if matches:
             return matches[0]
 

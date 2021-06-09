@@ -29,7 +29,17 @@
   <component name="ChangeListManager">
     <list default="true" id="99850780-df20-4af2-831c-10fab045648b" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/MainWindow/MenuBar.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/MainWindow/MenuBar.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Chip.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Chip.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Program/ProgramRunner.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program/ProgramRunner.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/AppGlobals.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/AppGlobals.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ChipSceneViewer.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ChipSceneViewer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ImageChipItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ImageChipItem.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramEditor/ProgramEditorTab.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramEditor/ProgramEditorTab.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramEditor/ProgramEditorWindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramEditor/ProgramEditorWindow.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramViews/ProgramList.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramViews/ProgramList.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramViews/RunningProgramsList.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramViews/RunningProgramsList.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/STYLESHEET.css" beforeDir="false" afterPath="$PROJECT_DIR$/UI/STYLESHEET.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -192,7 +202,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Model/Program/ProgramRunner.py</url>
-          <line>135</line>
+          <line>139</line>
           <option name="timeStamp" value="126" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -202,7 +212,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/UI/ChipEditor/ChipSceneViewer.py</url>
-          <line>310</line>
+          <line>317</line>
           <option name="timeStamp" value="130" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -217,13 +227,23 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Model/Chip.py</url>
-          <line>56</line>
+          <line>58</line>
           <option name="timeStamp" value="134" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/UI/ChipEditor/ChipSceneViewer.py</url>
-          <line>119</line>
-          <option name="timeStamp" value="135" />
+          <url>file://$PROJECT_DIR$/UI/MainWindow/ProgramRunnerWorker.py</url>
+          <line>16</line>
+          <option name="timeStamp" value="140" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/UI/MainWindow/ProgramRunnerWorker.py</url>
+          <line>12</line>
+          <option name="timeStamp" value="141" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/UI/ChipEditor/ImageChipItem.py</url>
+          <line>87</line>
+          <option name="timeStamp" value="145" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
