@@ -37,6 +37,8 @@ class Chip:
         file = open(self.path, "wb+")
         dill.dump(self, file)
         file.close()
+        for image in self.images:
+            image.path = path.parent / image.path
 
     @staticmethod
     def LoadFromFile(path: Path) -> 'Chip':

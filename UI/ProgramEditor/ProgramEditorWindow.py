@@ -64,7 +64,6 @@ class ProgramEditorWindow(QMainWindow):
         return True
 
     def closeEvent(self, event) -> None:
-        print("Close Request")
         if not self.RequestCloseAll():
             event.ignore()
 

@@ -21,6 +21,7 @@ class AppGlobals(QObject):
         self.chip = None
         self.onChipModified.connect(lambda: AppGlobals.Chip().Validate())
         self.onChipModified.connect(self.onChipDataModified.emit)
+        self.onChipModified.connect(self.programRunner.CheckPrograms)
 
     onChipOpened = Signal()  # Invoked whenever a new chip is opened
     onChipModified = Signal()  # Invoked whenever the chip lists change

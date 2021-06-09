@@ -143,7 +143,7 @@ class MainWindow(QMainWindow):
         if not self.CloseChip():
             event.ignore()
             return
-        self.updateWorker.stop()
+        self.updateWorker.terminate()
         super().closeEvent(event)
 
     def EditProgram(self, program: Program):

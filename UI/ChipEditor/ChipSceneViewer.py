@@ -6,6 +6,8 @@ from PySide6.QtCore import QPointF, Qt, QRectF, QSizeF, QLineF, Signal
 
 from UI.ChipEditor.ChipItem import ChipItem
 
+import math
+
 from enum import Enum, auto
 
 
@@ -157,24 +159,29 @@ class ChipSceneViewer(QGraphicsView):
         return selectionRect
 
     def UpdateHoveredItems(self):
-        if self._editing and self._state is not State.MOVING:
-            items = [item for item in self.scene().items(self.selectionBox.sceneBoundingRect())]
+        if self._state is State.PANNING:
+            return
+
+        if not self._editing or self._state is State.MOVING:
+            hoveredChipItems = []
         else:
-            items = []
+            # What are we hovering over in the scene
+            hoveredGraphicsItems = [item for item in self.scene().items(self.selectionBox.sceneBoundingRect())]
 
-        matched = []
-        for item in self._sceneItems:
-            if item.CanSelect() and item.GraphicsObject() in items:
-                matched.append(item)
-        matched.sort(key=lambda item: item.GraphicsObject().zValue())
+            hoveredChipItems = [item for item in self._sceneItems if item.GraphicsObject() in hoveredGraphicsItems]
+            # Make sure we maintain the found order
+            hoveredChipItems.sort(key=lambda x: hoveredGraphicsItems.index(x.GraphicsObject()))
 
-        for item in matched:
+            if self._state is not State.SELECTING:
+                hoveredChipItems = hoveredChipItems[:1]
+
+        for item in hoveredChipItems:
             if item not in self._hoveredItems and item.CanSelect():
                 item.SetHovered(True)
         for item in self._hoveredItems:
-            if item not in matched:
+            if item not in hoveredChipItems:
                 item.SetHovered(False)
-        self._hoveredItems = matched
+        self._hoveredItems = hoveredChipItems
 
     def UpdateSelectionBox(self):
         if self._state == State.SELECTING:

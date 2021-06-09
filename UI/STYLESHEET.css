@@ -69,3 +69,11 @@ ParameterEditorItem {
 ParameterEditorItem QLabel {
     padding-right: 15px;
 }
+MovingHandle {
+    min-width: 50px;
+    max-width: 50px;
+    min-height: 50px;
+    max-height: 50px;
+
+    background-color: blue
+}
