@@ -1,4 +1,4 @@
-import typing
+from typing import Optional, List
 
 from Model.Valve import Valve
 from Model.Program.Data import DataType
@@ -6,16 +6,46 @@ from Model.Program.Program import Program
 from Model.Program.ProgramPreset import ProgramPreset
 from Model.Image import Image
 from Model.Annotation import Annotation
+from pathlib import Path
+import dill
+
+import os
 
 
 class Chip:
     def __init__(self):
-        self.valves: typing.List[Valve] = []
-        self.programs: typing.List[Program] = []
-        self.programPresets: typing.List[ProgramPreset] = []
-        self.images: typing.List[Image] = []
-        self.annotations: typing.List[Annotation] = []
+        self.valves: List[Valve] = []
+        self.programs: List[Program] = []
+        self.programPresets: List[ProgramPreset] = []
+        self.images: List[Image] = []
+        self.annotations: List[Annotation] = []
         self.editingMode = True
+        self.path: Optional[Path] = None
+        self.modified = False
+
+    def RecordModification(self):
+        self.modified = True
+
+    def HasBeenSaved(self):
+        return bool(self.path)
+
+    def SaveToFile(self, path: Path):
+        self.path = path
+        self.modified = False
+        for image in self.images:
+            image.path = Path(os.path.relpath(image.path, self.path.parent))
+        file = open(self.path, "wb+")
+        dill.dump(self, file)
+        file.close()
+
+    @staticmethod
+    def LoadFromFile(path: Path) -> 'Chip':
+        file = open(path, "rb")
+        chip = dill.load(file)
+        file.close()
+        for image in chip.images:
+            image.path = path.parent / image.path
+        return chip
 
     def NextSolenoidNumber(self):
         number = 0

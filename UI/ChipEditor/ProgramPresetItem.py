@@ -15,7 +15,7 @@ class ProgramPresetItem(WidgetChipItem):
 
         self._preset = preset
 
-        self._presetNameField = QLineEdit()
+        self._presetNameField = QLineEdit(preset.name)
         self._presetNameField.textChanged.connect(self.UpdatePreset)
 
         self._presetNameLabel = QLabel()
@@ -37,11 +37,14 @@ class ProgramPresetItem(WidgetChipItem):
         super().SetEditDisplay(editing)
 
     def Move(self, delta: QPointF):
+        if delta != QPointF():
+            AppGlobals.Instance().onChipDataModified.emit()
         self._preset.position += delta
         self.GraphicsObject().setPos(self._preset.position)
 
     def UpdatePreset(self):
         self._preset.name = self._presetNameField.text()
+        AppGlobals.Instance().onChipDataModified.emit()
 
     def CheckForPreset(self):
         if self._preset not in AppGlobals.Chip().programPresets:
@@ -63,8 +66,6 @@ class ProgramPresetItem(WidgetChipItem):
         return ProgramPresetItem(newPreset)
 
     def Update(self):
-        if self._presetNameField.text() != self._preset.name:
-            self._presetNameField.setText(self._preset.name)
         self._presetNameLabel.setText(self._preset.name)
 
     def RunPreset(self):

@@ -6,6 +6,7 @@ from UI.ChipEditor.ValveChipItem import ValveChipItem, Valve
 from UI.ChipEditor.ImageChipItem import ImageChipItem, Image
 from UI.ChipEditor.ProgramPresetItem import ProgramPresetItem, ProgramPreset
 from UI.AppGlobals import AppGlobals
+from pathlib import Path
 
 from enum import Enum, auto
 
@@ -18,10 +19,10 @@ class Mode(Enum):
 class ChipEditor(QWidget):
     def __init__(self):
         super().__init__()
-        self._viewer = ChipSceneViewer()
+        self.viewer = ChipSceneViewer()
 
         actionsLayout = QHBoxLayout()
-        self._actionsWidget = QWidget(self._viewer)
+        self._actionsWidget = QWidget(self.viewer)
         self._actionsWidget.setLayout(actionsLayout)
 
         self._lockButton = QToolButton()
@@ -50,12 +51,10 @@ class ChipEditor(QWidget):
 
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.addWidget(self._viewer)
+        layout.addWidget(self.viewer)
         self.setLayout(layout)
 
         self._mode = Mode.VIEWING
-
-        self.SetEditing(False)
 
         AppGlobals.Instance().onChipOpened.connect(self.LoadChip)
 
@@ -64,18 +63,16 @@ class ChipEditor(QWidget):
         newValve.solenoidNumber = AppGlobals.Chip().NextSolenoidNumber()
         AppGlobals.Chip().valves.append(newValve)
         AppGlobals.Instance().onChipModified.emit()
-        self._viewer.CenterItem(self._viewer.AddItem(ValveChipItem(newValve)))
+        self.viewer.CenterItem(self.viewer.AddItem(ValveChipItem(newValve)))
 
     def BrowseForImage(self):
         filename, filterType = QFileDialog.getOpenFileName(self, "Browse for Image",
                                                            filter="Images (*.png *.bmp *.jpg *.jpeg *.tif *.tiff)")
         if filename:
-            newImage = Image()
-            newImage.filename = filename
-            newImage.InitializeSize()
+            newImage = Image(Path(filename))
             AppGlobals.Chip().images.append(newImage)
             AppGlobals.Instance().onChipModified.emit()
-            self._viewer.CenterItem(self._viewer.AddItem(ImageChipItem(newImage)))
+            self.viewer.CenterItem(self.viewer.AddItem(ImageChipItem(newImage)))
 
     def SelectProgramPreset(self):
         if not AppGlobals.Chip().programs:
@@ -89,10 +86,10 @@ class ChipEditor(QWidget):
             newPreset = ProgramPreset(selected)
             AppGlobals.Chip().programPresets.append(newPreset)
             AppGlobals.Instance().onChipModified.emit()
-            self._viewer.CenterItem(self._viewer.AddItem(ProgramPresetItem(newPreset)))
+            self.viewer.CenterItem(self.viewer.AddItem(ProgramPresetItem(newPreset)))
 
     def SetEditing(self, editing):
-        self._viewer.SetEditing(editing)
+        self.viewer.SetEditing(editing)
 
         self._lockButton.setVisible(editing)
         self._plusButton.setVisible(editing)
@@ -108,16 +105,16 @@ class ChipEditor(QWidget):
 
     def FloatWidgets(self):
         self._actionsWidget.adjustSize()
-        self._actionsWidget.move(self._viewer.rect().topRight() - self._actionsWidget.rect().topRight())
+        self._actionsWidget.move(self.viewer.rect().topRight() - self._actionsWidget.rect().topRight())
 
     def LoadChip(self):
-        self._viewer.RemoveAll()
+        self.viewer.RemoveAll()
 
         for valve in AppGlobals.Chip().valves:
-            self._viewer.AddItem(ValveChipItem(valve))
+            self.viewer.AddItem(ValveChipItem(valve))
         for image in AppGlobals.Chip().images:
-            self._viewer.AddItem(ImageChipItem(image))
+            self.viewer.AddItem(ImageChipItem(image))
 
-        self._viewer.Recenter()
+        self.viewer.Recenter()
 
         self.SetEditing(AppGlobals.Chip().editingMode)

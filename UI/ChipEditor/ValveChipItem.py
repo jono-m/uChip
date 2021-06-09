@@ -22,7 +22,7 @@ class ValveChipItem(WidgetChipItem):
         self.valveNumberDial.valueChanged.connect(self.UpdateValve)
 
         self.valveNameLabel = QLabel("Name")
-        self.valveNameField = QLineEdit()
+        self.valveNameField = QLineEdit(self._valve.name)
         self.valveNameField.textChanged.connect(self.UpdateValve)
 
         layout = QGridLayout()
@@ -42,6 +42,8 @@ class ValveChipItem(WidgetChipItem):
             self.RemoveItem()
 
     def Move(self, delta: QPointF):
+        if delta != QPointF():
+            AppGlobals.Instance().onChipDataModified.emit()
         self._valve.position += delta
         self.GraphicsObject().setPos(self._valve.position)
 
@@ -55,6 +57,7 @@ class ValveChipItem(WidgetChipItem):
     def UpdateValve(self):
         self._valve.solenoidNumber = self.valveNumberDial.value()
         self._valve.name = self.valveNameField.text()
+        AppGlobals.Instance().onChipDataModified.emit()
 
     def Toggle(self):
         AppGlobals.Rig().SetSolenoidState(self._valve.solenoidNumber,
@@ -78,9 +81,6 @@ class ValveChipItem(WidgetChipItem):
         text = self._valve.name + " (" + str(self._valve.solenoidNumber) + ")"
         if text != self.valveToggleButton.text():
             self.valveToggleButton.setText(text)
-
-        if self._valve.name != self.valveNameField.text():
-            self.valveNameField.setText(self._valve.name)
 
         lastState = self.valveToggleButton.property("valveState")
         newState = {True: "OPEN",

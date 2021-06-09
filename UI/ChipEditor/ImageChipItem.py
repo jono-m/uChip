@@ -39,6 +39,8 @@ class ImageChipItem(WidgetChipItem):
             self.RemoveItem()
 
     def Move(self, delta: QPointF):
+        if delta != QPointF():
+            AppGlobals.Instance().onChipDataModified.emit()
         self._image.position += delta
         self.GraphicsObject().setPos(self._image.position)
 
@@ -47,24 +49,23 @@ class ImageChipItem(WidgetChipItem):
         AppGlobals.Instance().onChipModified.emit()
 
     def Duplicate(self) -> 'ChipItem':
-        newImage = Image()
+        newImage = Image(self._image.path)
         newImage.position = QPointF(self._image.position)
         newImage.size = QSize(self._image.size)
-        newImage.filename = self._image.filename
 
         AppGlobals.Chip().images.append(newImage)
         AppGlobals.Instance().onChipModified.emit()
         return ImageChipItem(newImage)
 
     def Update(self):
-        mTime = Path(self._image.filename).stat().st_mtime
+        mTime = Path(self._image.path).stat().st_mtime
 
-        if mTime > self._lastVersion or self._image.filename != self._lastFilename:
+        if mTime > self._lastVersion or self._image.path != self._lastFilename:
             self._lastVersion = mTime
             self._lastSize = None
-            self._lastFilename = self._image.filename
+            self._lastFilename = self._image.path
 
-            self._rawImage = QImage(self._image.filename)
+            self._rawImage = QImage(str(self._image.path.absolute()))
 
         if self._image.size != self._lastSize:
             self.image.setPixmap(QPixmap(self._rawImage).scaled(self._image.size, Qt.AspectRatioMode.IgnoreAspectRatio))

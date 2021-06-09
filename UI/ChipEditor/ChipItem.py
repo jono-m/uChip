@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QGraphicsObject
 from PySide6.QtCore import QPointF, QTimer, Signal, QObject
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 
 class ChipItem(QObject):
