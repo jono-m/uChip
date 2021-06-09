@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QMainWindow, QDockWidget, QMessageBox
+from PySide6.QtWidgets import QMainWindow, QDockWidget, QMessageBox, QFileDialog
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QIcon
 from UI.ChipEditor.ChipEditor import ChipEditor
@@ -11,15 +11,20 @@ from UI.ProgramEditor.ProgramEditorWindow import ProgramEditorWindow
 from UI.MainWindow.ProgramRunnerWorker import ProgramRunnerWorker
 from UI.ProgramViews.RunningProgramsList import RunningProgramsList
 
+from pathlib import Path
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        AppGlobals.Instance().onChipDataModified.connect(self.UpdateTitle)
+        AppGlobals.Instance().onChipOpened.connect(self.UpdateTitle)
+        AppGlobals.Instance().onChipSaved.connect(self.UpdateTitle)
+
         AppGlobals.Rig().AddMock(0, "Mock A")
         AppGlobals.Rig().AddMock(24, "Mock B")
         AppGlobals.Rig().AddMock(48, "Mock C")
-        AppGlobals.OpenChip(Chip())
 
         StylesheetLoader.RegisterWidget(self)
 
@@ -30,7 +35,6 @@ class MainWindow(QMainWindow):
         self.resize(self.screen().size() / 2)
         self.move(self.screen().size().width() / 2, 0)
 
-        self.setWindowTitle("uChip")
         self.setWindowIcon(QIcon("Images/UCIcon.png"))
 
         self._rigViewer = RigViewer()
@@ -41,8 +45,14 @@ class MainWindow(QMainWindow):
         self._editorWindow.setVisible(False)
 
         menuBar = MenuBar()
+        menuBar.new.connect(self.NewChip)
+        menuBar.open.connect(self.OpenChip)
+        menuBar.save.connect(self.SaveChip)
+        menuBar.saveAs.connect(lambda: self.SaveChip(True))
+        menuBar.exit.connect(self.close)
         menuBar.showRigView.connect(self.ShowRigWidget)
         menuBar.showProgramList.connect(self.ShowProgramList)
+        menuBar.zoomToFit.connect(self.chipEditor.viewer.Recenter)
 
         self.updateWorker = ProgramRunnerWorker(self)
         self.updateWorker.start()
@@ -58,6 +68,69 @@ class MainWindow(QMainWindow):
         self.ShowRunningProgramsList()
         self._editorWindow.close()
 
+        AppGlobals.OpenChip(Chip())
+
+    def NewChip(self):
+        if self.CloseChip():
+            AppGlobals.OpenChip(Chip())
+
+    def OpenChip(self):
+        filename, filterType = QFileDialog.getOpenFileName(self, "Browse for Chip",
+                                                           filter="uChip Project File (*.ucc)")
+        if filename:
+            if not self.CloseChip():
+                return
+            AppGlobals.OpenChip(Chip.LoadFromFile(Path(filename)))
+
+    def UpdateTitle(self):
+        title = AppGlobals.Chip().path
+        if title:
+            title = title.stem
+        else:
+            title = "New Chip"
+        if AppGlobals.Chip().modified:
+            title += "*"
+        title += " - uChip"
+        self.setWindowTitle(title)
+
+    def SaveChip(self, saveAs=False) -> bool:
+        if saveAs or not AppGlobals.Chip().HasBeenSaved():
+
+            filename, filterType = QFileDialog.getSaveFileName(self, "Save Chip",
+                                                               filter="uChip Project File (*.ucc)")
+            if filename:
+                AppGlobals.Chip().SaveToFile(Path(filename))
+                AppGlobals.Instance().onChipSaved.emit()
+                return True
+            return False
+        else:
+            AppGlobals.Chip().SaveToFile(AppGlobals.Chip().path)
+            AppGlobals.Instance().onChipSaved.emit()
+            return True
+
+    def CloseChip(self) -> bool:
+        if AppGlobals.ProgramRunner().runningPrograms:
+            status = QMessageBox.question(self, "Confirm", "There is a program running. Are you sure you want to stop?")
+            if status is not QMessageBox.Yes:
+                return False
+            AppGlobals.ProgramRunner().StopAll()
+
+        if self._editorWindow.isVisible():
+            if not self._editorWindow.RequestCloseAll():
+                return False
+
+        if AppGlobals.Chip().modified:
+            ret = QMessageBox.warning(self, "Confirm",
+                                      "The current chip project has been modified.\nDo you want to save changes?",
+                                      QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel, QMessageBox.Save)
+            if ret is QMessageBox.Save:
+                if not self.SaveChip():
+                    return False
+            elif ret is QMessageBox.Cancel:
+                return False
+
+        return True
+
     def CheckForKill(self):
         if AppGlobals.ProgramRunner().GetTickDelta() > 2:
             self.updateWorker.terminate()
@@ -67,15 +140,9 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(self, "Timeout", "Program timed out.")
 
     def closeEvent(self, event):
-        if AppGlobals.ProgramRunner().runningPrograms:
-            status = QMessageBox.question(self, "Confirm", "There is a program running. Are you sure you want to quit?")
-            if status is not QMessageBox.Yes:
-                event.ignore()
-                return
-        if self._editorWindow.isVisible():
-            if not self._editorWindow.RequestCloseAll():
-                event.ignore()
-                return
+        if not self.CloseChip():
+            event.ignore()
+            return
         self.updateWorker.stop()
         super().closeEvent(event)
 

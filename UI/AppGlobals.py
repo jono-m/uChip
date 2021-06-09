@@ -20,9 +20,12 @@ class AppGlobals(QObject):
         self.programRunner.rig = self.rig
         self.chip = None
         self.onChipModified.connect(lambda: AppGlobals.Chip().Validate())
+        self.onChipModified.connect(self.onChipDataModified.emit)
 
     onChipOpened = Signal()  # Invoked whenever a new chip is opened
     onChipModified = Signal()  # Invoked whenever the chip lists change
+    onChipDataModified = Signal()  # Invoked whenever ANYTHING about the chip has been modified.
+    onChipSaved = Signal()
 
     @staticmethod
     def Rig() -> Rig:
@@ -31,6 +34,7 @@ class AppGlobals(QObject):
     @staticmethod
     def OpenChip(chip: Chip):
         AppGlobals.Instance().chip = chip
+        AppGlobals.Instance().onChipDataModified.connect(chip.RecordModification)
         AppGlobals.Instance().onChipOpened.emit()
         AppGlobals.Instance().programRunner.chip = chip
 
