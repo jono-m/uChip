@@ -47,7 +47,7 @@ class MenuBar(QMenuBar):
         # self._editMenu.addAction("Select All")
 
         self._viewMenu = self.addMenu("&View")
-        # self._zoomMenu = self._viewMenu.addMenu("Zoom")
+        self._zoomMenu = self._viewMenu.addMenu("Zoom")
         # self._zoomMenu.addAction("In")
         # self._zoomMenu.addAction("Out")
         # self._zoomMenu.addAction("100%")
