@@ -1,5 +1,5 @@
 from PySide6.QtCore import QPointF
-from PySide6.QtWidgets import QGraphicsProxyWidget, QLabel, QWidget
+from PySide6.QtWidgets import QGraphicsProxyWidget, QLabel, QWidget, QVBoxLayout
 from UI.ChipEditor.ChipItem import ChipItem
 from UI.StylesheetLoader import StylesheetLoader
 
@@ -11,10 +11,16 @@ class WidgetChipItem(ChipItem):
 
         super().__init__(self.graphicsWidget)
 
-        self.containerWidget = WidgetChipItemContainer()
-        self.graphicsWidget.setWidget(self.containerWidget)
+        self._bigContainer = WidgetChipItemContainer()
 
-        StylesheetLoader.RegisterWidget(self.containerWidget)
+        self.containerWidget = QWidget()
+        layout = QVBoxLayout()
+        layout.addWidget(self.containerWidget)
+
+        self._bigContainer.setLayout(layout)
+        self.graphicsWidget.setWidget(self._bigContainer)
+
+        StylesheetLoader.RegisterWidget(self._bigContainer)
 
         self._displayHovered = False
         self._displaySelected = False
@@ -23,6 +29,7 @@ class WidgetChipItem(ChipItem):
 
     def SetEditDisplay(self, editing: bool):
         self.containerWidget.adjustSize()
+        self._bigContainer.adjustSize()
 
     def SetHovered(self, isHovered: bool):
         self._displayHovered = isHovered
@@ -36,15 +43,15 @@ class WidgetChipItem(ChipItem):
         return True
 
     def CanMove(self, scenePoint: QPointF) -> bool:
-        childAt = self.containerWidget.childAt(self.GraphicsObject().mapFromScene(scenePoint).toPoint())
-        return childAt is None or isinstance(childAt, QLabel)
+        childAt = self._bigContainer.childAt(self.GraphicsObject().mapFromScene(scenePoint).toPoint())
+        return childAt is None or childAt is self.containerWidget or isinstance(childAt, QLabel)
 
     def CanDelete(self) -> bool:
         return True
 
     def RemoveItem(self):
         super().RemoveItem()
-        StylesheetLoader.UnregisterWidget(self.containerWidget)
+        StylesheetLoader.UnregisterWidget(self._bigContainer)
 
     def CanDuplicate(self) -> bool:
         return True

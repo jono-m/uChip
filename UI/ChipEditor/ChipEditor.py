@@ -47,10 +47,7 @@ class ChipEditor(QWidget):
 
         self._plusButton.setMenu(menu)
 
-        self._plusButton.setFixedSize(50, 50)
-
         layout = QHBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.viewer)
         self.setLayout(layout)
 
@@ -114,6 +111,8 @@ class ChipEditor(QWidget):
             self.viewer.AddItem(ValveChipItem(valve))
         for image in AppGlobals.Chip().images:
             self.viewer.AddItem(ImageChipItem(image))
+        for preset in AppGlobals.Chip().programPresets:
+            self.viewer.AddItem(ProgramPresetItem(preset))
 
         self.viewer.Recenter()
 

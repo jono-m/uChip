@@ -22,10 +22,6 @@ class MainWindow(QMainWindow):
         AppGlobals.Instance().onChipOpened.connect(self.UpdateTitle)
         AppGlobals.Instance().onChipSaved.connect(self.UpdateTitle)
 
-        AppGlobals.Rig().AddMock(0, "Mock A")
-        AppGlobals.Rig().AddMock(24, "Mock B")
-        AppGlobals.Rig().AddMock(48, "Mock C")
-
         StylesheetLoader.RegisterWidget(self)
 
         self.chipEditor = ChipEditor()
@@ -144,6 +140,7 @@ class MainWindow(QMainWindow):
             event.ignore()
             return
         self.updateWorker.terminate()
+        AppGlobals.Rig().SaveDevices()
         super().closeEvent(event)
 
     def EditProgram(self, program: Program):

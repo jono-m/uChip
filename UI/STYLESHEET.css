@@ -1,19 +1,37 @@
-WidgetChipItemContainer[state='None'] {
-	background-color: white;
+QLineEdit {
+    max-width: 100px;
 }
-WidgetChipItemContainer[state='Hover'] {
-	background-color: red;
+
+WidgetChipItemContainer, WidgetChipItemContainer *{
+    background: transparent;
+    color: white;
 }
-WidgetChipItemContainer[state='Select'] {
-	background-color: blue;
+WidgetChipItemContainer > QWidget {
+    background-color: rgba(50, 50, 50, 1);
+    border-radius: 8px;
 }
-WidgetChipItemContainer[state='HoverAndSelect'] {
-	background-color: yellow;
+WidgetChipItemContainer > QWidget[state='None'] {
+    border: 4px solid rgba(100, 100, 100, 1);
+    margin: 4px;
+}
+WidgetChipItemContainer > QWidget[state='Hover'] {
+    border: 4px solid rgba(35, 159, 168, 1);
+    margin: 4px;
+}
+WidgetChipItemContainer > QWidget[state='Select'] {
+    border: 4px solid rgba(52, 222, 235, 1);
+    margin: 4px;
+}
+WidgetChipItemContainer > QWidget[state='HoverAndSelect'] {
+    border: 6px solid rgba(52, 222, 235, 1);
+    margin: 2px;
 }
 QToolButton[valveState='OPEN'] {
+    border-radius: 4px;
 	background-color: green;
 }
 QToolButton[valveState='CLOSED']{
+    border-radius: 4px;
 	background-color: red;
 }
 ChipEditor QToolButton {

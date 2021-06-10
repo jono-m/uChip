@@ -58,6 +58,7 @@ class RigDevice:
     def __getstate__(self):
         myDict = self.__dict__.copy()
         del myDict["serialPort"]
+        myDict["isConnected"] = False
         return myDict
 
     def Connect(self):
@@ -92,7 +93,7 @@ class RigDevice:
         RigDevice.lastScannedPorts = list_ports.comports()
 
         return [port.serial_number for port in RigDevice.lastScannedPorts if
-                isinstance(port.serial_number, str) and port.manufacturer == "Elexol"]
+                isinstance(port.serial_number, str) and port.serial_number[:3] == "ELX"]
 
 
 class DeviceError(Exception):

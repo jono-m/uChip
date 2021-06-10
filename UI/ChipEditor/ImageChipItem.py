@@ -2,7 +2,7 @@ from typing import Optional
 
 from PySide6.QtGui import QPixmap, QImage, Qt
 from PySide6.QtCore import QPointF, QSize, Signal, QRectF
-from PySide6.QtWidgets import QLabel, QVBoxLayout, QFrame
+from PySide6.QtWidgets import QLabel, QVBoxLayout, QWidget
 
 from UI.ChipEditor.WidgetChipItem import WidgetChipItem, ChipItem
 from Model.Image import Image
@@ -154,7 +154,7 @@ class ImageChipItem(WidgetChipItem):
         self.GraphicsObject().setPos(self._image.position)
 
 
-class MovingHandle(QFrame):
+class MovingHandle(QWidget):
     moved = Signal(QPointF)
 
     def __init__(self, parent):

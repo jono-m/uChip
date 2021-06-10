@@ -21,8 +21,6 @@ class ProgramInstanceWidget(QWidget):
         self._programNameWidget = QLabel()
 
         layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
         self.setLayout(layout)
 
         self.runButton = QPushButton("Run")
@@ -34,7 +32,6 @@ class ProgramInstanceWidget(QWidget):
         self._parameterItems: List[ProgramParameterItem] = []
 
         self._parametersLayout = QVBoxLayout()
-        self._parametersLayout.setContentsMargins(0, 0, 0, 0)
 
         layout.addWidget(self._programNameWidget)
         layout.addLayout(self._parametersLayout)
@@ -100,12 +97,13 @@ class ProgramParameterItem(QWidget):
         elif self._parameter.dataType is DataType.STRING:
             self._valueField = QLineEdit()
             self._valueField.textChanged.connect(self.UpdateParameterValue)
-        else:
+        elif self._parameter.dataType is not DataType.OTHER:
             self._valueField = ChipDataSelection(self._parameter.dataType)
             self._valueField.currentIndexChanged.connect(self.UpdateParameterValue)
 
-        layout.addWidget(self._parameterName)
-        layout.addWidget(self._valueField)
+        if self._parameter.dataType is not DataType.OTHER:
+            layout.addWidget(self._parameterName)
+            layout.addWidget(self._valueField)
 
         timer = QTimer(self)
         timer.timeout.connect(self.UpdateFields)
@@ -122,7 +120,7 @@ class ProgramParameterItem(QWidget):
             self._programInstance.parameterValues[self._parameter] = self._valueField.currentData()
         elif self._parameter.dataType is DataType.STRING:
             self._programInstance.parameterValues[self._parameter] = self._valueField.text()
-        else:
+        elif self._parameter.dataType is not DataType.OTHER:
             self._programInstance.parameterValues[self._parameter] = self._valueField.currentData()
 
     def UpdateFields(self):
@@ -138,5 +136,5 @@ class ProgramParameterItem(QWidget):
             self._valueField.setCurrentText(str(self._programInstance.parameterValues[self._parameter]))
         elif self._parameter.dataType is DataType.STRING:
             self._valueField.setText(self._programInstance.parameterValues[self._parameter])
-        else:
+        elif self._parameter.dataType is not DataType.OTHER:
             self._valueField.Select(self._programInstance.parameterValues[self._parameter])

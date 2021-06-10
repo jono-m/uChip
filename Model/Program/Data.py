@@ -12,6 +12,7 @@ class DataType(Enum):
     VALVE = auto()
     PROGRAM = auto()
     PROGRAM_PRESET = auto()
+    OTHER = auto()
 
     def GetDefaultValue(self):
         return {DataType.INTEGER: 0,
@@ -20,7 +21,8 @@ class DataType(Enum):
                 DataType.STRING: "",
                 DataType.VALVE: None,
                 DataType.PROGRAM: None,
-                DataType.PROGRAM_PRESET: None}[self]
+                DataType.PROGRAM_PRESET: None,
+                DataType.OTHER: None}[self]
 
     def ToString(self):
         return {DataType.INTEGER: "Integer",
@@ -29,4 +31,5 @@ class DataType(Enum):
                 DataType.STRING: "String",
                 DataType.VALVE: "Valve",
                 DataType.PROGRAM: "Program",
-                DataType.PROGRAM_PRESET: "Program Preset"}[self]
+                DataType.PROGRAM_PRESET: "Program Preset",
+                DataType.OTHER: "Other"}[self]

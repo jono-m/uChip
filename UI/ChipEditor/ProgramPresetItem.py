@@ -34,6 +34,7 @@ class ProgramPresetItem(WidgetChipItem):
     def SetEditDisplay(self, editing: bool):
         self._presetNameField.setVisible(editing)
         self._presetNameLabel.setVisible(not editing)
+        self.containerWidget.adjustSize()
         super().SetEditDisplay(editing)
 
     def Move(self, delta: QPointF):
