@@ -45,6 +45,7 @@ class Chip:
         file = open(path, "rb")
         chip = dill.load(file)
         file.close()
+        chip.path = path
         for image in chip.images:
             image.path = path.parent / image.path
         return chip
@@ -69,6 +70,14 @@ class Chip:
             return matches[0]
         else:
             raise Exception("Could not find program with name '" + programName + "'.")
+
+    def FindPresetWithName(self, presetName: str):
+        print("Looking for item")
+        matches = [preset for preset in self.programPresets if preset.name == presetName]
+        if matches:
+            return matches[0]
+        else:
+            raise Exception("Could not find preset with name '" + presetName + "'.")
 
     def Validate(self):
         for preset in self.programPresets.copy():

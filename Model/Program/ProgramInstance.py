@@ -3,6 +3,7 @@ from typing import Dict, Optional
 from Model.Program.Parameter import Parameter
 from Model.Program.Data import DataValueType
 from Model.Program.Program import Program
+from Model.Program.Data import DataType
 
 
 class ProgramInstance:
@@ -41,3 +42,13 @@ class ProgramInstance:
             for parameterName in parameterValues:
                 instance.parameterValues[instance.GetParameterWithName(parameterName)] = parameterValues[parameterName]
         return instance
+
+    def SetParameter(self, parameterName: str, value):
+        parameter = self.GetParameterWithName(parameterName)
+
+        if parameter.dataType is DataType.INTEGER:
+            value = parameter.ClampInteger(value)
+        elif parameter.dataType is DataType.FLOAT:
+            value = parameter.ClampFloat(value)
+
+        self.parameterValues[parameter] = value

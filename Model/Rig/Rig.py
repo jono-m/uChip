@@ -12,15 +12,19 @@ class Rig:
 
         self.solenoidStates: Dict[int, bool] = {}
 
+        self.LoadDevices()
+
         self.Rescan()
 
-        self.LoadDevices()
+        for device in self.savedDevices:
+            if device.IsDeviceAvailable() and device.isEnabled:
+                device.Connect()
 
     def Rescan(self):
         foundSerialNumbers = RigDevice.Rescan()
         foundDevices = [device for device in self.savedDevices if device.IsDeviceAvailable() and device.isEnabled]
         if foundDevices:
-            highestNumber = max(sum([device.startNumber for device in foundDevices], []))
+            highestNumber = max([device.startNumber for device in foundDevices]) + 24
         else:
             highestNumber = 0
 
@@ -65,7 +69,3 @@ class Rig:
             file.close()
         else:
             self.savedDevices = set()
-
-        for device in self.savedDevices:
-            if device.IsDeviceAvailable() and device.isEnabled:
-                device.Connect()

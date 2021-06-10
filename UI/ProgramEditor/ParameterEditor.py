@@ -4,13 +4,13 @@ from Model.Program.Program import Program
 from Model.Program.Parameter import Parameter
 from Model.Program.Data import DataType
 
-from PySide6.QtWidgets import QFrame, QVBoxLayout, QHBoxLayout, QScrollArea, QLabel, QPushButton, QLineEdit, \
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QScrollArea, QLabel, QPushButton, QLineEdit, \
     QComboBox, QSpinBox, QDoubleSpinBox, QToolButton, QGridLayout
 from PySide6.QtCore import Signal, Qt
 from UI.ProgramViews.ChipDataSelection import ChipDataSelection
 
 
-class ParameterEditor(QFrame):
+class ParameterEditor(QWidget):
     onParametersChanged = Signal()
 
     def __init__(self, program: Program):
@@ -22,8 +22,6 @@ class ParameterEditor(QFrame):
         newParameterButton.clicked.connect(self.AddParameter)
 
         layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
         titleLayout = QHBoxLayout()
         titleLayout.addWidget(parametersLabel)
         titleLayout.addWidget(newParameterButton)
@@ -34,10 +32,8 @@ class ParameterEditor(QFrame):
         self._listArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self._listArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         layout.addWidget(self._listArea, stretch=1)
-        listWidget = QFrame()
+        listWidget = QWidget()
         self._itemLayout = QVBoxLayout()
-        self._itemLayout.setContentsMargins(0, 0, 0, 0)
-        self._itemLayout.setSpacing(0)
         self._itemLayout.setAlignment(Qt.AlignTop)
         listWidget.setLayout(self._itemLayout)
         self.setLayout(layout)
@@ -104,7 +100,7 @@ class ParameterEditor(QFrame):
             item.UpdateParameter()
 
 
-class ParameterEditorItem(QFrame):
+class ParameterEditorItem(QWidget):
     onRemoveParameter = Signal(Parameter)
     onMoveParameterUp = Signal(Parameter)
     onMoveParameterDown = Signal(Parameter)
@@ -127,8 +123,6 @@ class ParameterEditorItem(QFrame):
 
         buttonsLayout = QVBoxLayout()
         buttonsLayout.setAlignment(Qt.AlignTop)
-        buttonsLayout.setSpacing(0)
-        buttonsLayout.setContentsMargins(0, 0, 0, 0)
         buttonsLayout.addWidget(deleteButton)
         buttonsLayout.addWidget(upButton)
         buttonsLayout.addWidget(downButton)
@@ -172,8 +166,6 @@ class ParameterEditorItem(QFrame):
 
         gridLayout = QGridLayout()
         gridLayout.setAlignment(Qt.AlignTop)
-        gridLayout.setContentsMargins(0, 0, 0, 0)
-        gridLayout.setSpacing(0)
         gridLayout.addWidget(self._nameLabel, 0, 0)
         gridLayout.addWidget(self._nameField, 0, 1)
         gridLayout.addWidget(self._dataTypeLabel, 1, 0)
@@ -191,8 +183,6 @@ class ParameterEditorItem(QFrame):
         gridLayout.addWidget(self._maximumFloat, 4, 1)
 
         layout = QHBoxLayout()
-        layout.setSpacing(0)
-        layout.setContentsMargins(0, 0, 0, 0)
         layout.addLayout(buttonsLayout)
         layout.addLayout(gridLayout)
         self.setLayout(layout)

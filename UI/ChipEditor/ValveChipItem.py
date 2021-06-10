@@ -1,5 +1,5 @@
-from PySide6.QtCore import QPointF
-from PySide6.QtWidgets import QToolButton, QSpinBox, QLabel, QGridLayout, QLineEdit
+from PySide6.QtCore import QPointF, Qt
+from PySide6.QtWidgets import QToolButton, QSpinBox, QLabel, QGridLayout, QLineEdit, QSizePolicy, QVBoxLayout
 
 from UI.ChipEditor.WidgetChipItem import WidgetChipItem, ChipItem
 from Model.Valve import Valve
@@ -18,6 +18,7 @@ class ValveChipItem(WidgetChipItem):
         self.valveNumberLabel = QLabel("Number")
         self.valveNumberDial = QSpinBox()
         self.valveNumberDial.setMinimum(0)
+        self.valveNumberDial.setValue(self._valve.solenoidNumber)
         self.valveNumberDial.setMaximum(9999)
         self.valveNumberDial.valueChanged.connect(self.UpdateValve)
 
@@ -25,13 +26,17 @@ class ValveChipItem(WidgetChipItem):
         self.valveNameField = QLineEdit(self._valve.name)
         self.valveNameField.textChanged.connect(self.UpdateValve)
 
+        mainLayout = QVBoxLayout()
+        mainLayout.addWidget(self.valveToggleButton, alignment=Qt.AlignCenter)
+
         layout = QGridLayout()
-        layout.addWidget(self.valveToggleButton, 0, 0, 1, 2)
-        layout.addWidget(self.valveNameLabel, 1, 0)
-        layout.addWidget(self.valveNameField, 1, 1)
-        layout.addWidget(self.valveNumberLabel, 2, 0)
-        layout.addWidget(self.valveNumberDial, 2, 1)
-        self.containerWidget.setLayout(layout)
+        layout.addWidget(self.valveNameLabel, 0, 0)
+        layout.addWidget(self.valveNameField, 0, 1)
+        layout.addWidget(self.valveNumberLabel, 1, 0)
+        layout.addWidget(self.valveNumberDial, 1, 1)
+
+        mainLayout.addLayout(layout)
+        self.containerWidget.setLayout(mainLayout)
         self.valveToggleButton.clicked.connect(self.Toggle)
 
         self.Update()
@@ -61,7 +66,7 @@ class ValveChipItem(WidgetChipItem):
 
     def Toggle(self):
         AppGlobals.Rig().SetSolenoidState(self._valve.solenoidNumber,
-                                          not AppGlobals.Rig().GetSolenoidState(self._valve.solenoidNumber))
+                                          not AppGlobals.Rig().GetSolenoidState(self._valve.solenoidNumber), True)
 
     def RequestDelete(self):
         AppGlobals.Chip().valves.remove(self._valve)
@@ -78,7 +83,7 @@ class ValveChipItem(WidgetChipItem):
         return ValveChipItem(newValve)
 
     def Update(self):
-        text = self._valve.name + " (" + str(self._valve.solenoidNumber) + ")"
+        text = self._valve.name + "\n(" + str(self._valve.solenoidNumber) + ")"
         if text != self.valveToggleButton.text():
             self.valveToggleButton.setText(text)
 

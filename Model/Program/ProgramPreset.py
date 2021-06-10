@@ -1,6 +1,7 @@
 from PySide6.QtCore import QPointF
 from Model.Program.Program import Program
 from Model.Program.ProgramInstance import ProgramInstance
+from Model.Program.Data import DataType
 
 
 class ProgramPreset:

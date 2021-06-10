@@ -1,6 +1,6 @@
 from typing import List
 
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSpinBox, QToolButton
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSpinBox, QToolButton, QPushButton
 from PySide6.QtCore import Signal, Qt, QTimer
 from UI.AppGlobals import AppGlobals
 from Model.Rig.RigDevice import RigDevice
@@ -10,14 +10,24 @@ class RigViewer(QWidget):
     def __init__(self):
         super().__init__()
 
+        rescanButton = QPushButton("Rescan")
+        rescanButton.clicked.connect(self.Rescan)
         self._deviceLayout = QVBoxLayout()
+        self._deviceLayout.addWidget(rescanButton)
         self.setLayout(self._deviceLayout)
 
         self._deviceItems: List[DeviceItem] = []
 
         self.UpdateList()
 
+    def Rescan(self):
+        AppGlobals.Rig().Rescan()
+        self.UpdateList()
+
     def UpdateList(self):
+        for item in self._deviceItems:
+            item.deleteLater()
+        self._deviceItems = []
         for device in AppGlobals.Rig().savedDevices:
             if device.IsDeviceAvailable() and \
                     device not in [deviceItem.device for deviceItem in self._deviceItems]:
@@ -57,8 +67,6 @@ class DeviceItem(QWidget):
         self._enableToggle.setText("Disable")
 
         self._layout = QHBoxLayout()
-        self._layout.setContentsMargins(0, 0, 0, 0)
-        self._layout.setSpacing(0)
         self.setLayout(self._layout)
 
         self._layout.addWidget(self._nameLabel, stretch=1)
@@ -135,8 +143,6 @@ class SolenoidButton(QWidget):
         super().__init__()
 
         layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
         self.setLayout(layout)
 
         self._solenoidButton = QToolButton()

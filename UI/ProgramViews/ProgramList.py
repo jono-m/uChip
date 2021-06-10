@@ -30,7 +30,7 @@ class ProgramList(QWidget):
 
         self.setLayout(layout)
 
-        AppGlobals.Instance().onChipOpened.connect(self.RefreshList)
+        AppGlobals.Instance().onChipOpened.connect(self.SyncInstances)
 
     def EditProgram(self, selectedProgram: 'ProgramListItem'):
         self.onProgramEditRequest.emit(selectedProgram.program)

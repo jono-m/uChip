@@ -17,8 +17,6 @@ class ProgramEditorWindow(QMainWindow):
         self.setWindowIcon(QIcon("Images/UCIcon.png"))
 
         centralLayout = QVBoxLayout()
-        centralLayout.setSpacing(0)
-        centralLayout.setContentsMargins(0, 0, 0, 0)
         centralWidget = QWidget()
         centralWidget.setLayout(centralLayout)
         self.setCentralWidget(centralWidget)

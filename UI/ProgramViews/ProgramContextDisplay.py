@@ -19,7 +19,6 @@ class ProgramContextDisplay(QWidget):
         container = QWidget()
         self.setAutoFillBackground(True)
         clayout = QVBoxLayout()
-        clayout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(clayout)
         self.layout().addWidget(container)
 

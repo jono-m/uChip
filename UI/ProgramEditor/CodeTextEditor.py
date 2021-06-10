@@ -1,10 +1,10 @@
-from PySide6.QtWidgets import QFrame, QTextEdit, QHBoxLayout
+from PySide6.QtWidgets import QWidget, QTextEdit, QHBoxLayout
 from PySide6.QtGui import QSyntaxHighlighter, QTextCharFormat, QFont, Qt, QBrush
 from PySide6.QtCore import Signal, QRegularExpression
 import keyword
 
 
-class CodeTextEditor(QFrame):
+class CodeTextEditor(QWidget):
     codeChanged = Signal()
 
     def __init__(self):
