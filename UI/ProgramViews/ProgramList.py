@@ -15,6 +15,7 @@ class ProgramList(QWidget):
         self._programsLabel = QLabel("Programs")
         self._programsList = QListWidget()
         self._programsList.itemClicked.connect(self.SelectProgram)
+        self._programsList.itemDoubleClicked.connect(self.EditProgram)
 
         AppGlobals.Instance().onChipModified.connect(self.SyncInstances)
 

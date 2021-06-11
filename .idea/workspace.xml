@@ -30,30 +30,13 @@
     <list default="true" id="99850780-df20-4af2-831c-10fab045648b" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/1KChip/chipProject.ucc" beforeDir="false" afterPath="$PROJECT_DIR$/1KChip/chipProject.ucc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model/Chip.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Chip.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model/Program/Data.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program/Data.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Model/Program/ProgramInstance.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program/ProgramInstance.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Model/Program/ProgramPreset.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program/ProgramPreset.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model/Program/ProgramRunner.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program/ProgramRunner.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model/Rig/Rig.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Rig/Rig.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model/Rig/RigDevice.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Rig/RigDevice.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ChipEditor.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ChipEditor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ImageChipItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ImageChipItem.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ChipSceneViewer.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ChipSceneViewer.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ProgramPresetItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ProgramPresetItem.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ValveChipItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ValveChipItem.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/WidgetChipItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/WidgetChipItem.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProgramEditor/CodeTextEditor.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramEditor/CodeTextEditor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProgramEditor/ParameterEditor.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramEditor/ParameterEditor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProgramEditor/ProgramEditorWindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramEditor/ProgramEditorWindow.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProgramViews/ProgramContextDisplay.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramViews/ProgramContextDisplay.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/ProgramViews/ProgramInstanceWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramViews/ProgramInstanceWidget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/ProgramViews/ProgramList.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramViews/ProgramList.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/RigViewer/RigViewer.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/RigViewer/RigViewer.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/STYLESHEET.css" beforeDir="false" afterPath="$PROJECT_DIR$/UI/STYLESHEET.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/imageTest.ucc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/testImage.ucc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/testValve.ucc" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -235,19 +218,9 @@
           <option name="timeStamp" value="141" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/UI/ChipEditor/ImageChipItem.py</url>
-          <line>87</line>
-          <option name="timeStamp" value="145" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Model/Chip.py</url>
           <line>75</line>
           <option name="timeStamp" value="155" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/UI/ProgramViews/ProgramInstanceWidget.py</url>
-          <line>126</line>
-          <option name="timeStamp" value="157" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

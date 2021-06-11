@@ -192,7 +192,9 @@ class ChipSceneViewer(QGraphicsView):
         self.selectionBox.setRect(self.CreateSelectionRect())
 
     def drawBackground(self, painter: QPainter, rect: QRectF):
-        self.setBackgroundBrush(QBrush(self.backgroundColor))
+        currentColor = self.backgroundBrush().color()
+        if currentColor != self.backgroundColor:
+            self.setBackgroundBrush(QBrush(self.backgroundColor))
 
         super().drawBackground(painter, rect)
 
