@@ -1,7 +1,7 @@
+from typing import Dict
 from PySide6.QtCore import QPointF
 from Model.Program.Program import Program
-from Model.Program.ProgramInstance import ProgramInstance
-from Model.Program.Data import DataType
+from Model.Program.ProgramInstance import ProgramInstance, Parameter
 
 
 class ProgramPreset:
@@ -11,3 +11,4 @@ class ProgramPreset:
         self.name = program.name + " Preset"
 
         self.instance = ProgramInstance(program)
+

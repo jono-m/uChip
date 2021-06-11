@@ -9,8 +9,10 @@ from Model.Program.Data import DataType
 class ProgramInstance:
     def __init__(self, program: Program):
         self.parameterValues: Dict[Parameter, DataValueType] = {}
+
         self.program = program
         self.SyncParameters()
+        self.parameterVisibility: Dict[Parameter, bool] = {}
 
     def SyncParameters(self):
         oldParameterValues = self.parameterValues
@@ -20,6 +22,13 @@ class ProgramInstance:
         for oldParameter in oldParameterValues:
             if oldParameter in self.parameterValues:
                 self.parameterValues[oldParameter] = oldParameterValues[oldParameter]
+
+        self.parameterVisibility = {}
+        oldParameterVisiblities = self.parameterVisibility
+        self.parameterVisibility = {parameter: True for parameter in self.program.parameters}
+        for oldParameter in oldParameterVisiblities:
+            if oldParameter in self.parameterVisibility:
+                self.parameterVisibility[oldParameter] = oldParameterVisiblities[oldParameter]
 
     def GetParameterWithName(self, parameterName: str):
         if not isinstance(parameterName, str):

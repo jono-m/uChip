@@ -2,8 +2,10 @@ QLineEdit {
     max-width: 100px;
 }
 
-WidgetChipItemContainer, WidgetChipItemContainer *{
+WidgetChipItemContainer{
     background: transparent;
+}
+WidgetChipItemContainer QLabel {
     color: white;
 }
 WidgetChipItemContainer > QWidget {
