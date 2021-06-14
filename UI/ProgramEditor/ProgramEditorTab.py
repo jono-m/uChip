@@ -1,11 +1,11 @@
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QLineEdit, QVBoxLayout, QLabel
+from PySide6.QtWidgets import QFrame, QHBoxLayout, QLineEdit, QVBoxLayout, QLabel
 from Model.Program.Program import Program
 from UI.AppGlobals import AppGlobals
 from UI.ProgramEditor.CodeTextEditor import CodeTextEditor
 from UI.ProgramEditor.ParameterEditor import ParameterEditor
 
 
-class ProgramEditorTab(QWidget):
+class ProgramEditorTab(QFrame):
     def __init__(self, program: Program):
         super().__init__()
 
@@ -17,6 +17,8 @@ class ProgramEditorTab(QWidget):
         self.codeEditor = CodeTextEditor()
 
         layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         self.setLayout(layout)
 
         self._programNameField = QLineEdit(program.name)
@@ -27,6 +29,8 @@ class ProgramEditorTab(QWidget):
 
         programNameLabel = QLabel("Name:")
         sideLayout = QVBoxLayout()
+        sideLayout.setContentsMargins(0, 0, 0, 0)
+        sideLayout.setSpacing(0)
         sideLayout.addWidget(programNameLabel)
         sideLayout.addWidget(self._programNameField)
         sideLayout.addWidget(self._parameterEditor)

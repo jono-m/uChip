@@ -1,32 +1,42 @@
-QLineEdit {
-    max-width: 100px;
+/* Global */
+* {
+    margin: 0px;
+    padding: 0px;
 }
 
-WidgetChipItemContainer{
+/* Chip Editor */
+WidgetChipItemContainer {
     background: transparent;
 }
 WidgetChipItemContainer QLabel {
     color: white;
 }
-WidgetChipItemContainer > QWidget {
+WidgetChipItemContents {
     background-color: rgba(50, 50, 50, 1);
     border-radius: 8px;
 }
-WidgetChipItemContainer > QWidget[state='None'] {
+WidgetChipItemContents[state='None'] {
     border: 4px solid rgba(100, 100, 100, 1);
     margin: 4px;
 }
-WidgetChipItemContainer > QWidget[state='Hover'] {
+WidgetChipItemContents[state='Hover'] {
     border: 4px solid rgba(35, 159, 168, 1);
     margin: 4px;
 }
-WidgetChipItemContainer > QWidget[state='Select'] {
+WidgetChipItemContents[state='Select'] {
     border: 4px solid rgba(52, 222, 235, 1);
     margin: 4px;
 }
-WidgetChipItemContainer > QWidget[state='HoverAndSelect'] {
+WidgetChipItemContents[state='HoverAndSelect'] {
     border: 6px solid rgba(52, 222, 235, 1);
     margin: 2px;
+}
+MovingHandle {
+    min-width: 50px;
+    max-width: 50px;
+    min-height: 50px;
+    max-height: 50px;
+    background-color: blue
 }
 QToolButton[valveState='OPEN'] {
     border-radius: 4px;
@@ -42,10 +52,8 @@ ChipEditor QToolButton {
 	max-width: 50;
 	max-height: 50;
 }
-ChipInspector {
-    min-width: 200;
-    max-width: 200;
-}
+
+/* Rig View */
 SolenoidButton QToolButton {
 	min-width: 30;
 	min-height: 30;
@@ -58,11 +66,12 @@ SolenoidButton QToolButton:checked {
     background-color: green;
     qproperty-autoRaise: false;
 }
+
+/* Program View and Editor */
 ProgramContextDisplay > QWidget {
     border: 1px solid rgba(40, 40, 40, 1);
     border-width: 1px 1px 1px 0px;
 }
-
 ProgramContextDisplay QLineEdit {
     background-color: transparent;
     border-color: red;
@@ -89,11 +98,8 @@ ParameterEditorItem {
 ParameterEditorItem QLabel {
     padding-right: 15px;
 }
-MovingHandle {
-    min-width: 50px;
-    max-width: 50px;
-    min-height: 50px;
-    max-height: 50px;
 
-    background-color: blue
+/* Programs List */
+RunningProgramsList {
+    min-width: 300px;
 }

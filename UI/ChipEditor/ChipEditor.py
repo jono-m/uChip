@@ -1,6 +1,6 @@
 import PySide6
 from PySide6.QtGui import QKeyEvent
-from PySide6.QtWidgets import QWidget, QToolButton, QMenu, QHBoxLayout, QFileDialog, QInputDialog
+from PySide6.QtWidgets import QToolButton, QMenu, QHBoxLayout, QFileDialog, QInputDialog, QFrame
 from UI.ChipEditor.ChipSceneViewer import ChipSceneViewer
 from UI.ChipEditor.ValveChipItem import ValveChipItem, Valve
 from UI.ChipEditor.ImageChipItem import ImageChipItem, Image
@@ -16,13 +16,15 @@ class Mode(Enum):
     EDITING = auto()
 
 
-class ChipEditor(QWidget):
+class ChipEditor(QFrame):
     def __init__(self):
         super().__init__()
         self.viewer = ChipSceneViewer()
 
         actionsLayout = QHBoxLayout()
-        self._actionsWidget = QWidget(self.viewer)
+        actionsLayout.setContentsMargins(0, 0, 0, 0)
+        actionsLayout.setSpacing(0)
+        self._actionsWidget = QFrame(self.viewer)
         self._actionsWidget.setLayout(actionsLayout)
 
         self._lockButton = QToolButton()
@@ -48,7 +50,10 @@ class ChipEditor(QWidget):
         self._plusButton.setMenu(menu)
 
         layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         layout.addWidget(self.viewer)
+
         self.setLayout(layout)
 
         self._mode = Mode.VIEWING

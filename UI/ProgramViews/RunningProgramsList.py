@@ -1,25 +1,28 @@
 from typing import List
 
-4
-from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton, QHBoxLayout
+from PySide6.QtWidgets import QFrame, QLabel, QVBoxLayout, QPushButton, QHBoxLayout
 from PySide6.QtCore import QTimer, Signal
 from UI.AppGlobals import AppGlobals
 from Model.Program.ProgramInstance import ProgramInstance
 
 
-class RunningProgramsList(QWidget):
+class RunningProgramsList(QFrame):
     onTextChanged = Signal()
 
     def __init__(self):
         super().__init__()
 
         self.runningProgramsListLayout = QVBoxLayout()
+        self.runningProgramsListLayout.setContentsMargins(0, 0, 0, 0)
+        self.runningProgramsListLayout.setSpacing(0)
 
         self._console = QLabel()
 
         self.runningProgramListItems: List[RunningProgramItem] = []
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         layout.addLayout(self.runningProgramsListLayout)
         clearButton = QPushButton("Clear")
         clearButton.clicked.connect(lambda: AppGlobals.ProgramRunner().ClearMessages())
@@ -67,7 +70,7 @@ class RunningProgramsList(QWidget):
             return matches[0]
 
 
-class RunningProgramItem(QWidget):
+class RunningProgramItem(QFrame):
     onStopClicked = Signal(ProgramInstance)
 
     def __init__(self, programInstance: ProgramInstance):
@@ -80,12 +83,17 @@ class RunningProgramItem(QWidget):
         stopButton.clicked.connect(lambda: self.onStopClicked.emit(self.instance))
 
         infoLayout = QHBoxLayout()
+        infoLayout.setContentsMargins(0, 0, 0, 0)
+        infoLayout.setSpacing(0)
         infoLayout.addWidget(programNameLabel)
         infoLayout.addWidget(stopButton)
 
         self.runningChildrenListLayout = QVBoxLayout()
-
+        self.runningChildrenListLayout.setContentsMargins(0, 0, 0, 0)
+        self.runningChildrenListLayout.setSpacing(0)
         mainLayout = QVBoxLayout()
+        mainLayout.setContentsMargins(0, 0, 0, 0)
+        mainLayout.setSpacing(0)
         mainLayout.addLayout(infoLayout)
         mainLayout.addLayout(self.runningChildrenListLayout)
 

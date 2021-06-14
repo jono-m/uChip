@@ -4,13 +4,12 @@ from Model.Program.Program import Program
 from Model.Program.Parameter import Parameter
 from Model.Program.Data import DataType
 
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QScrollArea, QLabel, QPushButton, QLineEdit, \
+from PySide6.QtWidgets import QFrame, QVBoxLayout, QHBoxLayout, QScrollArea, QLabel, QPushButton, QLineEdit, \
     QComboBox, QSpinBox, QDoubleSpinBox, QToolButton, QGridLayout
 from PySide6.QtCore import Signal, Qt
-from UI.ProgramViews.ChipDataSelection import ChipDataSelection
 
 
-class ParameterEditor(QWidget):
+class ParameterEditor(QFrame):
     onParametersChanged = Signal()
 
     def __init__(self, program: Program):
@@ -22,7 +21,11 @@ class ParameterEditor(QWidget):
         newParameterButton.clicked.connect(self.AddParameter)
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         titleLayout = QHBoxLayout()
+        titleLayout.setContentsMargins(0, 0, 0, 0)
+        titleLayout.setSpacing(0)
         titleLayout.addWidget(parametersLabel)
         titleLayout.addWidget(newParameterButton)
         layout.addLayout(titleLayout)
@@ -32,8 +35,10 @@ class ParameterEditor(QWidget):
         self._listArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self._listArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         layout.addWidget(self._listArea, stretch=1)
-        listWidget = QWidget()
+        listWidget = QFrame()
         self._itemLayout = QVBoxLayout()
+        self._itemLayout.setContentsMargins(0, 0, 0, 0)
+        self._itemLayout.setSpacing(0)
         self._itemLayout.setAlignment(Qt.AlignTop)
         listWidget.setLayout(self._itemLayout)
         self.setLayout(layout)
@@ -100,7 +105,7 @@ class ParameterEditor(QWidget):
             item.UpdateParameter()
 
 
-class ParameterEditorItem(QWidget):
+class ParameterEditorItem(QFrame):
     onRemoveParameter = Signal(Parameter)
     onMoveParameterUp = Signal(Parameter)
     onMoveParameterDown = Signal(Parameter)
@@ -122,6 +127,8 @@ class ParameterEditorItem(QWidget):
         downButton.clicked.connect(lambda: self.onMoveParameterDown.emit(self.parameter))
 
         buttonsLayout = QVBoxLayout()
+        buttonsLayout.setContentsMargins(0, 0, 0, 0)
+        buttonsLayout.setSpacing(0)
         buttonsLayout.setAlignment(Qt.AlignTop)
         buttonsLayout.addWidget(deleteButton)
         buttonsLayout.addWidget(upButton)
@@ -165,6 +172,8 @@ class ParameterEditorItem(QWidget):
         self._maximumInteger.valueChanged.connect(self.OnChanged)
 
         gridLayout = QGridLayout()
+        gridLayout.setContentsMargins(0, 0, 0, 0)
+        gridLayout.setSpacing(0)
         gridLayout.setAlignment(Qt.AlignTop)
         gridLayout.addWidget(self._nameLabel, 0, 0)
         gridLayout.addWidget(self._nameField, 0, 1)
@@ -183,6 +192,8 @@ class ParameterEditorItem(QWidget):
         gridLayout.addWidget(self._maximumFloat, 4, 1)
 
         layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         layout.addLayout(buttonsLayout)
         layout.addLayout(gridLayout)
         self.setLayout(layout)

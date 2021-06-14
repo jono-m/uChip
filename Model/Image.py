@@ -1,12 +1,11 @@
-import typing
 from PySide6.QtGui import QImage
-from PySide6.QtCore import QPointF, QSize
+from PySide6.QtCore import QPoint, QSize
 from pathlib import Path
 
 
 class Image:
     def __init__(self, path: Path):
-        self.position = QPointF()
+        self.position = QPoint()
         self.path = path
 
         self.size = QSize()

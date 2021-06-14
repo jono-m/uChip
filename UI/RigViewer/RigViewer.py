@@ -1,18 +1,21 @@
 from typing import List
 
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSpinBox, QToolButton, QPushButton
+from PySide6.QtWidgets import QFrame, QVBoxLayout, QHBoxLayout, QLabel, QSpinBox, QToolButton, QPushButton
 from PySide6.QtCore import Signal, Qt, QTimer
 from UI.AppGlobals import AppGlobals
 from Model.Rig.RigDevice import RigDevice
 
 
-class RigViewer(QWidget):
+class RigViewer(QFrame):
     def __init__(self):
         super().__init__()
 
         rescanButton = QPushButton("Rescan")
         rescanButton.clicked.connect(self.Rescan)
         self._deviceLayout = QVBoxLayout()
+        self._deviceLayout.setContentsMargins(0, 0, 0, 0)
+        self._deviceLayout.setSpacing(0)
+
         self._deviceLayout.addWidget(rescanButton)
         self.setLayout(self._deviceLayout)
 
@@ -46,7 +49,7 @@ class RigViewer(QWidget):
             self._deviceLayout.addWidget(item)
 
 
-class DeviceItem(QWidget):
+class DeviceItem(QFrame):
     numberChanged = Signal()
 
     def __init__(self, device: RigDevice):
@@ -67,6 +70,8 @@ class DeviceItem(QWidget):
         self._enableToggle.setText("Disable")
 
         self._layout = QHBoxLayout()
+        self._layout.setContentsMargins(0, 0, 0, 0)
+        self._layout.setSpacing(0)
         self.setLayout(self._layout)
 
         self._layout.addWidget(self._nameLabel, stretch=1)
@@ -135,7 +140,7 @@ class DeviceItem(QWidget):
             self._solenoidButtons[i].Update(self.device.startNumber + i, self.device.solenoidPolarities[i])
 
 
-class SolenoidButton(QWidget):
+class SolenoidButton(QFrame):
     solenoidClicked = Signal()
     polarityClicked = Signal()
 
@@ -143,6 +148,8 @@ class SolenoidButton(QWidget):
         super().__init__()
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         self.setLayout(layout)
 
         self._solenoidButton = QToolButton()

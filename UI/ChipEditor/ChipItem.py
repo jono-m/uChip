@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QGraphicsObject
-from PySide6.QtCore import QPointF, QTimer, Signal, QObject
+from PySide6.QtCore import QPoint, QTimer, Signal, QObject
 from abc import abstractmethod
 
 
@@ -31,10 +31,10 @@ class ChipItem(QObject):
         pass
 
     @abstractmethod
-    def CanMove(self, scenePoint: QPointF) -> bool:
+    def CanMove(self, scenePoint: QPoint) -> bool:
         pass
 
-    def Move(self, delta: QPointF):
+    def Move(self, delta: QPoint):
         pass
 
     @abstractmethod

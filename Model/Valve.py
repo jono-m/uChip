@@ -1,8 +1,8 @@
-from PySide6.QtCore import QPointF
+from PySide6.QtCore import QPoint
 
 
 class Valve:
     def __init__(self):
         self.name = "Valve"
-        self.position = QPointF()
+        self.position = QPoint()
         self.solenoidNumber = 0

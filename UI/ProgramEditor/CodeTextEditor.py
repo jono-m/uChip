@@ -1,10 +1,10 @@
-from PySide6.QtWidgets import QWidget, QTextEdit, QHBoxLayout
+from PySide6.QtWidgets import QFrame, QTextEdit, QHBoxLayout
 from PySide6.QtGui import QSyntaxHighlighter, QTextCharFormat, QFont, Qt, QBrush
 from PySide6.QtCore import Signal, QRegularExpression
 import keyword
 
 
-class CodeTextEditor(QWidget):
+class CodeTextEditor(QFrame):
     codeChanged = Signal()
 
     def __init__(self):
@@ -18,6 +18,8 @@ class CodeTextEditor(QWidget):
         self.textEdit.setAcceptRichText(False)
 
         layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         self.setLayout(layout)
         layout.addWidget(self.textEdit)
 
