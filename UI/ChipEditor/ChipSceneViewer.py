@@ -2,11 +2,9 @@ from typing import Set, List
 
 from PySide6.QtWidgets import QGraphicsView, QGraphicsScene, QApplication
 from PySide6.QtGui import QPainter, QBrush, QColor, QTransform, QWheelEvent, QMouseEvent, QPen, QKeyEvent
-from PySide6.QtCore import QPointF, Qt, QRectF, QSizeF, QLineF, Signal
+from PySide6.QtCore import QPoint, Qt, QRect, QSize, QLine, Signal
 
 from UI.ChipEditor.ChipItem import ChipItem
-
-import math
 
 from enum import Enum, auto
 
@@ -25,12 +23,12 @@ class ChipSceneViewer(QGraphicsView):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setMouseTracking(True)
 
-        self._offset = QPointF(0, 0)
+        self._offset = QPoint(0, 0)
         self._zoom = 0
 
         self.backgroundColor = QColor(40, 40, 40)
 
-        self.gridSpacing = QSizeF(60, 60)
+        self.gridSpacing = QSize(60, 60)
         self.gridThickness = 1
         self.gridColor = QColor(100, 100, 100)
         self.gridZoomThreshold = -1.5
@@ -45,10 +43,10 @@ class ChipSceneViewer(QGraphicsView):
         self._selectedItems: List[ChipItem] = []
         self._sceneItems: Set[ChipItem] = set()
 
-        self._boxSelectionRectAnchor = QPointF()
-        self._currentCursorPosition = QPointF()
+        self._boxSelectionRectAnchor = QPoint()
+        self._currentCursorPosition = QPoint()
 
-        self.selectionBox = self.scene().addRect(QRectF(),
+        self.selectionBox = self.scene().addRect(QRect(),
                                                  QPen(self.selectionBoxStrokeColor, self.selectionBoxThickness),
                                                  QBrush(self.selectionBoxFillColor))
         self.selectionBox.setVisible(False)
@@ -64,9 +62,12 @@ class ChipSceneViewer(QGraphicsView):
 
         for item in self._sceneItems:
             item.SetEditDisplay(editing)
+            item.Update()
 
         if not editing:
             self.DeselectAll()
+
+        self.update()
 
     def GetSelectedItems(self):
         return self._selectedItems
@@ -74,7 +75,7 @@ class ChipSceneViewer(QGraphicsView):
     def AddItem(self, item: ChipItem):
         if item not in self._sceneItems:
             self._sceneItems.add(item)
-            item.Move(QPointF())
+            item.Move(QPoint())
             item.onRemoved.connect(self.RemoveItem)
             self.scene().addItem(item.GraphicsObject())
         item.SetEditDisplay(self._editing)
@@ -119,7 +120,7 @@ class ChipSceneViewer(QGraphicsView):
             self.DeselectItem(item)
 
     def Recenter(self):
-        itemsRect = QRectF()
+        itemsRect = QRect()
         for item in self._sceneItems:
             itemsRect = itemsRect.united(item.GraphicsObject().boundingRect().translated(item.GraphicsObject().pos()))
         self._offset = itemsRect.center()
@@ -128,8 +129,8 @@ class ChipSceneViewer(QGraphicsView):
 
     def CenterItem(self, item: ChipItem):
         QApplication.processEvents()
-        sceneCenter = self.mapToScene(self.rect().center())
-        currentCenter = item.GraphicsObject().sceneBoundingRect().center()
+        sceneCenter = self.mapToScene(self.rect().center()).toPoint()
+        currentCenter = item.GraphicsObject().sceneBoundingRect().center().toPoint()
         delta = sceneCenter - currentCenter
         item.Move(delta)
 
@@ -137,7 +138,7 @@ class ChipSceneViewer(QGraphicsView):
         matrix = QTransform()
         matrix.scale(2 ** self._zoom, 2 ** self._zoom)
         self.setTransform(matrix)
-        self.setSceneRect(QRectF(self._offset.x(), self._offset.y(), 10, 10))
+        self.setSceneRect(QRect(self._offset.x(), self._offset.y(), 10, 10))
 
         self.UpdateSelectionBox()
         self.UpdateHoveredItems()
@@ -148,14 +149,14 @@ class ChipSceneViewer(QGraphicsView):
             return SelectionMode.MODIFY
         return SelectionMode.NORMAL
 
-    def CreateSelectionRect(self) -> QRectF:
-        cursorScene = self.mapToScene(self._currentCursorPosition.toPoint())
+    def CreateSelectionRect(self) -> QRect:
+        cursorScene = self.mapToScene(self._currentCursorPosition).toPoint()
         if self._state is State.SELECTING:
-            selectionRect = QRectF(0, 0, abs(self._boxSelectionRectAnchor.x() - cursorScene.x()),
-                                   abs(self._boxSelectionRectAnchor.y() - cursorScene.y()))
+            selectionRect = QRect(0, 0, abs(self._boxSelectionRectAnchor.x() - cursorScene.x()),
+                                  abs(self._boxSelectionRectAnchor.y() - cursorScene.y()))
             selectionRect.moveCenter((cursorScene + self._boxSelectionRectAnchor) / 2.0)
         else:
-            selectionRect = QRectF(cursorScene, QSizeF())
+            selectionRect = QRect(cursorScene, QSize())
         return selectionRect
 
     def UpdateHoveredItems(self):
@@ -191,7 +192,7 @@ class ChipSceneViewer(QGraphicsView):
             self.selectionBox.setVisible(False)
         self.selectionBox.setRect(self.CreateSelectionRect())
 
-    def drawBackground(self, painter: QPainter, rect: QRectF):
+    def drawBackground(self, painter: QPainter, rect: QRect):
         currentColor = self.backgroundBrush().color()
         if currentColor != self.backgroundColor:
             self.setBackgroundBrush(QBrush(self.backgroundColor))
@@ -207,14 +208,14 @@ class ChipSceneViewer(QGraphicsView):
         if self.gridSpacing.width() > 0:
             xStart = rect.left() - rect.left() % self.gridSpacing.width()
             while xStart <= rect.right():
-                line = QLineF(xStart, rect.bottom(), xStart, rect.top())
+                line = QLine(xStart, rect.bottom(), xStart, rect.top())
                 lines.append(line)
                 xStart = xStart + self.gridSpacing.width()
 
         if self.gridSpacing.height() > 0:
             yStart = rect.top() - rect.top() % self.gridSpacing.height()
             while yStart <= rect.bottom():
-                line = QLineF(rect.left(), yStart, rect.right(), yStart)
+                line = QLine(rect.left(), yStart, rect.right(), yStart)
                 lines.append(line)
                 yStart = yStart + self.gridSpacing.height()
 
@@ -223,13 +224,13 @@ class ChipSceneViewer(QGraphicsView):
     def wheelEvent(self, event: QWheelEvent):
         numSteps = float(event.angleDelta().y()) / 1000
 
-        oldWorldPos = self.mapToScene(self._currentCursorPosition.toPoint())
+        oldWorldPos = self.mapToScene(self._currentCursorPosition)
         self._zoom = min(self._zoom + numSteps, 0)
         self.UpdateView()
-        newWorldPos = self.mapToScene(self._currentCursorPosition.toPoint())
+        newWorldPos = self.mapToScene(self._currentCursorPosition)
 
         delta = newWorldPos - oldWorldPos
-        self._offset -= delta
+        self._offset -= delta.toPoint()
 
         self.UpdateView()
 
@@ -242,7 +243,7 @@ class ChipSceneViewer(QGraphicsView):
         elif event.button() == Qt.LeftButton and self._editing:
             if len(self._hoveredItems) == 0:
                 self._state = State.SELECTING
-                self._boxSelectionRectAnchor = self.mapToScene(self._currentCursorPosition.toPoint())
+                self._boxSelectionRectAnchor = self.mapToScene(self._currentCursorPosition).toPoint()
             else:
                 hoveredItem = self._hoveredItems[0]
                 if self.GetSelectionMode() is SelectionMode.MODIFY:
@@ -253,7 +254,7 @@ class ChipSceneViewer(QGraphicsView):
                         self.DeselectAll()
                         self.SelectItem(hoveredItem)
                         self.selectionChanged.emit(self._selectedItems)
-                    if hoveredItem.CanMove(self.mapToScene(self._currentCursorPosition.toPoint())):
+                    if hoveredItem.CanMove(self.mapToScene(self._currentCursorPosition).toPoint()):
                         self._state = State.MOVING
 
         self.UpdateView()
@@ -262,12 +263,12 @@ class ChipSceneViewer(QGraphicsView):
 
     def mouseMoveEvent(self, event: QMouseEvent):
         # Update position movement
-        newCursorPosition = event.localPos()
+        newCursorPosition = event.localPos().toPoint()
         if self._currentCursorPosition is None:
-            deltaScene = QPointF()
+            deltaScene = QPoint()
         else:
-            deltaScene = (self.mapToScene(newCursorPosition.toPoint()) -
-                          self.mapToScene(self._currentCursorPosition.toPoint()))
+            deltaScene = (self.mapToScene(newCursorPosition) -
+                          self.mapToScene(self._currentCursorPosition)).toPoint()
         self._currentCursorPosition = newCursorPosition
 
         if self._state is State.PANNING:
@@ -324,7 +325,7 @@ class ChipSceneViewer(QGraphicsView):
         for item in self.GetSelectedItems():
             if item.CanDuplicate():
                 newItem = item.Duplicate()
-                newItem.Move(QPointF(50, 50))
+                newItem.Move(QPoint(50, 50))
                 self.AddItem(newItem)
                 newItems.append(newItem)
         if newItems:

@@ -1,5 +1,5 @@
 from typing import Dict
-from PySide6.QtWidgets import QWidget, QLabel, QListWidget, QPushButton, QMessageBox, QListWidgetItem, QVBoxLayout
+from PySide6.QtWidgets import QFrame, QLabel, QListWidget, QPushButton, QMessageBox, QListWidgetItem, QVBoxLayout
 from PySide6.QtCore import Signal, Qt
 from Model.Program.Program import Program
 from Model.Program.ProgramInstance import ProgramInstance
@@ -7,7 +7,7 @@ from UI.AppGlobals import AppGlobals
 from UI.ProgramViews.ProgramContextDisplay import ProgramContextDisplay
 
 
-class ProgramList(QWidget):
+class ProgramList(QFrame):
     onProgramEditRequest = Signal(Program)
 
     def __init__(self, parent):
@@ -25,6 +25,8 @@ class ProgramList(QWidget):
         self._newButton.clicked.connect(self.NewProgram)
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         layout.addWidget(self._programsLabel)
         layout.addWidget(self._programsList)
         layout.addWidget(self._newButton)

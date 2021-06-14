@@ -2,7 +2,6 @@ from typing import List
 
 from PySide6.QtWidgets import QComboBox
 from PySide6.QtCore import QTimer
-from Model.Valve import Valve
 from Model.Program.Data import DataType
 from UI.AppGlobals import AppGlobals
 

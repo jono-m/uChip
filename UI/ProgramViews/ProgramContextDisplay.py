@@ -1,11 +1,11 @@
 from Model.Program.ProgramInstance import ProgramInstance, Program
 
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QApplication, QPushButton
+from PySide6.QtWidgets import QFrame, QVBoxLayout, QApplication, QPushButton
 from PySide6.QtCore import Qt, QTimer, QEvent, Signal
 from UI.ProgramViews.ProgramInstanceWidget import ProgramInstanceWidget
 
 
-class ProgramContextDisplay(QWidget):
+class ProgramContextDisplay(QFrame):
     onDelete = Signal(Program)
     onEdit = Signal(Program)
 
@@ -16,9 +16,11 @@ class ProgramContextDisplay(QWidget):
 
         self.listWidget = listWidget
 
-        container = QWidget()
+        container = QFrame()
         self.setAutoFillBackground(True)
         clayout = QVBoxLayout()
+        clayout.setContentsMargins(0, 0, 0, 0)
+        clayout.setSpacing(0)
         self.setLayout(clayout)
         self.layout().addWidget(container)
 
@@ -28,6 +30,8 @@ class ProgramContextDisplay(QWidget):
         self._deleteButton.clicked.connect(lambda: self.onDelete.emit(self._programInstance.program))
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         container.setLayout(layout)
 
         QApplication.instance().installEventFilter(self)

@@ -1,6 +1,6 @@
-from typing import List
+from typing import List, Union
 
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QSpinBox, QDoubleSpinBox, QComboBox, \
+from PySide6.QtWidgets import QFrame, QHBoxLayout, QVBoxLayout, QLabel, QSpinBox, QDoubleSpinBox, QComboBox, \
     QLineEdit, QPushButton, QToolButton
 from PySide6.QtCore import QTimer
 from UI.ProgramViews.ChipDataSelection import ChipDataSelection
@@ -9,7 +9,7 @@ from Model.Program.Data import DataType
 from UI.AppGlobals import AppGlobals
 
 
-class ProgramInstanceWidget(QWidget):
+class ProgramInstanceWidget(QFrame):
     def __init__(self, programInstance: ProgramInstance, uniqueRun):
         super().__init__()
 
@@ -23,6 +23,8 @@ class ProgramInstanceWidget(QWidget):
         self._programNameWidget = QLabel()
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         self.setLayout(layout)
 
         self.runButton = QPushButton("Run")
@@ -87,11 +89,13 @@ class ProgramInstanceWidget(QWidget):
         AppGlobals.ProgramRunner().Stop(self.programInstance)
 
 
-class ProgramParameterItem(QWidget):
-    def __init__(self, parameter: Parameter, instance: ProgramInstance, withVisToggle=False):
+class ProgramParameterItem(QFrame):
+    def __init__(self, parameter: Parameter, instance: ProgramInstance):
         super().__init__()
 
         layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         self.setLayout(layout)
 
         self.parameter = parameter
@@ -119,6 +123,9 @@ class ProgramParameterItem(QWidget):
         elif self.parameter.dataType is not DataType.OTHER:
             self._valueField = ChipDataSelection(self.parameter.dataType)
             self._valueField.currentIndexChanged.connect(self.UpdateParameterValue)
+
+        self._valueField: Union[
+            QSpinBox, QDoubleSpinBox, QComboBox, QLineEdit, ChipDataSelection, None] = self._valueField
 
         if self.parameter.dataType is not DataType.OTHER:
             layout.addWidget(self.visibilityToggle)

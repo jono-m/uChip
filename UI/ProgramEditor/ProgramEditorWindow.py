@@ -1,6 +1,6 @@
 from typing import List
 
-from PySide6.QtWidgets import QTabWidget, QWidget, QMessageBox, QVBoxLayout, QMainWindow
+from PySide6.QtWidgets import QTabWidget, QFrame, QMessageBox, QVBoxLayout, QMainWindow
 from UI.ProgramEditor.ProgramEditorTab import ProgramEditorTab, Program
 from PySide6.QtCore import QTimer
 from PySide6.QtGui import QIcon
@@ -17,7 +17,9 @@ class ProgramEditorWindow(QMainWindow):
         self.setWindowIcon(QIcon("Images/UCIcon.png"))
 
         centralLayout = QVBoxLayout()
-        centralWidget = QWidget()
+        centralLayout.setContentsMargins(0, 0, 0, 0)
+        centralLayout.setSpacing(0)
+        centralWidget = QFrame()
         centralWidget.setLayout(centralLayout)
         self.setCentralWidget(centralWidget)
 

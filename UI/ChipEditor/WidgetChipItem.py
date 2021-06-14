@@ -1,5 +1,5 @@
-from PySide6.QtCore import QPointF
-from PySide6.QtWidgets import QGraphicsProxyWidget, QLabel, QWidget, QVBoxLayout
+from PySide6.QtCore import QPoint
+from PySide6.QtWidgets import QGraphicsProxyWidget, QLabel, QFrame, QVBoxLayout
 from UI.ChipEditor.ChipItem import ChipItem
 from UI.StylesheetLoader import StylesheetLoader
 
@@ -11,16 +11,18 @@ class WidgetChipItem(ChipItem):
 
         super().__init__(self.graphicsWidget)
 
-        self._bigContainer = WidgetChipItemContainer()
+        self.bigContainer = WidgetChipItemContainer()
 
-        self.containerWidget = QWidget()
+        self.containerWidget = WidgetChipItemContents()
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         layout.addWidget(self.containerWidget)
 
-        self._bigContainer.setLayout(layout)
-        self.graphicsWidget.setWidget(self._bigContainer)
+        self.bigContainer.setLayout(layout)
+        self.graphicsWidget.setWidget(self.bigContainer)
 
-        StylesheetLoader.RegisterWidget(self._bigContainer)
+        StylesheetLoader.RegisterWidget(self.bigContainer)
 
         self._displayHovered = False
         self._displaySelected = False
@@ -29,7 +31,7 @@ class WidgetChipItem(ChipItem):
 
     def SetEditDisplay(self, editing: bool):
         self.containerWidget.adjustSize()
-        self._bigContainer.adjustSize()
+        self.bigContainer.adjustSize()
 
     def SetHovered(self, isHovered: bool):
         self._displayHovered = isHovered
@@ -42,8 +44,8 @@ class WidgetChipItem(ChipItem):
     def CanSelect(self) -> bool:
         return True
 
-    def CanMove(self, scenePoint: QPointF) -> bool:
-        childAt = self._bigContainer.childAt(self.GraphicsObject().mapFromScene(scenePoint).toPoint())
+    def CanMove(self, scenePoint: QPoint) -> bool:
+        childAt = self.bigContainer.childAt(self.GraphicsObject().mapFromScene(scenePoint).toPoint())
         return childAt is None or childAt is self.containerWidget or isinstance(childAt, QLabel)
 
     def CanDelete(self) -> bool:
@@ -51,7 +53,7 @@ class WidgetChipItem(ChipItem):
 
     def RemoveItem(self):
         super().RemoveItem()
-        StylesheetLoader.UnregisterWidget(self._bigContainer)
+        StylesheetLoader.UnregisterWidget(self.bigContainer)
 
     def CanDuplicate(self) -> bool:
         return True
@@ -73,9 +75,13 @@ class ClearingProxy(QGraphicsProxyWidget):
         while toClear:
             w = toClear.pop(0)
             w.clearFocus()
-            toClear += [child for child in w.children() if isinstance(child, QWidget)]
+            toClear += [child for child in w.children() if isinstance(child, QFrame)]
         super().mousePressEvent(event)
 
 
-class WidgetChipItemContainer(QWidget):
+class WidgetChipItemContainer(QFrame):
+    pass
+
+
+class WidgetChipItemContents(QFrame):
     pass

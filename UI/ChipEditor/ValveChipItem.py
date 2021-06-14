@@ -1,5 +1,5 @@
-from PySide6.QtCore import QPointF, Qt
-from PySide6.QtWidgets import QToolButton, QSpinBox, QLabel, QGridLayout, QLineEdit, QSizePolicy, QVBoxLayout
+from PySide6.QtCore import QPoint, Qt
+from PySide6.QtWidgets import QToolButton, QSpinBox, QLabel, QGridLayout, QLineEdit, QVBoxLayout
 
 from UI.ChipEditor.WidgetChipItem import WidgetChipItem, ChipItem
 from Model.Valve import Valve
@@ -27,9 +27,13 @@ class ValveChipItem(WidgetChipItem):
         self.valveNameField.textChanged.connect(self.UpdateValve)
 
         mainLayout = QVBoxLayout()
+        mainLayout.setContentsMargins(0, 0, 0, 0)
+        mainLayout.setSpacing(0)
         mainLayout.addWidget(self.valveToggleButton, alignment=Qt.AlignCenter)
 
         layout = QGridLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         layout.addWidget(self.valveNameLabel, 0, 0)
         layout.addWidget(self.valveNameField, 0, 1)
         layout.addWidget(self.valveNumberLabel, 1, 0)
@@ -40,17 +44,18 @@ class ValveChipItem(WidgetChipItem):
         self.valveToggleButton.clicked.connect(self.Toggle)
 
         self.Update()
-        self.Move(QPointF())
+        self.Move(QPoint())
 
     def CheckForValve(self):
         if self._valve not in AppGlobals.Chip().valves:
             self.RemoveItem()
 
-    def Move(self, delta: QPointF):
-        if delta != QPointF():
+    def Move(self, delta: QPoint):
+        if delta != QPoint():
             AppGlobals.Instance().onChipDataModified.emit()
         self._valve.position += delta
         self.GraphicsObject().setPos(self._valve.position)
+        super().Move(delta)
 
     def SetEditDisplay(self, editing: bool):
         self.valveNameField.setVisible(editing)
@@ -74,7 +79,7 @@ class ValveChipItem(WidgetChipItem):
 
     def Duplicate(self) -> 'ChipItem':
         newValve = Valve()
-        newValve.position = QPointF(self._valve.position)
+        newValve.position = QPoint(self._valve.position)
         newValve.name = self._valve.name
         newValve.solenoidNumber = AppGlobals.Chip().NextSolenoidNumber()
 
@@ -93,3 +98,5 @@ class ValveChipItem(WidgetChipItem):
         if lastState != newState:
             self.valveToggleButton.setProperty("valveState", newState)
             self.valveToggleButton.setStyle(self.valveToggleButton.style())
+
+        super().Update()

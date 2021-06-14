@@ -1,8 +1,8 @@
 from typing import Optional
 
 from PySide6.QtGui import QPixmap, QImage, Qt
-from PySide6.QtCore import QPointF, QSize, Signal, QRectF
-from PySide6.QtWidgets import QLabel, QVBoxLayout, QWidget
+from PySide6.QtCore import QPoint, QSize, Signal, QRect, QPoint
+from PySide6.QtWidgets import QLabel, QVBoxLayout, QFrame
 
 from UI.ChipEditor.WidgetChipItem import WidgetChipItem, ChipItem
 from Model.Image import Image
@@ -23,6 +23,8 @@ class ImageChipItem(WidgetChipItem):
         AppGlobals.Instance().onChipModified.connect(self.CheckForImage)
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         layout.addWidget(self.image)
         self.containerWidget.setLayout(layout)
 
@@ -34,26 +36,26 @@ class ImageChipItem(WidgetChipItem):
 
         self.GraphicsObject().setZValue(-10)
 
-        self._neHandle = MovingHandle(self.containerWidget)
+        self._neHandle = MovingHandle(self.bigContainer)
         self._neHandle.moved.connect(
             lambda currentPosition: self.HandleResize(self._neHandle, currentPosition))
 
-        self._nwHandle = MovingHandle(self.containerWidget)
+        self._nwHandle = MovingHandle(self.bigContainer)
         self._nwHandle.moved.connect(
             lambda currentPosition: self.HandleResize(self._nwHandle, currentPosition))
 
-        self._seHandle = MovingHandle(self.containerWidget)
+        self._seHandle = MovingHandle(self.bigContainer)
         self._seHandle.moved.connect(
             lambda currentPosition: self.HandleResize(self._seHandle, currentPosition))
 
-        self._swHandle = MovingHandle(self.containerWidget)
+        self._swHandle = MovingHandle(self.bigContainer)
         self._swHandle.moved.connect(
             lambda currentPosition: self.HandleResize(self._swHandle, currentPosition))
 
         self._handles = [self._neHandle, self._seHandle, self._swHandle, self._nwHandle]
 
         self.Update()
-        self.Move(QPointF())
+        self.Move(QPoint())
         self.PositionHandles()
 
     def SetSelected(self, isSelected: bool):
@@ -65,11 +67,12 @@ class ImageChipItem(WidgetChipItem):
         if self._image not in AppGlobals.Chip().images:
             self.RemoveItem()
 
-    def Move(self, delta: QPointF):
-        if delta != QPointF():
+    def Move(self, delta: QPoint):
+        if delta != QPoint():
             AppGlobals.Instance().onChipDataModified.emit()
         self._image.position += delta
         self.GraphicsObject().setPos(self._image.position)
+        super().Move(delta)
 
     def RequestDelete(self):
         AppGlobals.Chip().images.remove(self._image)
@@ -77,7 +80,7 @@ class ImageChipItem(WidgetChipItem):
 
     def Duplicate(self) -> 'ChipItem':
         newImage = Image(self._image.path)
-        newImage.position = QPointF(self._image.position)
+        newImage.position = QPoint(self._image.position)
         newImage.size = QSize(self._image.size)
 
         AppGlobals.Chip().images.append(newImage)
@@ -85,10 +88,10 @@ class ImageChipItem(WidgetChipItem):
         return ImageChipItem(newImage)
 
     def PositionHandles(self):
-        self._neHandle.move(self.containerWidget.rect().topRight() - self._neHandle.rect().topRight())
-        self._nwHandle.move(self.containerWidget.rect().topLeft() - self._neHandle.rect().topLeft())
-        self._seHandle.move(self.containerWidget.rect().bottomRight() - self._neHandle.rect().bottomRight())
-        self._swHandle.move(self.containerWidget.rect().bottomLeft() - self._neHandle.rect().bottomLeft())
+        self._neHandle.move(self.bigContainer.rect().topRight() - self._neHandle.rect().topRight())
+        self._nwHandle.move(self.bigContainer.rect().topLeft() - self._neHandle.rect().topLeft())
+        self._seHandle.move(self.bigContainer.rect().bottomRight() - self._neHandle.rect().bottomRight())
+        self._swHandle.move(self.bigContainer.rect().bottomLeft() - self._neHandle.rect().bottomLeft())
 
     def Update(self):
         mTime = Path(self._image.path).stat().st_mtime
@@ -103,18 +106,22 @@ class ImageChipItem(WidgetChipItem):
                 self._image.size = newImage.size()
             self._rawImage = newImage
             self.containerWidget.adjustSize()
+            self.bigContainer.adjustSize()
             self.PositionHandles()
 
         if self._image.size != self._lastSize:
             self.image.setPixmap(QPixmap(self._rawImage).scaled(self._image.size, Qt.AspectRatioMode.IgnoreAspectRatio))
             self.image.setFixedSize(self._image.size)
             self.containerWidget.adjustSize()
+            self.bigContainer.adjustSize()
             self._lastSize = self._image.size
             self.PositionHandles()
 
-    def HandleResize(self, handle: 'MovingHandle', currentPosition: QPointF):
-        imageRect = QRectF(self._image.position, self._image.size)
-        currentPosition = self.GraphicsObject().mapToScene(self.containerWidget.mapFromGlobal(currentPosition))
+        super().Update()
+
+    def HandleResize(self, handle: 'MovingHandle', currentPosition: QPoint):
+        imageRect = QRect(self._image.position, self._image.size)
+        currentPosition = self.GraphicsObject().mapToScene(self.bigContainer.mapFromGlobal(currentPosition)).toPoint()
         aspect = self._rawImage.width() / self._rawImage.height()
 
         getHandlePosition = lambda rect: {self._neHandle: rect.topRight(),
@@ -132,13 +139,13 @@ class ImageChipItem(WidgetChipItem):
                    self._seHandle: 1,
                    self._swHandle: -1}[handle]
 
-        wpRect = QRectF(imageRect)
-        hpRect = QRectF(imageRect)
+        wpRect = QRect(imageRect)
+        hpRect = QRect(imageRect)
 
         trueDelta = currentPosition - getHandlePosition(imageRect)
 
-        wpDelta = QPointF(trueDelta.x(), signMod * trueDelta.x() / aspect)
-        hpDelta = QPointF(trueDelta.y() * aspect * signMod, trueDelta.y())
+        wpDelta = QPoint(trueDelta.x(), signMod * trueDelta.x() / aspect)
+        hpDelta = QPoint(trueDelta.y() * aspect * signMod, trueDelta.y())
 
         setHandlePosition(wpRect, getHandlePosition(wpRect) + wpDelta)
         setHandlePosition(hpRect, getHandlePosition(hpRect) + hpDelta)
@@ -149,13 +156,14 @@ class ImageChipItem(WidgetChipItem):
             imageRect = hpRect
 
         self._image.position = imageRect.topLeft()
-        self._image.size = imageRect.size().toSize()
+        self._image.size = imageRect.size()
         self.Update()
         self.GraphicsObject().setPos(self._image.position)
+        self.GraphicsObject().prepareGeometryChange()
 
 
-class MovingHandle(QWidget):
-    moved = Signal(QPointF)
+class MovingHandle(QFrame):
+    moved = Signal(QPoint)
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -170,7 +178,7 @@ class MovingHandle(QWidget):
 
     def mouseMoveEvent(self, event) -> None:
         if self._pressed:
-            currentPosition = event.globalPosition()
+            currentPosition = event.globalPosition().toPoint()
             self.moved.emit(currentPosition)
 
     def mouseReleaseEvent(self, event) -> None:
@@ -178,7 +186,7 @@ class MovingHandle(QWidget):
         print("Released")
 
 
-def DistanceToEdge(point: QPointF, rect: QRectF):
+def DistanceToEdge(point: QPoint, rect: QRect):
     dx = max(rect.left() - point.x(), 0, point.x() - rect.right())
     dy = max(rect.top() - point.y(), 0, point.y() - rect.bottom())
     return math.sqrt(dx * dx + dy * dy)
