@@ -65,7 +65,11 @@ class Rig:
     def LoadDevices(self):
         if Path("devices.pkl").exists():
             file = open("devices.pkl", "rb")
-            self.savedDevices = dill.load(file)
+            try:
+                self.savedDevices = dill.load(file)
+            except Exception as e:
+                print("Error loading device: " + str(e))
+                self.savedDevices = set()
             file.close()
         else:
             self.savedDevices = set()

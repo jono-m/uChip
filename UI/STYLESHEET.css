@@ -14,6 +14,7 @@ WidgetChipItemContainer QLabel {
 WidgetChipItemContents {
     background-color: rgba(50, 50, 50, 1);
     border-radius: 8px;
+    padding: 20px;
 }
 WidgetChipItemContents[state='None'] {
     border: 4px solid rgba(100, 100, 100, 1);
@@ -32,11 +33,11 @@ WidgetChipItemContents[state='HoverAndSelect'] {
     margin: 2px;
 }
 MovingHandle {
-    min-width: 50px;
-    max-width: 50px;
-    min-height: 50px;
-    max-height: 50px;
-    background-color: blue
+    min-width: 10px;
+    max-width: 10px;
+    min-height: 10px;
+    max-height: 10px;
+    background-color: yellow
 }
 QToolButton[valveState='OPEN'] {
     border-radius: 4px;

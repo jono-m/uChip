@@ -61,6 +61,9 @@ class RigDevice:
         myDict["isConnected"] = False
         return myDict
 
+    def __setstate__(self, state):
+        state["serialPort"] = None
+
     def Connect(self):
         if not self.IsDeviceAvailable():
             raise DeviceError(self, "Could not find device " + self.GetName())

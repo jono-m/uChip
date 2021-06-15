@@ -1,14 +1,14 @@
 from PySide6.QtGui import QImage
-from PySide6.QtCore import QPoint, QSize
+from PySide6.QtCore import QPointF, QSizeF
 from pathlib import Path
 
 
 class Image:
     def __init__(self, path: Path):
-        self.position = QPoint()
+        self.position = QPointF()
         self.path = path
 
-        self.size = QSize()
+        self.size = QSizeF()
 
         self.InitializeSize()
 

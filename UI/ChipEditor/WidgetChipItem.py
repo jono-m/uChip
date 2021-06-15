@@ -1,4 +1,4 @@
-from PySide6.QtCore import QPoint
+from PySide6.QtCore import QPointF
 from PySide6.QtWidgets import QGraphicsProxyWidget, QLabel, QFrame, QVBoxLayout
 from UI.ChipEditor.ChipItem import ChipItem
 from UI.StylesheetLoader import StylesheetLoader
@@ -44,7 +44,7 @@ class WidgetChipItem(ChipItem):
     def CanSelect(self) -> bool:
         return True
 
-    def CanMove(self, scenePoint: QPoint) -> bool:
+    def CanMove(self, scenePoint: QPointF) -> bool:
         childAt = self.bigContainer.childAt(self.GraphicsObject().mapFromScene(scenePoint).toPoint())
         return childAt is None or childAt is self.containerWidget or isinstance(childAt, QLabel)
 

@@ -11,8 +11,8 @@ class ProgramInstance:
         self.parameterValues: Dict[Parameter, DataValueType] = {}
 
         self.program = program
-        self.SyncParameters()
         self.parameterVisibility: Dict[Parameter, bool] = {}
+        self.SyncParameters()
 
     def SyncParameters(self):
         oldParameterValues = self.parameterValues
@@ -23,7 +23,6 @@ class ProgramInstance:
             if oldParameter in self.parameterValues:
                 self.parameterValues[oldParameter] = oldParameterValues[oldParameter]
 
-        self.parameterVisibility = {}
         oldParameterVisiblities = self.parameterVisibility
         self.parameterVisibility = {parameter: True for parameter in self.program.parameters}
         for oldParameter in oldParameterVisiblities:
@@ -42,6 +41,7 @@ class ProgramInstance:
     def Clone(self):
         newInstance = ProgramInstance(self.program)
         newInstance.parameterValues = self.parameterValues.copy()
+        newInstance.parameterVisibility = self.parameterVisibility.copy()
         return newInstance
 
     @staticmethod

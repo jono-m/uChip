@@ -1,4 +1,4 @@
-from PySide6.QtCore import QPoint, Qt
+from PySide6.QtCore import QPointF, Qt
 from PySide6.QtWidgets import QToolButton, QSpinBox, QLabel, QGridLayout, QLineEdit, QVBoxLayout
 
 from UI.ChipEditor.WidgetChipItem import WidgetChipItem, ChipItem
@@ -44,14 +44,14 @@ class ValveChipItem(WidgetChipItem):
         self.valveToggleButton.clicked.connect(self.Toggle)
 
         self.Update()
-        self.Move(QPoint())
+        self.Move(QPointF())
 
     def CheckForValve(self):
         if self._valve not in AppGlobals.Chip().valves:
             self.RemoveItem()
 
-    def Move(self, delta: QPoint):
-        if delta != QPoint():
+    def Move(self, delta: QPointF):
+        if delta != QPointF():
             AppGlobals.Instance().onChipDataModified.emit()
         self._valve.position += delta
         self.GraphicsObject().setPos(self._valve.position)

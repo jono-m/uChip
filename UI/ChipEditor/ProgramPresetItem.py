@@ -1,4 +1,4 @@
-from PySide6.QtCore import QPoint
+from PySide6.QtCore import QPointF
 from PySide6.QtWidgets import QLineEdit, QVBoxLayout, QLabel
 
 from UI.ChipEditor.WidgetChipItem import WidgetChipItem, ChipItem
@@ -36,13 +36,14 @@ class ProgramPresetItem(WidgetChipItem):
     def SetEditDisplay(self, editing: bool):
         self._presetNameField.setVisible(editing)
         self._presetNameLabel.setVisible(not editing)
+        self._instanceWidget.programNameWidget.setVisible(editing)
         self.containerWidget.adjustSize()
         self._instanceWidget.editingParameterVisibility = editing
         self._instanceWidget.UpdateParameterVisibility()
         super().SetEditDisplay(editing)
 
-    def Move(self, delta: QPoint):
-        if delta != QPoint():
+    def Move(self, delta: QPointF):
+        if delta != QPointF():
             AppGlobals.Instance().onChipDataModified.emit()
         self._preset.position += delta
         self.GraphicsObject().setPos(self._preset.position)
@@ -64,7 +65,7 @@ class ProgramPresetItem(WidgetChipItem):
     def Duplicate(self) -> 'ChipItem':
         newPreset = ProgramPreset(self._preset.instance.program)
         newPreset.instance = self._preset.instance.Clone()
-        newPreset.position = QPoint(self._preset.position)
+        newPreset.position = QPointF(self._preset.position)
         newPreset.name = self._preset.name
 
         AppGlobals.Chip().programPresets.append(newPreset)
