@@ -64,7 +64,7 @@ class ProgramRunner:
             else:
                 info.waitingForProgram = None
             try:
-                yieldValue = next(self.runningPrograms[programInstance].iterator, None)
+                yieldValue = next(self.runningPrograms[programInstance].iterator, -1)
             except Exception as e:
                 self.Report(ProgramRunnerMessage(programInstance, True, str(e)))
                 continue
@@ -73,8 +73,10 @@ class ProgramRunner:
             elif isinstance(yieldValue, WaitForSeconds):
                 info.waitStartTime = time.time()
                 info.waitDuration = yieldValue.duration
-            elif yieldValue is None:
+            elif yieldValue == -1:
                 self.Stop(programInstance)
+            elif yieldValue is None:
+                continue
             else:
                 self.Report(ProgramRunnerMessage(programInstance, True, str(Exception(
                     "Yielded object must be of type WaitForSeconds, ProgramInstance, or NoneType."))))

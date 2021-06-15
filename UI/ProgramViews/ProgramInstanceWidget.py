@@ -20,7 +20,7 @@ class ProgramInstanceWidget(QFrame):
         self.programInstance = programInstance
         self.uniqueRun = uniqueRun
 
-        self._programNameWidget = QLabel()
+        self.programNameWidget = QLabel()
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -37,7 +37,7 @@ class ProgramInstanceWidget(QFrame):
 
         self._parametersLayout = QVBoxLayout()
 
-        layout.addWidget(self._programNameWidget)
+        layout.addWidget(self.programNameWidget)
         layout.addLayout(self._parametersLayout)
         layout.addWidget(self.runButton)
         layout.addWidget(self._stopButton)
@@ -53,12 +53,16 @@ class ProgramInstanceWidget(QFrame):
         self.parameterItems = []
 
         for parameter in self.programInstance.program.parameters:
-            newItem = ProgramParameterItem(parameter, self.programInstance)
-            self._parametersLayout.addWidget(newItem)
-            self.parameterItems.append(newItem)
+            if parameter.dataType is not DataType.OTHER:
+                newItem = ProgramParameterItem(parameter, self.programInstance)
+                self._parametersLayout.addWidget(newItem)
+                self.parameterItems.append(newItem)
+
+        self.UpdateParameterVisibility()
+        self.adjustSize()
 
     def UpdateInstanceView(self):
-        self._programNameWidget.setText(self.programInstance.program.name)
+        self.programNameWidget.setText(self.programInstance.program.name)
         if self.uniqueRun:
             self.runButton.setVisible(not AppGlobals.ProgramRunner().IsRunning(self.programInstance))
             self._stopButton.setVisible(AppGlobals.ProgramRunner().IsRunning(self.programInstance))
@@ -103,8 +107,7 @@ class ProgramParameterItem(QFrame):
         self._parameterName = QLabel()
 
         self.visibilityToggle = QToolButton()
-        self.visibilityToggle.setCheckable(True)
-        self.visibilityToggle.clicked.connect(self.UpdateParameterValue)
+        self.visibilityToggle.clicked.connect(self.ToggleVisibility)
 
         if self.parameter.dataType is DataType.INTEGER:
             self._valueField = QSpinBox()
@@ -124,15 +127,16 @@ class ProgramParameterItem(QFrame):
             self._valueField = ChipDataSelection(self.parameter.dataType)
             self._valueField.currentIndexChanged.connect(self.UpdateParameterValue)
 
-        self._valueField: Union[
-            QSpinBox, QDoubleSpinBox, QComboBox, QLineEdit, ChipDataSelection, None] = self._valueField
-
-        if self.parameter.dataType is not DataType.OTHER:
-            layout.addWidget(self.visibilityToggle)
-            layout.addWidget(self._parameterName)
-            layout.addWidget(self._valueField)
+        layout.addWidget(self.visibilityToggle)
+        layout.addWidget(self._parameterName)
+        layout.addWidget(self._valueField)
 
         self.UpdateFields()
+
+    def ToggleVisibility(self):
+        self._programInstance.parameterVisibility[self.parameter] = not self._programInstance.parameterVisibility[
+            self.parameter]
+        AppGlobals.Instance().onChipDataModified.emit()
 
     def UpdateParameterValue(self):
         lastValue = self._programInstance.parameterValues[self.parameter]
@@ -148,20 +152,16 @@ class ProgramParameterItem(QFrame):
         elif self.parameter.dataType is not DataType.OTHER:
             self._programInstance.parameterValues[self.parameter] = self._valueField.currentData()
 
-        self._programInstance.parameterVisibility[self.parameter] = self.visibilityToggle.isChecked()
-
         if self._programInstance.parameterValues[self.parameter] != lastValue:
-            AppGlobals.Instance().onChipModified.emit()
+            AppGlobals.Instance().onChipDataModified.emit()
 
     def UpdateFields(self):
         self._parameterName.setText(self.parameter.name)
 
         if self._programInstance.parameterVisibility[self.parameter]:
             self.visibilityToggle.setText("O")
-            self.visibilityToggle.setChecked(True)
         else:
             self.visibilityToggle.setText("X")
-            self.visibilityToggle.setChecked(False)
 
         if self.parameter.dataType is DataType.INTEGER:
             self._valueField.setValue(self._programInstance.parameterValues[self.parameter])

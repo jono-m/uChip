@@ -35,9 +35,9 @@ class AppGlobals(QObject):
     @staticmethod
     def OpenChip(chip: Chip):
         AppGlobals.Instance().chip = chip
+        AppGlobals.Instance().programRunner.chip = chip
         AppGlobals.Instance().onChipDataModified.connect(chip.RecordModification)
         AppGlobals.Instance().onChipOpened.emit()
-        AppGlobals.Instance().programRunner.chip = chip
 
     @staticmethod
     def ProgramRunner() -> ProgramRunner:
