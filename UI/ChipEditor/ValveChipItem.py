@@ -79,7 +79,7 @@ class ValveChipItem(WidgetChipItem):
 
     def Duplicate(self) -> 'ChipItem':
         newValve = Valve()
-        newValve.position = QPoint(self._valve.position)
+        newValve.position = QPointF(self._valve.position)
         newValve.name = self._valve.name
         newValve.solenoidNumber = AppGlobals.Chip().NextSolenoidNumber()
 
