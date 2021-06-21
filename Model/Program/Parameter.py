@@ -17,6 +17,7 @@ class Parameter:
         self.maximumFloat: Optional[float] = 100
         self.minimumInteger: Optional[int] = 0
         self.maximumInteger: Optional[int] = 100
+        self.listType = DataType.INTEGER
 
     def ValidateDefaultValues(self):
         self.defaultValueDict[DataType.INTEGER] = self.ClampInteger(self.defaultValueDict[DataType.INTEGER])

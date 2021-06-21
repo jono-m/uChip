@@ -80,6 +80,14 @@ class DeviceItem(QFrame):
         self._layout.addWidget(self._startNumberDial)
         self._layout.addStretch(1)
 
+        openAllButton = QPushButton("Open All")
+        openAllButton.clicked.connect(lambda: self.SetAll(True))
+        closeAllButton = QPushButton("Close All")
+        closeAllButton.clicked.connect(lambda: self.SetAll(False))
+
+        self._layout.addWidget(openAllButton)
+        self._layout.addWidget(closeAllButton)
+
         solenoidLabelLayout = QVBoxLayout()
         solenoidLabelLayout.addWidget(QLabel("State"), alignment=Qt.AlignRight)
         solenoidLabelLayout.addWidget(QLabel("Invert"), alignment=Qt.AlignRight)
@@ -96,6 +104,11 @@ class DeviceItem(QFrame):
             self._layout.addWidget(newButton, stretch=0)
 
         self.Update()
+
+    def SetAll(self, isOpen: bool):
+        for i in range(24):
+            AppGlobals.Rig().SetSolenoidState(self.device.startNumber + i, isOpen)
+        AppGlobals.Rig().FlushStates()
 
     def SetStartNumber(self):
         self.device.startNumber = self._startNumberDial.value()

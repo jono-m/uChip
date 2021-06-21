@@ -90,9 +90,6 @@ class Chip:
                     if parameter.dataType is DataType.VALVE:
                         if preset.instance.parameterValues[parameter] not in self.valves:
                             preset.instance.parameterValues[parameter] = None
-                    elif parameter.dataType is DataType.PROGRAM:
-                        if preset.instance.parameterValues[parameter] not in self.programs:
-                            preset.instance.parameterValues[parameter] = None
                     elif parameter.dataType is DataType.PROGRAM_PRESET:
                         if preset.instance.parameterValues[parameter] not in self.programPresets:
                             preset.instance.parameterValues[parameter] = None

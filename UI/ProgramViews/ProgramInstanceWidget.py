@@ -1,9 +1,8 @@
 from typing import List, Union
 
-from PySide6.QtWidgets import QFrame, QHBoxLayout, QVBoxLayout, QLabel, QSpinBox, QDoubleSpinBox, QComboBox, \
-    QLineEdit, QPushButton, QToolButton
+from PySide6.QtWidgets import QFrame, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QToolButton
 from PySide6.QtCore import QTimer
-from UI.ProgramViews.ChipDataSelection import ChipDataSelection
+from UI.ProgramViews.DataValueWidget import DataValueWidget
 from Model.Program.ProgramInstance import ProgramInstance, Parameter
 from Model.Program.Data import DataType
 from UI.AppGlobals import AppGlobals
@@ -36,6 +35,8 @@ class ProgramInstanceWidget(QFrame):
         self.parameterItems: List[ProgramParameterItem] = []
 
         self._parametersLayout = QVBoxLayout()
+        self._parametersLayout.setSpacing(0)
+        self._parametersLayout.setContentsMargins(0, 0, 0, 0)
 
         layout.addWidget(self.programNameWidget)
         layout.addLayout(self._parametersLayout)
@@ -109,23 +110,8 @@ class ProgramParameterItem(QFrame):
         self.visibilityToggle = QToolButton()
         self.visibilityToggle.clicked.connect(self.ToggleVisibility)
 
-        if self.parameter.dataType is DataType.INTEGER:
-            self._valueField = QSpinBox()
-            self._valueField.valueChanged.connect(self.UpdateParameterValue)
-        elif self.parameter.dataType is DataType.FLOAT:
-            self._valueField = QDoubleSpinBox()
-            self._valueField.valueChanged.connect(self.UpdateParameterValue)
-        elif self.parameter.dataType is DataType.BOOLEAN:
-            self._valueField = QComboBox()
-            self._valueField.addItem("True", True)
-            self._valueField.addItem("False", False)
-            self._valueField.currentIndexChanged.connect(self.UpdateParameterValue)
-        elif self.parameter.dataType is DataType.STRING:
-            self._valueField = QLineEdit()
-            self._valueField.textChanged.connect(self.UpdateParameterValue)
-        elif self.parameter.dataType is not DataType.OTHER:
-            self._valueField = ChipDataSelection(self.parameter.dataType)
-            self._valueField.currentIndexChanged.connect(self.UpdateParameterValue)
+        self._valueField = DataValueWidget(self.parameter.dataType, self.parameter.listType)
+        self._valueField.dataChanged.connect(self.UpdateParameterValue)
 
         layout.addWidget(self.visibilityToggle)
         layout.addWidget(self._parameterName)
@@ -142,15 +128,12 @@ class ProgramParameterItem(QFrame):
         lastValue = self._programInstance.parameterValues[self.parameter]
 
         if self.parameter.dataType is DataType.INTEGER:
-            self._programInstance.parameterValues[self.parameter] = self._valueField.value()
+            value = self.parameter.ClampInteger(self._valueField.GetData())
         elif self.parameter.dataType is DataType.FLOAT:
-            self._programInstance.parameterValues[self.parameter] = self._valueField.value()
-        elif self.parameter.dataType is DataType.BOOLEAN:
-            self._programInstance.parameterValues[self.parameter] = self._valueField.currentData()
-        elif self.parameter.dataType is DataType.STRING:
-            self._programInstance.parameterValues[self.parameter] = self._valueField.text()
-        elif self.parameter.dataType is not DataType.OTHER:
-            self._programInstance.parameterValues[self.parameter] = self._valueField.currentData()
+            value = self.parameter.ClampFloat(self._valueField.GetData())
+        else:
+            value = self._valueField.GetData()
+        self._programInstance.parameterValues[self.parameter] = value
 
         if self._programInstance.parameterValues[self.parameter] != lastValue:
             AppGlobals.Instance().onChipDataModified.emit()
@@ -163,15 +146,4 @@ class ProgramParameterItem(QFrame):
         else:
             self.visibilityToggle.setText("X")
 
-        if self.parameter.dataType is DataType.INTEGER:
-            self._valueField.setValue(self._programInstance.parameterValues[self.parameter])
-            self._valueField.setRange(self.parameter.minimumInteger, self.parameter.maximumInteger)
-        elif self.parameter.dataType is DataType.FLOAT:
-            self._valueField.setValue(self._programInstance.parameterValues[self.parameter])
-            self._valueField.setRange(self.parameter.minimumFloat, self.parameter.maximumFloat)
-        elif self.parameter.dataType is DataType.BOOLEAN:
-            self._valueField.setCurrentText(str(self._programInstance.parameterValues[self.parameter]))
-        elif self.parameter.dataType is DataType.STRING:
-            self._valueField.setText(self._programInstance.parameterValues[self.parameter])
-        elif self.parameter.dataType is not DataType.OTHER:
-            self._valueField.Select(self._programInstance.parameterValues[self.parameter])
+        self._valueField.Update(self._programInstance.parameterValues[self.parameter])
