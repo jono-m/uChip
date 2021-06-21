@@ -1,7 +1,7 @@
 from typing import List
 
 from PySide6.QtWidgets import QFrame, QLabel, QVBoxLayout, QPushButton, QHBoxLayout
-from PySide6.QtCore import QTimer, Signal
+from PySide6.QtCore import QTimer, Signal, Qt
 from UI.AppGlobals import AppGlobals
 from Model.Program.ProgramInstance import ProgramInstance
 
@@ -16,7 +16,17 @@ class RunningProgramsList(QFrame):
         self.runningProgramsListLayout.setContentsMargins(0, 0, 0, 0)
         self.runningProgramsListLayout.setSpacing(0)
 
-        self._console = QLabel()
+        consoleLayout = QVBoxLayout()
+        consoleLabel = QLabel("Console")
+        clearButton = QPushButton("Clear")
+        clearButton.clicked.connect(lambda: AppGlobals.ProgramRunner().ClearMessages())
+        consoleTitleLayout = QHBoxLayout()
+        consoleTitleLayout.addWidget(consoleLabel)
+        consoleTitleLayout.addWidget(clearButton)
+
+        self._consoleText = QLabel()
+        consoleLayout.addLayout(consoleTitleLayout)
+        consoleLayout.addWidget(self._consoleText, alignment=Qt.AlignTop)
 
         self.runningProgramListItems: List[RunningProgramItem] = []
 
@@ -24,10 +34,7 @@ class RunningProgramsList(QFrame):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
         layout.addLayout(self.runningProgramsListLayout)
-        clearButton = QPushButton("Clear")
-        clearButton.clicked.connect(lambda: AppGlobals.ProgramRunner().ClearMessages())
-        layout.addWidget(clearButton)
-        layout.addWidget(self._console)
+        layout.addLayout(consoleLayout)
         self.setLayout(layout)
 
         timer = QTimer(self)
@@ -38,8 +45,8 @@ class RunningProgramsList(QFrame):
         text = ""
         for message in AppGlobals.ProgramRunner().GetMessages():
             text += message.text + "\n"
-        if self._console.text() != text:
-            self._console.setText(text)
+        if self._consoleText.text() != text:
+            self._consoleText.setText(text)
 
         for runningProgramListItem in self.runningProgramListItems.copy():
             if not AppGlobals.ProgramRunner().IsRunning(runningProgramListItem.instance):

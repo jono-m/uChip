@@ -92,11 +92,11 @@ class ParameterEditor(QFrame):
 
     def MoveParameterUp(self, parameter: Parameter):
         index = self._temporaryParameters.index(parameter)
-        self.Reorder(parameter, index-1)
+        self.Reorder(parameter, index - 1)
 
     def MoveParameterDown(self, parameter: Parameter):
         index = self._temporaryParameters.index(parameter)
-        self.Reorder(parameter, index+1)
+        self.Reorder(parameter, index + 1)
 
     def Save(self):
         self._program.parameters = self._temporaryParameters
@@ -144,6 +144,13 @@ class ParameterEditorItem(QFrame):
             self._dataTypeField.addItem(dataType.ToString(), userData=dataType)
         self._dataTypeField.currentIndexChanged.connect(self.OnChanged)
 
+        self._listDataTypeLabel = QLabel("List Type")
+        self._listDataTypeField = QComboBox()
+        for dataType in DataType:
+            if dataType != DataType.LIST:
+                self._listDataTypeField.addItem(dataType.ToString(), userData=dataType)
+        self._listDataTypeField.currentIndexChanged.connect(self.OnChanged)
+
         self._defaultValueLabel = QLabel("Default Value")
         self._defaultInteger = QSpinBox()
         self._defaultInteger.valueChanged.connect(self.OnChanged)
@@ -179,6 +186,10 @@ class ParameterEditorItem(QFrame):
         gridLayout.addWidget(self._nameField, 0, 1)
         gridLayout.addWidget(self._dataTypeLabel, 1, 0)
         gridLayout.addWidget(self._dataTypeField, 1, 1)
+
+        gridLayout.addWidget(self._listDataTypeLabel, 2, 0)
+        gridLayout.addWidget(self._listDataTypeField, 2, 1)
+
         gridLayout.addWidget(self._defaultValueLabel, 2, 0)
 
         for defaultField in [self._defaultInteger, self._defaultFloat, self._defaultBoolean, self._defaultString]:
@@ -204,6 +215,7 @@ class ParameterEditorItem(QFrame):
         self._nameField.setText(self.parameter.name)
 
         self._dataTypeField.setCurrentText(self.parameter.dataType.ToString())
+        self._listDataTypeField.setCurrentText(self.parameter.listType.ToString())
 
         minFloat, maxFloat = self.parameter.minimumFloat, self.parameter.maximumFloat
         minInt, maxInt = self.parameter.minimumInteger, self.parameter.maximumInteger
@@ -251,7 +263,10 @@ class ParameterEditorItem(QFrame):
         self._maximumLabel.setVisible(self._dataTypeField.currentData() in [DataType.INTEGER, DataType.FLOAT])
 
         self._defaultValueLabel.setVisible(
-            self._dataTypeField.currentData() not in [DataType.VALVE, DataType.PROGRAM, DataType.PROGRAM_PRESET])
+            self._dataTypeField.currentData() not in [DataType.VALVE, DataType.LIST, DataType.PROGRAM_PRESET])
+
+        self._listDataTypeLabel.setVisible(self._dataTypeField.currentData() is DataType.LIST)
+        self._listDataTypeField.setVisible(self._dataTypeField.currentData() is DataType.LIST)
 
     def OnChanged(self):
         self.UpdateVisibility()
@@ -266,6 +281,8 @@ class ParameterEditorItem(QFrame):
     def UpdateParameter(self):
         self.parameter.name = self._nameField.text()
         self.parameter.dataType = self._dataTypeField.currentData()
+
+        self.parameter.listType = self._listDataTypeField.currentData()
 
         self.parameter.defaultValueDict[DataType.INTEGER] = self._defaultInteger.value()
         self.parameter.defaultValueDict[DataType.FLOAT] = self._defaultFloat.value()

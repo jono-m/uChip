@@ -29,8 +29,6 @@ class ChipDataSelection(QComboBox):
     def ItemsToRepopulate(self) -> List:
         if self.dataType is DataType.VALVE:
             return AppGlobals.Chip().valves
-        if self.dataType is DataType.PROGRAM:
-            return AppGlobals.Chip().programs
         if self.dataType is DataType.PROGRAM_PRESET:
             return AppGlobals.Chip().programPresets
 

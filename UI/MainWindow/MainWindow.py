@@ -29,7 +29,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.chipEditor)
 
         self.resize(self.screen().size() / 2)
-        self.move(self.screen().size().width() / 2, 0)
+        self.move(self.screen().size().width() / 2, self.screen().size().height()/2)
 
         self.setWindowIcon(QIcon("Images/UCIcon.png"))
 

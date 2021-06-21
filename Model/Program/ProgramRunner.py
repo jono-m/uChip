@@ -2,7 +2,7 @@ import time
 import types
 from typing import Optional, Dict, List, Union
 
-from Model.Program.ProgramInstance import ProgramInstance
+from Model.Program.ProgramInstance import ProgramInstance, DataType
 from Model.Chip import Chip, ProgramPreset
 from Model.Rig import Rig
 
@@ -136,9 +136,17 @@ class ProgramRunner:
         else:
             self.queuedPrograms.append(instance)
 
+    @staticmethod
+    def GetParameter(instance: ProgramInstance, name: str):
+        parameter = instance.GetParameterWithName(name)
+        if parameter.dataType == DataType.PROGRAM_PRESET:
+            return instance.parameterValues[parameter].instance
+        else:
+            return instance.parameterValues[parameter]
+
     def Start(self, instance: ProgramInstance, parentInstance: Optional[ProgramInstance] = None):
         globalEnv = {
-            'Parameter': lambda name: instance.parameterValues[instance.GetParameterWithName(name)],
+            'Parameter': lambda name: self.GetParameter(instance, name),
             "Valve": lambda name: self.chip.FindValveWithName(name),
             "Program": lambda programName, parameters=None: ProgramInstance.InstanceWithParameters(
                 self.chip.FindProgramWithName(programName), parameters),

@@ -28,10 +28,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="99850780-df20-4af2-831c-10fab045648b" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/UI/ProgramViews/DataValueWidget.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/AppGlobals.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/AppGlobals.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ValveChipItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ValveChipItem.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProgramEditor/CodeTextEditor.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramEditor/CodeTextEditor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Chip.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Chip.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Program/Data.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program/Data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Program/Parameter.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program/Parameter.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Program/ProgramRunner.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program/ProgramRunner.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramEditor/ParameterEditor.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramEditor/ParameterEditor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramViews/ChipDataSelection.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramViews/ChipDataSelection.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramViews/ProgramInstanceWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramViews/ProgramInstanceWidget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramViews/RunningProgramsList.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramViews/RunningProgramsList.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/RigViewer/RigViewer.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/RigViewer/RigViewer.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -189,7 +197,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Model/Program/ProgramRunner.py</url>
-          <line>160</line>
+          <line>168</line>
           <option name="timeStamp" value="126" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -226,21 +234,6 @@
           <url>file://$PROJECT_DIR$/UI/ChipEditor/ProgramPresetItem.py</url>
           <line>70</line>
           <option name="timeStamp" value="166" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/UI/ProgramEditor/CodeTextEditor.py</url>
-          <line>115</line>
-          <option name="timeStamp" value="171" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/UI/ProgramEditor/CodeTextEditor.py</url>
-          <line>104</line>
-          <option name="timeStamp" value="172" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/UI/ProgramEditor/CodeTextEditor.py</url>
-          <line>95</line>
-          <option name="timeStamp" value="175" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
