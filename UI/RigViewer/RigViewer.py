@@ -65,7 +65,7 @@ class DeviceItem(QFrame):
         self._startNumberDial.setValue(device.startNumber)
         self._startNumberDial.valueChanged.connect(self.SetStartNumber)
 
-        self._enableToggle = QToolButton()
+        self._enableToggle = QPushButton()
         self._enableToggle.clicked.connect(self.ToggleEnable)
         self._enableToggle.setText("Disable")
 
@@ -78,7 +78,6 @@ class DeviceItem(QFrame):
         self._layout.addWidget(self._statusLabel, stretch=1)
         self._layout.addWidget(self._enableToggle)
         self._layout.addWidget(self._startNumberDial)
-        self._layout.addStretch(1)
 
         openAllButton = QPushButton("Open All")
         openAllButton.clicked.connect(lambda: self.SetAll(True))
@@ -87,17 +86,9 @@ class DeviceItem(QFrame):
 
         self._layout.addWidget(openAllButton)
         self._layout.addWidget(closeAllButton)
-
-        solenoidLabelLayout = QVBoxLayout()
-        solenoidLabelLayout.addWidget(QLabel("State"), alignment=Qt.AlignRight)
-        solenoidLabelLayout.addWidget(QLabel("Invert"), alignment=Qt.AlignRight)
-
-        self._layout.addLayout(solenoidLabelLayout)
-        self._layout.addSpacing(5)
-
         self._solenoidButtons: List[SolenoidButton] = []
         for solenoidNumber in range(24):
-            newButton = SolenoidButton(solenoidNumber, device.solenoidPolarities[solenoidNumber])
+            newButton = SolenoidButton(solenoidNumber)
             newButton.solenoidClicked.connect(lambda s=newButton: self.ToggleSolenoid(s))
             newButton.polarityClicked.connect(lambda s=newButton: self.TogglePolarity(s))
             self._solenoidButtons.append(newButton)
@@ -150,45 +141,35 @@ class DeviceItem(QFrame):
         self._startNumberDial.setEnabled(self.device.isEnabled and self.device.isConnected)
         for i in range(24):
             self._solenoidButtons[i].setEnabled(self.device.isConnected and self.device.isEnabled)
-            self._solenoidButtons[i].Update(self.device.startNumber + i, self.device.solenoidPolarities[i])
+            self._solenoidButtons[i].Update(self.device.startNumber + i)
 
 
-class SolenoidButton(QFrame):
+class SolenoidButton(QToolButton):
     solenoidClicked = Signal()
     polarityClicked = Signal()
 
-    def __init__(self, number, polarity):
+    def __init__(self, number):
         super().__init__()
 
-        layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
-        self.setLayout(layout)
+        self.clicked.connect(self.solenoidClicked.emit)
 
-        self._solenoidButton = QToolButton()
-        self._solenoidButton.setCheckable(True)
-        self._solenoidButton.clicked.connect(self.solenoidClicked.emit)
-        self._polarityButton = QToolButton()
-        self._polarityButton.clicked.connect(self.polarityClicked.emit)
-
-        layout.addWidget(self._solenoidButton)
-        layout.addWidget(self._polarityButton)
-
-        self.Update(number, polarity)
+        self.Update(number)
 
         timer = QTimer(self)
         timer.timeout.connect(self.UpdateValveState)
         timer.start(30)
 
         self._number = number
+        self._showOpen = None
 
-    def Update(self, number: int, polarity: bool):
+    def Update(self, number: int):
         self._number = number
-
-        self._solenoidButton.setText(str(number))
-        self._polarityButton.setText({True: "+",
-                                      False: "-"}[polarity])
-        self._polarityButton.setChecked(polarity)
+        self.setText(str(number))
 
     def UpdateValveState(self):
-        self._solenoidButton.setChecked(AppGlobals.Rig().GetSolenoidState(self._number))
+        showOpen = AppGlobals.Rig().GetSolenoidState(self._number)
+        if showOpen != self._showOpen:
+            self.setProperty("IsOpen", showOpen)
+            self._showOpen = showOpen
+            self.setStyle(self.style())
+

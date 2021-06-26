@@ -16,25 +16,12 @@ class RunningProgramsList(QFrame):
         self.runningProgramsListLayout.setContentsMargins(0, 0, 0, 0)
         self.runningProgramsListLayout.setSpacing(0)
 
-        consoleLayout = QVBoxLayout()
-        consoleLabel = QLabel("Console")
-        clearButton = QPushButton("Clear")
-        clearButton.clicked.connect(lambda: AppGlobals.ProgramRunner().ClearMessages())
-        consoleTitleLayout = QHBoxLayout()
-        consoleTitleLayout.addWidget(consoleLabel)
-        consoleTitleLayout.addWidget(clearButton)
-
-        self._consoleText = QLabel()
-        consoleLayout.addLayout(consoleTitleLayout)
-        consoleLayout.addWidget(self._consoleText, alignment=Qt.AlignTop)
-
         self.runningProgramListItems: List[RunningProgramItem] = []
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
         layout.addLayout(self.runningProgramsListLayout)
-        layout.addLayout(consoleLayout)
         self.setLayout(layout)
 
         timer = QTimer(self)
@@ -42,12 +29,6 @@ class RunningProgramsList(QFrame):
         timer.start(30)
 
     def Update(self):
-        text = ""
-        for message in AppGlobals.ProgramRunner().GetMessages():
-            text += message.text + "\n"
-        if self._consoleText.text() != text:
-            self._consoleText.setText(text)
-
         for runningProgramListItem in self.runningProgramListItems.copy():
             if not AppGlobals.ProgramRunner().IsRunning(runningProgramListItem.instance):
                 self.runningProgramListItems.remove(runningProgramListItem)
