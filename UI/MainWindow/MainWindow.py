@@ -10,6 +10,7 @@ from UI.AppGlobals import AppGlobals, Chip
 from UI.ProgramEditor.ProgramEditorWindow import ProgramEditorWindow
 from UI.MainWindow.ProgramRunnerWorker import ProgramRunnerWorker
 from UI.ProgramViews.RunningProgramsList import RunningProgramsList
+from UI.ProgramViews.ConsoleViewer import ConsoleViewer
 
 from pathlib import Path
 
@@ -29,7 +30,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.chipEditor)
 
         self.resize(self.screen().size() / 2)
-        self.move(self.screen().size().width() / 2, self.screen().size().height()/2)
+        self.move(self.screen().size().width() / 2, self.screen().size().height() / 2)
 
         self.setWindowIcon(QIcon("Images/UCIcon.png"))
 
@@ -38,6 +39,7 @@ class MainWindow(QMainWindow):
         self._programList = ProgramList(self)
         self._programList.onProgramEditRequest.connect(self.EditProgram)
         self._runningProgramsList = RunningProgramsList()
+        self._consoleView = ConsoleViewer()
         self._editorWindow.setVisible(False)
 
         menuBar = MenuBar()
@@ -48,6 +50,8 @@ class MainWindow(QMainWindow):
         menuBar.exit.connect(self.close)
         menuBar.showRigView.connect(self.ShowRigWidget)
         menuBar.showProgramList.connect(self.ShowProgramList)
+        menuBar.showRunningProgramsList.connect(self.ShowRunningProgramsList)
+        menuBar.showConsole.connect(self.ShowConsole)
         menuBar.zoomToFit.connect(self.chipEditor.viewer.Recenter)
 
         self.updateWorker = ProgramRunnerWorker(self)
@@ -62,6 +66,7 @@ class MainWindow(QMainWindow):
         self.ShowProgramList()
         self.ShowProgramEditorWindow()
         self.ShowRunningProgramsList()
+        self.ShowConsole()
         self._editorWindow.close()
 
         AppGlobals.OpenChip(Chip())
@@ -176,7 +181,18 @@ class MainWindow(QMainWindow):
         dock.setWindowTitle("Running Programs")
         dock.setAllowedAreas(Qt.RightDockWidgetArea)
         dock.setWidget(self._runningProgramsList)
-        dock.setFeatures(QDockWidget.NoDockWidgetFeatures)
+        dock.setFeatures(QDockWidget.DockWidgetClosable)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock)
+
+    def ShowConsole(self):
+        if self._consoleView.isVisible():
+            return
+
+        dock = QDockWidget()
+        dock.setWindowTitle("Console")
+        dock.setAllowedAreas(Qt.RightDockWidgetArea)
+        dock.setWidget(self._consoleView)
+        dock.setFeatures(QDockWidget.DockWidgetClosable)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock)
 
     def ShowProgramEditorWindow(self):

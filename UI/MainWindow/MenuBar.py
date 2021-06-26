@@ -6,6 +6,8 @@ from PySide6.QtCore import Signal
 class MenuBar(QMenuBar):
     showRigView = Signal()
     showProgramList = Signal()
+    showRunningProgramsList = Signal()
+    showConsole = Signal()
     save = Signal()
     saveAs = Signal()
     new = Signal()
@@ -56,3 +58,5 @@ class MenuBar(QMenuBar):
         # self._viewMenu.addSeparator()
         self._viewMenu.addAction("Chip Programs").triggered.connect(self.showProgramList.emit)
         self._viewMenu.addAction("Rig").triggered.connect(self.showRigView.emit)
+        self._viewMenu.addAction("Running Programs").triggered.connect(self.showRunningProgramsList.emit)
+        self._viewMenu.addAction("Console").triggered.connect(self.showConsole.emit)
