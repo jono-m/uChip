@@ -1,7 +1,7 @@
 from typing import Set, List
 
 from PySide6.QtWidgets import QGraphicsView, QGraphicsScene, QApplication
-from PySide6.QtGui import QPainter, QBrush, QColor, QTransform, QWheelEvent, QMouseEvent, QPen, QKeyEvent
+from PySide6.QtGui import QPainter, QBrush, QColor, QTransform, QWheelEvent, QMouseEvent, QPen, QKeyEvent, QGuiApplication
 from PySide6.QtCore import QPointF, Qt, QRectF, QSizeF, QLine, Signal, QTimer
 
 from UI.ChipEditor.ChipItem import ChipItem
@@ -241,9 +241,11 @@ class ChipSceneViewer(QGraphicsView):
 
     def mousePressEvent(self, event):
         if self._state != State.IDLE:
+            super().mousePressEvent(event)
             return
 
         if event.button() == Qt.RightButton:
+            QGuiApplication.setOverrideCursor(Qt.SizeAllCursor)
             self._state = State.PANNING
         elif event.button() == Qt.LeftButton and self._editing:
             if len(self._hoveredItems) == 0:
@@ -288,9 +290,9 @@ class ChipSceneViewer(QGraphicsView):
         super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event: QMouseEvent):
-        super().mouseReleaseEvent(event)
         if self._state == State.PANNING:
             if event.button() == Qt.RightButton:
+                QGuiApplication.restoreOverrideCursor()
                 self._state = State.IDLE
         elif self._state == State.SELECTING:
             if event.button() == Qt.LeftButton:

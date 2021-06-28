@@ -1,6 +1,3 @@
-ProgramInstanceWidget {
-    border: 1px solid @borderColor;
-}
 ProgramInstanceWidget > QLabel {
     font-weight: bold;
     padding: 10px;
@@ -11,11 +8,15 @@ ProgramParameterItem {
     min-height: 30px;
 }
 ProgramParameterItem > QLabel {
-    margin: 0 20px 0 0;
+    margin: 0 20px 0 20px;
 }
 ProgramParameterItem QAbstractSpinBox {
     min-width: 50px;
 }
 ProgramInstanceWidget QPushButton {
     padding: 5px;
+}
+ProgramParameterItem QToolButton {
+    min-width: 30px;
+    min-height: 34px;
 }

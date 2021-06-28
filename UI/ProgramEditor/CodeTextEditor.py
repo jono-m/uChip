@@ -1,6 +1,7 @@
-from PySide6.QtWidgets import QFrame, QTextEdit, QHBoxLayout
-from PySide6.QtGui import QSyntaxHighlighter, QTextCharFormat, QFont, Qt, QBrush, QKeyEvent
-from PySide6.QtCore import Signal, QRegularExpression, Qt
+from PySide6.QtWidgets import QFrame, QTextEdit, QHBoxLayout, QLabel
+from PySide6.QtGui import QSyntaxHighlighter, QTextCharFormat, QFont, Qt, QBrush, QKeyEvent, QColor, QPaintEvent, \
+    QPainter, QFontMetricsF
+from PySide6.QtCore import Signal, QRegularExpression, Qt, QRect
 import keyword
 import re
 
@@ -37,14 +38,16 @@ class PythonSyntaxHighlighter(QSyntaxHighlighter):
     def __init__(self, parent):
         super().__init__(parent)
         keywordFormat = QTextCharFormat()
+        macroFormat = QTextCharFormat()
         commentFormat = QTextCharFormat()
         stringFormat = QTextCharFormat()
+        numberFormat = QTextCharFormat()
         singleQuotedStringFormat = QTextCharFormat()
 
         self.highlightingRules = []
 
         # keyword
-        brush = QBrush(Qt.blue, Qt.SolidPattern)
+        brush = QBrush(QColor(255, 154, 59), Qt.SolidPattern)
         keywordFormat.setForeground(brush)
         keywordFormat.setFontWeight(QFont.Bold)
         keywords = keyword.kwlist
@@ -54,30 +57,50 @@ class PythonSyntaxHighlighter(QSyntaxHighlighter):
             rule = HighlightingRule(pattern, keywordFormat)
             self.highlightingRules.append(rule)
 
+        # macro
+        brush = QBrush(QColor(187, 101, 207), Qt.SolidPattern)
+        macroFormat.setForeground(brush)
+        macroFormat.setFontWeight(QFont.Bold)
+        macros = ['Parameter', "Valve", "Program", "Preset", "SetValve", "GetValve", "Start", "IsRunning", "Stop",
+                  "Pause", "IsPaused", "Resume", "print", "WaitForSeconds", "OPEN", "CLOSED"]
+
+        for word in macros:
+            pattern = QRegularExpression("\\b" + word + "\\b")
+            rule = HighlightingRule(pattern, macroFormat)
+            self.highlightingRules.append(rule)
+
         # comment
-        brush = QBrush(Qt.green, Qt.SolidPattern)
+        brush = QBrush(QColor(166, 166, 166), Qt.SolidPattern)
         pattern = QRegularExpression("#[^\n]*")
         commentFormat.setForeground(brush)
         rule = HighlightingRule(pattern, commentFormat)
         self.highlightingRules.append(rule)
 
         # string
-        brush = QBrush(Qt.red, Qt.SolidPattern)
+        brush = QBrush(QColor(147, 201, 105), Qt.SolidPattern)
         pattern = QRegularExpression("\".*\"")
+        pattern.setPatternOptions(QRegularExpression.InvertedGreedinessOption)
         stringFormat.setForeground(brush)
         rule = HighlightingRule(pattern, stringFormat)
         self.highlightingRules.append(rule)
 
         # singleQuotedString
         pattern = QRegularExpression("\'.*\'")
+        pattern.setPatternOptions(QRegularExpression.InvertedGreedinessOption)
         singleQuotedStringFormat.setForeground(brush)
         rule = HighlightingRule(pattern, singleQuotedStringFormat)
+        self.highlightingRules.append(rule)
+
+        # number
+        brush = QBrush(QColor(100, 184, 217), Qt.SolidPattern)
+        pattern = QRegularExpression(r"\b\d+")
+        numberFormat.setForeground(brush)
+        rule = HighlightingRule(pattern, numberFormat)
         self.highlightingRules.append(rule)
 
     def highlightBlock(self, text):
         for rule in self.highlightingRules:
             expression = rule.pattern
-            rule.pattern.setPatternOptions(QRegularExpression.InvertedGreedinessOption)
             iterator = expression.globalMatch(text)
             while iterator.hasNext():
                 match = iterator.next()
@@ -92,7 +115,6 @@ class HighlightingRule:
 
 class CodeTextEditorWidget(QTextEdit):
     def keyPressEvent(self, e: QKeyEvent) -> None:
-        print(e.key())
         if e.key() == Qt.Key.Key_Backtab:
             self.HandleTab(False)
         elif e.key() == Qt.Key.Key_Tab:
@@ -144,3 +166,30 @@ class CodeTextEditorWidget(QTextEdit):
         cursor.setPosition(end + deltaLastLine, cursor.KeepAnchor)
 
         self.setTextCursor(cursor)
+
+
+class CodeLineNumbers(QFrame):
+    def __init__(self, editorWidget: CodeTextEditorWidget):
+        super().__init__()
+        self._editorWidget = editorWidget
+
+        self._lineHeight = 20
+        self.setFixedWidth(100)
+
+    def paintEvent(self, event: QPaintEvent):
+        painter = QPainter(self)
+        metrics = QFontMetricsF(self._editorWidget.font())
+        lineHeight = metrics.boundingRect("T").height() + 3
+        rectStart = event.rect().top() + 3 - self._editorWidget.verticalScrollBar().value()
+        i = 0
+        while rectStart < event.rect().bottom():
+            newRect = QRect(event.rect().left(), rectStart, event.rect().width(), lineHeight)
+            if i % 2 == 0:
+                color = Qt.lightGray
+            else:
+                color = Qt.gray
+            i += 1
+            painter.fillRect(newRect, color)
+            painter.setFont(self._editorWidget.font())
+            painter.drawText(newRect, str(i))
+            rectStart += lineHeight

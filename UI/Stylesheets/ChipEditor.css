@@ -18,30 +18,46 @@ WidgetChipItemContainer {
     background: transparent;
 }
 WidgetChipItemContents {
-    background-color: rgba(50, 50, 50, 1);
-    border-radius: 8px;
-    padding: 20px;
+    background-color: @backgroundColor;
 }
 WidgetChipItemContents[state='None'] {
-    border: 4px solid rgba(100, 100, 100, 1);
+    border: 4px solid @lightColor;
     margin: 4px;
 }
 WidgetChipItemContents[state='Hover'] {
-    border: 4px solid rgba(35, 159, 168, 1);
+    border: 4px solid @editorBorderHighlight;
     margin: 4px;
 }
 WidgetChipItemContents[state='Select'] {
-    border: 4px solid rgba(52, 222, 235, 1);
+    border: 4px solid @editorBorderSelect;
     margin: 4px;
 }
 WidgetChipItemContents[state='HoverAndSelect'] {
-    border: 6px solid rgba(52, 222, 235, 1);
+    border: 6px solid @editorBorderSelect;
     margin: 2px;
 }
+WidgetChipItemContents QLabel {
+    padding: 0 20px 0 20px;
+}
+WidgetChipItemContents > QLabel {
+    padding: 10px;
+}
+WidgetChipItemContents > ImageLabel {
+    padding: 0;
+}
+WidgetChipItemContents > QPushButton {
+    padding: 5px;
+}
+WidgetChipItemContents QLineEdit, WidgetChipItemContents QAbstractSpinBox, WidgetChipItemContents QComboBox {
+    padding: 10px;
+}
 MovingHandle {
-    min-width: 10px;
-    max-width: 10px;
-    min-height: 10px;
-    max-height: 10px;
-    background-color: yellow
+    min-width: 30px;
+    max-width: 30px;
+    min-height: 30px;
+    max-height: 30px;
+    background-color: @attentionColor;
+}
+MovingHandle::hover {
+    background-color: @attentionPressColor;
 }

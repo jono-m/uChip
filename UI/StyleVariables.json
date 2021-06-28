@@ -1,5 +1,7 @@
 {
   "backgroundColor": "rgb(60, 60, 60)",
+  "lightColor": "rgb(70, 70, 70)",
+  "darkColor": "rgb(30, 30, 30)",
   "barColor": "rgb(40, 40, 40)",
   "borderColor": "rgb(35, 35, 35)",
   "textColor": "rgb(220, 220, 220)",
@@ -13,10 +15,13 @@
   "valveClosedColorPress": "rgb(160, 0, 0)",
 
   "attentionColor": "rgb(199, 96, 0)",
-  "attentionHoverColor": "rgb(204, 111, 24)",
-  "attentionPressColor": "rgb(212, 129, 51)",
+  "attentionHoverColor": "rgb(212, 129, 51)",
+  "attentionPressColor": "rgb(232, 152, 77)",
 
   "controlNormalColor": "rgb(50, 50, 50)",
   "controlHoverColor": "rgb(60, 60, 60)",
-  "controlPressColor": "rgb(80, 80, 80)"
+  "controlPressColor": "rgb(80, 80, 80)",
+
+  "editorBorderHighlight": "rgb(35, 159, 168)",
+  "editorBorderSelect": "rgb(52, 222, 235)"
 }

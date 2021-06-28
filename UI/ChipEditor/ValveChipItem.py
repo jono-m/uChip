@@ -1,5 +1,5 @@
 from PySide6.QtCore import QPointF, Qt
-from PySide6.QtWidgets import QToolButton, QSpinBox, QLabel, QGridLayout, QLineEdit, QVBoxLayout
+from PySide6.QtWidgets import QPushButton, QSpinBox, QLabel, QGridLayout, QLineEdit, QVBoxLayout
 
 from UI.ChipEditor.WidgetChipItem import WidgetChipItem, ChipItem
 from Model.Valve import Valve
@@ -14,7 +14,7 @@ class ValveChipItem(WidgetChipItem):
 
         self._valve = valve
 
-        self.valveToggleButton = QToolButton()
+        self.valveToggleButton = QPushButton()
         self.valveNumberLabel = QLabel("Number")
         self.valveNumberDial = QSpinBox()
         self.valveNumberDial.setMinimum(0)
@@ -29,7 +29,7 @@ class ValveChipItem(WidgetChipItem):
         mainLayout = QVBoxLayout()
         mainLayout.setContentsMargins(0, 0, 0, 0)
         mainLayout.setSpacing(0)
-        mainLayout.addWidget(self.valveToggleButton, alignment=Qt.AlignCenter)
+        mainLayout.addWidget(self.valveToggleButton)
 
         layout = QGridLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -42,6 +42,8 @@ class ValveChipItem(WidgetChipItem):
         mainLayout.addLayout(layout)
         self.containerWidget.setLayout(mainLayout)
         self.valveToggleButton.clicked.connect(self.Toggle)
+
+        self._showOpen = None
 
         self.Update()
         self.Move(QPointF())
@@ -92,11 +94,10 @@ class ValveChipItem(WidgetChipItem):
         if text != self.valveToggleButton.text():
             self.valveToggleButton.setText(text)
 
-        lastState = self.valveToggleButton.property("valveState")
-        newState = {True: "OPEN",
-                    False: "CLOSED"}[AppGlobals.Rig().GetSolenoidState(self._valve.solenoidNumber)]
-        if lastState != newState:
-            self.valveToggleButton.setProperty("valveState", newState)
+        newState = AppGlobals.Rig().GetSolenoidState(self._valve.solenoidNumber)
+        if newState != self._showOpen:
+            self.valveToggleButton.setProperty("IsOpen", newState)
             self.valveToggleButton.setStyle(self.valveToggleButton.style())
+            self._showOpen = newState
 
         super().Update()

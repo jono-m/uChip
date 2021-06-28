@@ -84,7 +84,7 @@ class ChipEditor(QFrame):
         if not AppGlobals.Chip().programs:
             return
 
-        presetSelection, confirmed = QInputDialog.getItem(self, "Program Preset", "Program",
+        presetSelection, confirmed = QInputDialog.getItem(self, "Program Preset", "Select a program:",
                                                           [program.name for program in AppGlobals.Chip().programs], 0,
                                                           False)
         if confirmed:

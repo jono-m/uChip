@@ -1,0 +1,10 @@
+ConsoleViewer QPushButton {
+    padding: 10px;
+}
+ConsoleViewer QLabel {
+    padding: 5px;
+}
+ConsoleViewer QLabel[IsEven=true] {
+    background-color: @lightColor;
+    margin: 0;
+}

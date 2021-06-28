@@ -8,7 +8,6 @@ from UI.ChipEditor.WidgetChipItem import WidgetChipItem, ChipItem
 from Model.Image import Image
 from UI.AppGlobals import AppGlobals
 
-import math
 from pathlib import Path
 
 
@@ -18,7 +17,7 @@ class ImageChipItem(WidgetChipItem):
 
         self._image = image
 
-        self.image = QLabel()
+        self.image = ImageLabel()
 
         AppGlobals.Instance().onChipModified.connect(self.CheckForImage)
 
@@ -53,6 +52,9 @@ class ImageChipItem(WidgetChipItem):
             lambda currentPosition: self.HandleResize(self._swHandle, currentPosition))
 
         self._handles = [self._neHandle, self._seHandle, self._swHandle, self._nwHandle]
+
+        [handle.setCursor(cursor) for handle, cursor in
+         zip(self._handles, [Qt.SizeBDiagCursor, Qt.SizeFDiagCursor, Qt.SizeBDiagCursor, Qt.SizeFDiagCursor])]
 
         self.Update()
         self.Move(QPointF())
@@ -167,3 +169,6 @@ class MovingHandle(QFrame):
 
     def mouseReleaseEvent(self, event) -> None:
         self._pressed = False
+
+class ImageLabel(QLabel):
+    pass

@@ -104,20 +104,22 @@ class DeviceItem(QObject):
         self._enableToggle.clicked.connect(self.ToggleEnable)
         self._enableToggle.setText("Disable")
 
-        openAllButton = QPushButton("Open All")
-        openAllButton.clicked.connect(lambda: self.SetAll(True))
-        openAllButton.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
-        closeAllButton = QPushButton("Close All")
-        closeAllButton.clicked.connect(lambda: self.SetAll(False))
-        closeAllButton.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+        self.openAllButton = QPushButton("Open All")
+        self.openAllButton.clicked.connect(lambda: self.SetAll(True))
+        self.openAllButton.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+        self.closeAllButton = QPushButton("Close All")
+        self.closeAllButton.clicked.connect(lambda: self.SetAll(False))
+        self.closeAllButton.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
 
         self.statusLayout = QHBoxLayout()
         self.statusLayout.addWidget(self._statusLabel, stretch=1)
         self.statusLayout.addWidget(self._enableToggle, stretch=0)
 
         self.solenoidsLayout = QHBoxLayout()
-        self.solenoidsLayout.addWidget(openAllButton)
-        self.solenoidsLayout.addWidget(closeAllButton)
+        openCloseLayout = QVBoxLayout()
+        openCloseLayout.addWidget(self.openAllButton)
+        openCloseLayout.addWidget(self.closeAllButton)
+        self.solenoidsLayout.addLayout(openCloseLayout)
         self._solenoidButtons: List[SolenoidButton] = []
         for solenoidNumber in range(24):
             newButton = SolenoidButton(solenoidNumber)
@@ -171,6 +173,8 @@ class DeviceItem(QObject):
         self._enableToggle.setText({False: "Enable",
                                     True: "Disable"}[self.device.isEnabled])
         self.startNumberDial.setEnabled(self.device.isEnabled and self.device.isConnected)
+        self.openAllButton.setEnabled(self.device.isEnabled and self.device.isConnected)
+        self.closeAllButton.setEnabled(self.device.isEnabled and self.device.isConnected)
         for i in range(24):
             self._solenoidButtons[i].setEnabled(self.device.isConnected and self.device.isEnabled)
             self._solenoidButtons[i].Update(self.device.startNumber + i)
