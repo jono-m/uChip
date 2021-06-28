@@ -16,13 +16,15 @@
     background-color: @attentionPressColor;
     font-weight: bold;
 }
-QAbstractButton, QSpinBox, QLineEdit, QMenuBar::item, QMenu::item, QListView::item, QScrollBar::handle {
+QAbstractButton, QSpinBox, QLineEdit, QMenuBar::item, QMenu::item, QListView::item, QScrollBar::handle, QTabBar::tab,
+    QComboBox {
     background-color: @controlNormalColor;
 }
-QAbstractButton::hover, QSpinBox::hover, QLineEdit::hover, QMenuBar::item:selected, QMenu::item:selected, QListView::item:hover, QScrollBar::handle:hover {
+QAbstractButton::hover, QSpinBox::hover, QLineEdit::hover, QMenuBar::item:selected, QMenu::item:selected,
+    QListView::item:hover, QScrollBar::handle:hover, QTabBar::tab:hover, QComboBox::hover {
     background-color: @controlHoverColor;
 }
-QAbstractButton::pressed, QSpinBox::hover, QLineEdit::hover, QMenuBar::item:pressed, QListView::item:selected, QScrollBar::handle:pressed {
+QAbstractButton::pressed, QSpinBox::pressed, QLineEdit::pressed, QMenuBar::item:pressed, QListView::item:selected, QScrollBar::handle:pressed, QTabBar::tab:selected {
     background-color: @controlPressColor;
 }
 QDockWidget {
@@ -43,6 +45,10 @@ QDockWidget::title {
 QMenuBar {
     min-height: 30px;
     background-color: @controlNormalColor;
+}
+QMenu::separator {
+    height: 1px;
+    background-color: @lightColor;
 }
 QListView::item:selected {
     color: white;

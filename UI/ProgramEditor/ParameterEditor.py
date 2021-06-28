@@ -17,24 +17,22 @@ class ParameterEditor(QFrame):
         self._program = program
 
         parametersLabel = QLabel("Parameters")
+        parametersLabel.setAlignment(Qt.AlignCenter)
         newParameterButton = QPushButton("Add Parameter")
+        newParameterButton.setProperty("Attention", True)
         newParameterButton.clicked.connect(self.AddParameter)
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
-        titleLayout = QHBoxLayout()
-        titleLayout.setContentsMargins(0, 0, 0, 0)
-        titleLayout.setSpacing(0)
-        titleLayout.addWidget(parametersLabel)
-        titleLayout.addWidget(newParameterButton)
-        layout.addLayout(titleLayout)
+        layout.addWidget(parametersLabel)
 
         self._listArea = QScrollArea()
         self._listArea.setWidgetResizable(True)
         self._listArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self._listArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         layout.addWidget(self._listArea, stretch=1)
+        layout.addWidget(newParameterButton)
         listWidget = QFrame()
         self._itemLayout = QVBoxLayout()
         self._itemLayout.setContentsMargins(0, 0, 0, 0)

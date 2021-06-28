@@ -1,0 +1,15 @@
+QDialog, QDialog * {
+    background-color: @lightColor;
+}
+QDialog * {
+}
+QDialog QFrame {
+    margin-top: 10px;
+}
+QDialog QPushButton {
+    padding: 10px;
+    min-width: 50px;
+}
+QDialog QComboBox {
+    padding: 10px;
+}

@@ -1,4 +1,4 @@
-from PySide6.QtCore import QPointF
+from PySide6.QtCore import QPointF, Qt
 from PySide6.QtWidgets import QLineEdit, QVBoxLayout, QLabel
 
 from UI.ChipEditor.WidgetChipItem import WidgetChipItem, ChipItem
@@ -19,6 +19,7 @@ class ProgramPresetItem(WidgetChipItem):
         self._presetNameField.textChanged.connect(self.UpdatePreset)
 
         self._presetNameLabel = QLabel()
+        self._presetNameLabel.setAlignment(Qt.AlignCenter)
 
         self._instanceWidget = ProgramInstanceWidget(preset.instance, True)
 

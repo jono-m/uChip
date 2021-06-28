@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QFrame, QHBoxLayout, QLineEdit, QVBoxLayout, QLabel
+from PySide6.QtWidgets import QFrame, QSplitter, QHBoxLayout, QLineEdit, QVBoxLayout, QLabel
 from Model.Program.Program import Program
 from UI.AppGlobals import AppGlobals
 from UI.ProgramEditor.CodeTextEditor import CodeTextEditor
@@ -16,10 +16,13 @@ class ProgramEditorTab(QFrame):
         self.modified = False
         self.codeEditor = CodeTextEditor()
 
+        splitter = QSplitter()
+        splitter.setChildrenCollapsible(False)
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
         self.setLayout(layout)
+        layout.addWidget(splitter)
 
         self._programNameField = QLineEdit(program.name)
         self._programNameField.textChanged.connect(self.UpdateProgramName)
@@ -27,15 +30,18 @@ class ProgramEditorTab(QFrame):
         self._parameterEditor = ParameterEditor(program)
         self._parameterEditor.onParametersChanged.connect(self.ProgramEdited)
 
-        programNameLabel = QLabel("Name:")
         sideLayout = QVBoxLayout()
         sideLayout.setContentsMargins(0, 0, 0, 0)
         sideLayout.setSpacing(0)
-        sideLayout.addWidget(programNameLabel)
         sideLayout.addWidget(self._programNameField)
         sideLayout.addWidget(self._parameterEditor)
-        layout.addLayout(sideLayout, stretch=0)
-        layout.addWidget(self.codeEditor, stretch=1)
+        sideWidget = QFrame()
+        sideWidget.setLayout(sideLayout)
+
+        splitter.addWidget(sideWidget)
+        splitter.addWidget(self.codeEditor)
+        splitter.setStretchFactor(0, 0)
+        splitter.setStretchFactor(1, 1)
 
         self.codeEditor.SetCode(self.program.script)
 
