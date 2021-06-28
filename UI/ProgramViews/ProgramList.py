@@ -12,8 +12,8 @@ class ProgramList(QFrame):
 
     def __init__(self, parent):
         super().__init__(parent)
-        self._programsLabel = QLabel("Programs")
         self._programsList = QListWidget()
+        self._programsList.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self._programsList.itemClicked.connect(self.SelectProgram)
         self._programsList.itemDoubleClicked.connect(self.EditProgram)
 
@@ -21,13 +21,13 @@ class ProgramList(QFrame):
 
         self._instances: Dict[Program, ProgramInstance] = {}
 
-        self._newButton = QPushButton("Create New Program")
+        self._newButton = QPushButton("New Program")
+        self._newButton.setProperty("Attention", True)
         self._newButton.clicked.connect(self.NewProgram)
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
-        layout.addWidget(self._programsLabel)
         layout.addWidget(self._programsList)
         layout.addWidget(self._newButton)
 

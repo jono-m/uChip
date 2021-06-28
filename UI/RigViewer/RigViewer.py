@@ -1,7 +1,8 @@
 from typing import List
 
-from PySide6.QtWidgets import QFrame, QVBoxLayout, QHBoxLayout, QLabel, QSpinBox, QToolButton, QPushButton
-from PySide6.QtCore import Signal, Qt, QTimer
+from PySide6.QtWidgets import QFrame, QVBoxLayout, QHBoxLayout, QLabel, QSpinBox, QToolButton, QPushButton, QGridLayout, \
+    QSizePolicy
+from PySide6.QtCore import Signal, Qt, QTimer, QObject
 from UI.AppGlobals import AppGlobals
 from Model.Rig.RigDevice import RigDevice
 
@@ -10,14 +11,39 @@ class RigViewer(QFrame):
     def __init__(self):
         super().__init__()
 
+        mainLayout = QVBoxLayout()
+        mainLayout.setContentsMargins(0, 0, 0, 0)
+        mainLayout.setSpacing(0)
+        mainLayout.setAlignment(Qt.AlignTop)
+        self.setLayout(mainLayout)
+
         rescanButton = QPushButton("Rescan")
+        rescanButton.setProperty("Attention", True)
         rescanButton.clicked.connect(self.Rescan)
-        self._deviceLayout = QVBoxLayout()
+        rescanButton.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Preferred)
+        self._deviceLayout = QGridLayout()
+        self._deviceLayout.setAlignment(Qt.AlignTop)
         self._deviceLayout.setContentsMargins(0, 0, 0, 0)
         self._deviceLayout.setSpacing(0)
 
-        self._deviceLayout.addWidget(rescanButton)
-        self.setLayout(self._deviceLayout)
+        self._deviceLayout.addWidget(QLabel("Device Name"), 0, 0)
+        self._deviceLayout.addWidget(QLabel("Status"), 0, 1)
+        self._deviceLayout.addWidget(QLabel("Start Number"), 0, 2)
+        solenoidLayout = QHBoxLayout()
+        solenoidLayout.addWidget(QLabel("Solenoids"))
+        solenoidLayout.addWidget(rescanButton, stretch=0)
+        self._deviceLayout.addLayout(solenoidLayout, 0, 3)
+        mainLayout.addLayout(self._deviceLayout, stretch=0)
+        mainLayout.addStretch(1)
+        self.setLayout(mainLayout)
+
+        even = False
+        for item in self.children():
+            item.setProperty("IsHeader", True)
+            item.setProperty("IsColumnEven", even)
+            even = not even
+            if isinstance(item, QLabel):
+                item.setAlignment(Qt.AlignCenter)
 
         self._deviceItems: List[DeviceItem] = []
 
@@ -37,19 +63,24 @@ class RigViewer(QFrame):
                 newItem = DeviceItem(device)
                 newItem.numberChanged.connect(self.SortList)
                 self._deviceItems.append(newItem)
-                self._deviceLayout.addWidget(newItem)
 
         self.SortList()
 
     def SortList(self):
         self._deviceItems.sort(key=lambda deviceItem: deviceItem.device.startNumber)
-        for item in self._deviceItems:
-            self._deviceLayout.removeWidget(item)
-        for item in self._deviceItems:
-            self._deviceLayout.addWidget(item)
+        self.FillList()
+
+    def FillList(self):
+        for row in range(1, self._deviceLayout.rowCount()):
+            [self._deviceLayout.removeItem(self._deviceLayout.itemAtPosition(row, column)) for column in range(4)]
+        for row, item in enumerate(self._deviceItems):
+            self._deviceLayout.addWidget(item.nameLabel, row + 1, 0)
+            self._deviceLayout.addLayout(item.statusLayout, row + 1, 1)
+            self._deviceLayout.addWidget(item.startNumberDial, row + 1, 2)
+            self._deviceLayout.addLayout(item.solenoidsLayout, row + 1, 3)
 
 
-class DeviceItem(QFrame):
+class DeviceItem(QObject):
     numberChanged = Signal()
 
     def __init__(self, device: RigDevice):
@@ -57,42 +88,43 @@ class DeviceItem(QFrame):
 
         self.device = device
 
-        self._nameLabel = QLabel(device.serialNumber)
+        self.nameLabel = QLabel(device.serialNumber)
+        self.nameLabel.setAlignment(Qt.AlignCenter)
         self._statusLabel = QLabel("")
-        self._startNumberDial = QSpinBox()
-        self._startNumberDial.setMinimum(0)
-        self._startNumberDial.setMaximum(9999)
-        self._startNumberDial.setValue(device.startNumber)
-        self._startNumberDial.valueChanged.connect(self.SetStartNumber)
+        self._statusLabel.setAlignment(Qt.AlignCenter)
+        self.startNumberDial = QSpinBox()
+        self.startNumberDial.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+        self.startNumberDial.setMinimum(0)
+        self.startNumberDial.setMaximum(9999)
+        self.startNumberDial.setValue(device.startNumber)
+        self.startNumberDial.valueChanged.connect(self.SetStartNumber)
 
         self._enableToggle = QPushButton()
+        self._enableToggle.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         self._enableToggle.clicked.connect(self.ToggleEnable)
         self._enableToggle.setText("Disable")
 
-        self._layout = QHBoxLayout()
-        self._layout.setContentsMargins(0, 0, 0, 0)
-        self._layout.setSpacing(0)
-        self.setLayout(self._layout)
-
-        self._layout.addWidget(self._nameLabel, stretch=1)
-        self._layout.addWidget(self._statusLabel, stretch=1)
-        self._layout.addWidget(self._enableToggle)
-        self._layout.addWidget(self._startNumberDial)
-
         openAllButton = QPushButton("Open All")
         openAllButton.clicked.connect(lambda: self.SetAll(True))
+        openAllButton.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         closeAllButton = QPushButton("Close All")
         closeAllButton.clicked.connect(lambda: self.SetAll(False))
+        closeAllButton.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
 
-        self._layout.addWidget(openAllButton)
-        self._layout.addWidget(closeAllButton)
+        self.statusLayout = QHBoxLayout()
+        self.statusLayout.addWidget(self._statusLabel, stretch=1)
+        self.statusLayout.addWidget(self._enableToggle, stretch=0)
+
+        self.solenoidsLayout = QHBoxLayout()
+        self.solenoidsLayout.addWidget(openAllButton)
+        self.solenoidsLayout.addWidget(closeAllButton)
         self._solenoidButtons: List[SolenoidButton] = []
         for solenoidNumber in range(24):
             newButton = SolenoidButton(solenoidNumber)
             newButton.solenoidClicked.connect(lambda s=newButton: self.ToggleSolenoid(s))
             newButton.polarityClicked.connect(lambda s=newButton: self.TogglePolarity(s))
             self._solenoidButtons.append(newButton)
-            self._layout.addWidget(newButton, stretch=0)
+            self.solenoidsLayout.addWidget(newButton, stretch=0)
 
         self.Update()
 
@@ -102,7 +134,7 @@ class DeviceItem(QFrame):
         AppGlobals.Rig().FlushStates()
 
     def SetStartNumber(self):
-        self.device.startNumber = self._startNumberDial.value()
+        self.device.startNumber = self.startNumberDial.value()
         self.Update()
         self.numberChanged.emit()
 
@@ -138,7 +170,7 @@ class DeviceItem(QFrame):
 
         self._enableToggle.setText({False: "Enable",
                                     True: "Disable"}[self.device.isEnabled])
-        self._startNumberDial.setEnabled(self.device.isEnabled and self.device.isConnected)
+        self.startNumberDial.setEnabled(self.device.isEnabled and self.device.isConnected)
         for i in range(24):
             self._solenoidButtons[i].setEnabled(self.device.isConnected and self.device.isEnabled)
             self._solenoidButtons[i].Update(self.device.startNumber + i)
@@ -172,4 +204,3 @@ class SolenoidButton(QToolButton):
             self.setProperty("IsOpen", showOpen)
             self._showOpen = showOpen
             self.setStyle(self.style())
-

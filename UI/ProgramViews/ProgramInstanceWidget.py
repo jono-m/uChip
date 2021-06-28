@@ -1,7 +1,7 @@
 from typing import List, Union
 
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QToolButton
-from PySide6.QtCore import QTimer
+from PySide6.QtCore import QTimer, Qt
 from UI.ProgramViews.DataValueWidget import DataValueWidget
 from Model.Program.ProgramInstance import ProgramInstance, Parameter
 from Model.Program.Data import DataType
@@ -20,6 +20,7 @@ class ProgramInstanceWidget(QFrame):
         self.uniqueRun = uniqueRun
 
         self.programNameWidget = QLabel()
+        self.programNameWidget.setAlignment(Qt.AlignCenter)
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -27,19 +28,22 @@ class ProgramInstanceWidget(QFrame):
         self.setLayout(layout)
 
         self.runButton = QPushButton("Run")
+        self.runButton.setProperty("Attention", True)
         self.runButton.clicked.connect(self.RunProgram)
 
         self._stopButton = QPushButton("Stop")
+        self._stopButton.setProperty("Attention", True)
         self._stopButton.clicked.connect(self.StopProgram)
 
         self.parameterItems: List[ProgramParameterItem] = []
 
+        parameterWidget = QFrame()
         self._parametersLayout = QVBoxLayout()
         self._parametersLayout.setSpacing(0)
         self._parametersLayout.setContentsMargins(0, 0, 0, 0)
-
+        parameterWidget.setLayout(self._parametersLayout)
         layout.addWidget(self.programNameWidget)
-        layout.addLayout(self._parametersLayout)
+        layout.addWidget(parameterWidget)
         layout.addWidget(self.runButton)
         layout.addWidget(self._stopButton)
         timer = QTimer(self)

@@ -1,0 +1,36 @@
+/* Rig View */
+SolenoidButton {
+	min-width: 40px;
+	max-width: 40px;
+	min-height: 40px;
+	max-height: 40px;
+}
+RigViewer > * {
+    border: 1px solid @borderColor;
+}
+RigViewer > *[IsHeader=true] {
+    padding: 10px;
+    qproperty-alignment: AlignCenter;
+}
+RigViewer > QPushButton {
+    min-width: 80px;
+    max-width: 80px;
+}
+SolenoidButton[IsOpen=true] {
+	background-color: @valveOpenColor;
+}
+SolenoidButton[IsOpen=false]{
+	background-color: @valveClosedColor;
+}
+SolenoidButton[IsOpen=true]::hover {
+	background-color: @valveOpenColorHover;
+}
+SolenoidButton[IsOpen=false]::hover{
+	background-color: @valveClosedColorHover;
+}
+SolenoidButton[IsOpen=true]::pressed {
+	background-color: @valveOpenColorPress;
+}
+SolenoidButton[IsOpen=false]::pressed {
+	background-color: @valveClosedColorPress;
+}

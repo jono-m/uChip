@@ -28,13 +28,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="99850780-df20-4af2-831c-10fab045648b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/UI/ProgramViews/ConsoleViewer.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/UI/StyleVariables.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/UI/Stylesheets/ChipEditor.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/UI/Stylesheets/ProgramContextDisplay.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/UI/Stylesheets/ProgramEditor.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/UI/Stylesheets/ProgramInstanceWidget.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/UI/Stylesheets/ProgramList.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/UI/Stylesheets/RigView.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Rig/Rig.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Rig/Rig.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ChipEditor.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ChipEditor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ChipSceneViewer.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ChipSceneViewer.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/MainWindow/MenuBar.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/MainWindow/MenuBar.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProgramViews/RunningProgramsList.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramViews/RunningProgramsList.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramViews/ConsoleViewer.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramViews/ConsoleViewer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramViews/DataValueWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramViews/DataValueWidget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramViews/ProgramContextDisplay.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramViews/ProgramContextDisplay.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramViews/ProgramInstanceWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramViews/ProgramInstanceWidget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramViews/ProgramList.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramViews/ProgramList.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/RigViewer/RigViewer.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/RigViewer/RigViewer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/STYLESHEET.css" beforeDir="false" afterPath="$PROJECT_DIR$/UI/STYLESHEET.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/STYLESHEET.css" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Stylesheets/Globals.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/StylesheetLoader.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/StylesheetLoader.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -78,10 +91,11 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="JSON" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="Errors" />
   </component>
   <component name="PyConsoleOptionsProvider">
     <option name="myPythonConsoleState">
@@ -96,11 +110,11 @@
       <recent name="C:\Users\jonoj\Repositories\uChip\500KChip" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\jonoj\Repositories\uChip\UI\Stylesheets" />
       <recent name="C:\Users\jonoj\Repositories\uChip\UI\ProgramViews" />
       <recent name="C:\Users\jonoj\Repositories\uChip\Model\Program" />
       <recent name="C:\Users\jonoj\Repositories\uChip\Model" />
       <recent name="C:\Users\jonoj\Repositories\uChip\ProjectSystem" />
-      <recent name="C:\Users\jonoj\Repositories\uChip\UI\Main" />
     </key>
   </component>
   <component name="RunManager">
@@ -144,6 +158,9 @@
       <updated>1591375173813</updated>
     </task>
     <servers />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.css" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">

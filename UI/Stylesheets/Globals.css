@@ -1,0 +1,68 @@
+* {
+    color: @textColor;
+    background-color: @backgroundColor;
+    border-color: @borderColor;
+    border: none;
+}
+*[Attention=true] {
+    background-color: @attentionColor;
+    font-weight: bold;
+}
+*[Attention=true]::hover {
+    background-color: @attentionHoverColor;
+    font-weight: bold;
+}
+*[Attention=true]::pressed {
+    background-color: @attentionPressColor;
+    font-weight: bold;
+}
+QAbstractButton, QSpinBox, QLineEdit, QMenuBar::item, QMenu::item, QListView::item, QScrollBar::handle {
+    background-color: @controlNormalColor;
+}
+QAbstractButton::hover, QSpinBox::hover, QLineEdit::hover, QMenuBar::item:selected, QMenu::item:selected, QListView::item:hover, QScrollBar::handle:hover {
+    background-color: @controlHoverColor;
+}
+QAbstractButton::pressed, QSpinBox::hover, QLineEdit::hover, QMenuBar::item:pressed, QListView::item:selected, QScrollBar::handle:pressed {
+    background-color: @controlPressColor;
+}
+QDockWidget {
+    font-weight: bold;
+    min-width: 200px;
+    min-height: 200px;
+}
+QDockWidget > QFrame {
+    border: 2px solid @borderColor;
+    border-top-width: 0px;
+}
+QDockWidget::title {
+    padding: 5px 0 0 5px;
+    background-color: @barColor;
+    border: 2px solid @borderColor;
+    border-bottom-width: 0px;
+}
+QMenuBar {
+    min-height: 30px;
+    background-color: @controlNormalColor;
+}
+QListView::item:selected {
+    color: white;
+    border: none;
+}
+ QScrollBar {
+    border: none;
+    background-color: @barColor;
+ }
+ QScrollBar::handle {
+    border: none;
+    margin: 2px;
+ }
+ QScrollBar::add-line, QScrollBar::sub-line {
+    height: 0;
+    width: 0;
+ }
+ QScrollBar::add-page, QScrollBar::sub-page {
+    background: none;
+ }
+ QAbstractSpinBox {
+    padding-left: 10px;
+ }

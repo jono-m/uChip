@@ -1,0 +1,15 @@
+ProgramContextDisplay {
+    background-color: @controlPressColor;
+    border: 2px solid @darkBorder;
+    border-width: 0 2px 2px 0;
+    padding-left: 30px;
+}
+ProgramContextDisplay QPushButton {
+    padding: 5px;
+}
+ProgramContextDisplay QFrame, ProgramContextDisplay QLabel {
+    background-color: transparent;
+}
+ProgramContextDisplay > QFrame > QLabel {
+    font-weight: bold;
+}

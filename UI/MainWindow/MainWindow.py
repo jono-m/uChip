@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QMainWindow, QDockWidget, QMessageBox, QFileDialog
+from PySide6.QtWidgets import QMainWindow, QDockWidget, QMessageBox, QFileDialog, QApplication
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QIcon
 from UI.ChipEditor.ChipEditor import ChipEditor
@@ -29,8 +29,9 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(self.chipEditor)
 
-        self.resize(self.screen().size() / 2)
-        self.move(self.screen().size().width() / 2, self.screen().size().height() / 2)
+        rect = self.screen().availableGeometry()
+        self.resize(rect.width()/2, rect.height()-35)
+        self.move(rect.center().x(), 0)
 
         self.setWindowIcon(QIcon("Images/UCIcon.png"))
 
@@ -160,6 +161,7 @@ class MainWindow(QMainWindow):
         dock.setWindowTitle("Rig")
         dock.setAllowedAreas(Qt.AllDockWidgetAreas)
         dock.setWidget(self._rigViewer)
+        dock.setFeatures(QDockWidget.DockWidgetClosable | QDockWidget.DockWidgetMovable)
         self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, dock)
 
     def ShowProgramList(self):
@@ -179,9 +181,9 @@ class MainWindow(QMainWindow):
 
         dock = QDockWidget()
         dock.setWindowTitle("Running Programs")
-        dock.setAllowedAreas(Qt.RightDockWidgetArea)
+        dock.setAllowedAreas(Qt.AllDockWidgetAreas)
         dock.setWidget(self._runningProgramsList)
-        dock.setFeatures(QDockWidget.DockWidgetClosable)
+        dock.setFeatures(QDockWidget.DockWidgetClosable | QDockWidget.DockWidgetMovable)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock)
 
     def ShowConsole(self):
@@ -190,9 +192,9 @@ class MainWindow(QMainWindow):
 
         dock = QDockWidget()
         dock.setWindowTitle("Console")
-        dock.setAllowedAreas(Qt.RightDockWidgetArea)
+        dock.setAllowedAreas(Qt.AllDockWidgetAreas)
         dock.setWidget(self._consoleView)
-        dock.setFeatures(QDockWidget.DockWidgetClosable)
+        dock.setFeatures(QDockWidget.DockWidgetClosable | QDockWidget.DockWidgetMovable)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock)
 
     def ShowProgramEditorWindow(self):

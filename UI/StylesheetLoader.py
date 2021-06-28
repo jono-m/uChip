@@ -2,6 +2,9 @@ from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QApplication, QWidget
 import typing
 import os
+import json
+import re
+from pathlib import Path
 
 
 class StylesheetLoader:
@@ -34,21 +37,42 @@ class StylesheetLoader:
         self.updateTimer.timeout.connect(self.TimerUpdate)
         self.updateTimer.start(1000)
 
-        self.lastModifiedTime = None
+        self.stylesheetsLastModifiedTime = {}
+        self.variablesLastModifiedTime = None
 
-        self.scriptFilename = "UI/STYLESHEET.css"
+        self.stylesheetDirectory = Path("UI/Stylesheets")
+        self.variablesFilename = "UI/StyleVariables.json"
 
         self.stylesheet = None
+        self.variables = None
 
     def TimerUpdate(self):
-        currentModifiedTime = os.path.getmtime(self.scriptFilename)
-        if currentModifiedTime != self.lastModifiedTime:
+        files = self.stylesheetDirectory.iterdir()
+        reload = False
+        for file in files:
+            modTime = os.path.getmtime(file)
+            if file not in self.stylesheetsLastModifiedTime or self.stylesheetsLastModifiedTime[file] != modTime:
+                reload = True
+                self.stylesheetsLastModifiedTime[file] = modTime
+                break
+
+        variablesModifiedTime = os.path.getmtime(self.variablesFilename)
+        if reload or variablesModifiedTime != self.variablesLastModifiedTime:
             self.ReloadSS()
-            self.lastModifiedTime = currentModifiedTime
+            self.variablesLastModifiedTime = variablesModifiedTime
 
     def ReloadSS(self):
-        f = open(self.scriptFilename)
-        self.stylesheet = f.read()
+        self.stylesheet = ""
+        for file in self.stylesheetDirectory.iterdir():
+            f = open(file)
+            self.stylesheet += f.read()
+            f.close()
+
+        f = open(self.variablesFilename)
+        self.variables = json.loads(f.read())
+        f.close()
+
+        self.stylesheet = re.sub(r"@\w+", lambda x: self.variables[x.group(0)[1:]], self.stylesheet)
 
         self.widgetsList: typing.List[QWidget] = [widget for widget in self.widgetsList if widget]
         for widget in self.widgetsList:

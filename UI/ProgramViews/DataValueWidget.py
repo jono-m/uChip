@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QFrame, QSpinBox, QDoubleSpinBox, QComboBox, QLineEdit, QVBoxLayout, QLabel, QHBoxLayout
+from PySide6.QtWidgets import QFrame, QSpinBox, QDoubleSpinBox, QComboBox, QLineEdit, QVBoxLayout, QLabel, QHBoxLayout, QSizePolicy
 from PySide6.QtCore import Signal
 from Model.Program.Data import DataType, DataValueType
 from UI.ProgramViews.ChipDataSelection import ChipDataSelection
@@ -35,6 +35,7 @@ class DataValueWidget(QFrame):
             self.field.dataChanged.connect(lambda: self.dataChanged.emit())
         else:
             return
+        self.field.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
