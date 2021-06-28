@@ -26,11 +26,11 @@ class ChipSceneViewer(QGraphicsView):
         self._offset = QPointF(0, 0)
         self._zoom = 0
 
-        self.backgroundColor = QColor(40, 40, 40)
+        self.backgroundColor = QColor(30, 30, 30)
 
         self.gridSpacing = QSizeF(60, 60)
         self.gridThickness = 1
-        self.gridColor = QColor(100, 100, 100)
+        self.gridColor = QColor(50, 50, 50)
         self.gridZoomThreshold = -1.5
         self.showGrid = True
 

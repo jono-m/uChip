@@ -47,13 +47,9 @@ class ProgramContextDisplay(QFrame):
         timer.timeout.connect(self.Reposition)
         timer.start(30)
 
-        self.Reposition()
+    def Reposition(self):
         self.show()
         self.raise_()
-
-    def Reposition(self):
-        if not self.isVisible():
-            return
         self.resize(self.sizeHint())
         topLeft = self.mapToGlobal(self.rect().topLeft())
 

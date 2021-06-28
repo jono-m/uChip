@@ -20,6 +20,7 @@ class ChipEditor(QFrame):
     def __init__(self):
         super().__init__()
         self.viewer = ChipSceneViewer()
+        self.setContentsMargins(0, 0, 0, 0)
 
         actionsLayout = QHBoxLayout()
         actionsLayout.setContentsMargins(0, 0, 0, 0)
@@ -28,13 +29,16 @@ class ChipEditor(QFrame):
         self._actionsWidget.setLayout(actionsLayout)
 
         self._lockButton = QToolButton()
+        self._lockButton.setProperty("Attention", True)
         self._lockButton.setText("Done")
         self._lockButton.clicked.connect(lambda: self.SetEditing(False))
         self._editButton = QToolButton()
+        self._editButton.setProperty("Attention", True)
         self._editButton.setText("Edit")
         self._editButton.clicked.connect(lambda: self.SetEditing(True))
 
         self._plusButton = QToolButton()
+        self._plusButton.setProperty("Attention", True)
         self._plusButton.setText("+")
         self._plusButton.setPopupMode(QToolButton.InstantPopup)
 

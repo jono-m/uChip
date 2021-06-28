@@ -59,7 +59,8 @@ class Rig:
 
     def SaveDevices(self):
         file = open("devices.pkl", "wb")
-        dill.dump(self.savedDevices, file)
+        nonMock = {device for device in self.savedDevices if not isinstance(device, MockRigDevice)}
+        dill.dump(nonMock, file)
         file.close()
 
     def LoadDevices(self):

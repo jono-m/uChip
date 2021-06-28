@@ -12,17 +12,15 @@ class ConsoleViewer(QFrame):
         consoleLayout = QVBoxLayout()
         clearButton = QPushButton("Clear")
         clearButton.clicked.connect(lambda: AppGlobals.ProgramRunner().ClearMessages())
-        consoleTitleLayout = QHBoxLayout()
-        consoleTitleLayout.addWidget(clearButton)
 
         self._consoleText = QLabel()
-        consoleLayout.addLayout(consoleTitleLayout)
         consoleLayout.addWidget(self._consoleText, alignment=Qt.AlignTop)
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
-        layout.addLayout(consoleLayout)
+        layout.addLayout(consoleLayout, stretch=1)
+        layout.addWidget(clearButton, stretch=0)
         self.setLayout(layout)
 
         timer = QTimer(self)

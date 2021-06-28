@@ -1,0 +1,22 @@
+{
+  "backgroundColor": "rgb(60, 60, 60)",
+  "barColor": "rgb(40, 40, 40)",
+  "borderColor": "rgb(35, 35, 35)",
+  "textColor": "rgb(220, 220, 220)",
+  "darkBorder": "rgb(15, 15, 15)",
+
+  "valveOpenColor": "rgb(0, 150, 0)",
+  "valveOpenColorHover": "rgb(0, 180, 0)",
+  "valveOpenColorPress": "rgb(0, 220, 0)",
+  "valveClosedColor": "rgb(100, 0, 0)",
+  "valveClosedColorHover": "rgb(130, 0, 0)",
+  "valveClosedColorPress": "rgb(160, 0, 0)",
+
+  "attentionColor": "rgb(199, 96, 0)",
+  "attentionHoverColor": "rgb(204, 111, 24)",
+  "attentionPressColor": "rgb(212, 129, 51)",
+
+  "controlNormalColor": "rgb(50, 50, 50)",
+  "controlHoverColor": "rgb(60, 60, 60)",
+  "controlPressColor": "rgb(80, 80, 80)"
+}

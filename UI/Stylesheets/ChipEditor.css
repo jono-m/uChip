@@ -1,0 +1,47 @@
+/* Chip Editor */
+ChipSceneViewer {
+    border: 5px inset @darkBorder;
+}
+ChipSceneViewer > QFrame {
+    background-color: transparent;
+    margin: 20px;
+}
+ChipEditor QToolButton {
+    margin: 5px;
+    padding: 5px;
+	min-width: 50;
+	min-height: 50;
+	max-width: 50;
+	max-height: 50;
+}
+WidgetChipItemContainer {
+    background: transparent;
+}
+WidgetChipItemContents {
+    background-color: rgba(50, 50, 50, 1);
+    border-radius: 8px;
+    padding: 20px;
+}
+WidgetChipItemContents[state='None'] {
+    border: 4px solid rgba(100, 100, 100, 1);
+    margin: 4px;
+}
+WidgetChipItemContents[state='Hover'] {
+    border: 4px solid rgba(35, 159, 168, 1);
+    margin: 4px;
+}
+WidgetChipItemContents[state='Select'] {
+    border: 4px solid rgba(52, 222, 235, 1);
+    margin: 4px;
+}
+WidgetChipItemContents[state='HoverAndSelect'] {
+    border: 6px solid rgba(52, 222, 235, 1);
+    margin: 2px;
+}
+MovingHandle {
+    min-width: 10px;
+    max-width: 10px;
+    min-height: 10px;
+    max-height: 10px;
+    background-color: yellow
+}
