@@ -53,10 +53,6 @@ class ChipSceneViewer(QGraphicsView):
 
         self._state = State.IDLE
 
-        buggyUpdateTimer = QTimer(self)
-        buggyUpdateTimer.timeout.connect(self.update)
-        buggyUpdateTimer.start(30)
-
         self.UpdateView()
 
     def SetEditing(self, editing: bool):
@@ -66,7 +62,6 @@ class ChipSceneViewer(QGraphicsView):
 
         for item in self._sceneItems:
             item.SetEditDisplay(editing)
-            item.Update()
 
         if not editing:
             self.DeselectAll()

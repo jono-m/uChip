@@ -10,10 +10,6 @@ class ChipItem(QObject):
         super().__init__()
         self._graphicsObject = graphicsObject
 
-        timer = QTimer(self.GraphicsObject())
-        timer.timeout.connect(self.Update)
-        timer.start(30)
-
     def GraphicsObject(self):
         return self._graphicsObject
 
@@ -53,7 +49,4 @@ class ChipItem(QObject):
         pass
 
     def Duplicate(self) -> 'ChipItem':
-        pass
-
-    def Update(self):
         pass

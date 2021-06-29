@@ -30,13 +30,11 @@ class ConsoleViewer(QFrame):
         layout.addWidget(clearButton, stretch=0)
         self.setLayout(layout)
 
-        timer = QTimer(self)
-        timer.timeout.connect(self.Update)
-        timer.start(30)
+        AppGlobals.ProgramRunner().onMessage.connect(self.UpdateConsole)
 
         self._messages = []
 
-    def Update(self):
+    def UpdateConsole(self):
         messages = AppGlobals.ProgramRunner().GetMessages()
         delta = len(messages) - len(self._messages)
 

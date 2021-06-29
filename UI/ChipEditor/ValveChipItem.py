@@ -11,6 +11,7 @@ class ValveChipItem(WidgetChipItem):
         super().__init__()
 
         AppGlobals.Instance().onChipModified.connect(self.CheckForValve)
+        AppGlobals.Instance().onValveChanged.connect(self.UpdateDisplay)
 
         self._valve = valve
 
@@ -45,7 +46,7 @@ class ValveChipItem(WidgetChipItem):
 
         self._showOpen = None
 
-        self.Update()
+        self.UpdateDisplay()
         self.Move(QPointF())
 
     def CheckForValve(self):
@@ -70,10 +71,12 @@ class ValveChipItem(WidgetChipItem):
         self._valve.solenoidNumber = self.valveNumberDial.value()
         self._valve.name = self.valveNameField.text()
         AppGlobals.Instance().onChipDataModified.emit()
+        self.UpdateDisplay()
 
     def Toggle(self):
         AppGlobals.Rig().SetSolenoidState(self._valve.solenoidNumber,
                                           not AppGlobals.Rig().GetSolenoidState(self._valve.solenoidNumber), True)
+        AppGlobals.Instance().onValveChanged.emit()
 
     def RequestDelete(self):
         AppGlobals.Chip().valves.remove(self._valve)
@@ -89,7 +92,7 @@ class ValveChipItem(WidgetChipItem):
         AppGlobals.Instance().onChipModified.emit()
         return ValveChipItem(newValve)
 
-    def Update(self):
+    def UpdateDisplay(self):
         text = self._valve.name + "\n(" + str(self._valve.solenoidNumber) + ")"
         if text != self.valveToggleButton.text():
             self.valveToggleButton.setText(text)
@@ -99,5 +102,3 @@ class ValveChipItem(WidgetChipItem):
             self.valveToggleButton.setProperty("IsOpen", newState)
             self.valveToggleButton.setStyle(self.valveToggleButton.style())
             self._showOpen = newState
-
-        super().Update()

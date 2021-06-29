@@ -13,6 +13,7 @@ class ProgramInstanceWidget(QFrame):
         super().__init__()
 
         AppGlobals.Instance().onChipModified.connect(self.UpdateParameterItems)
+        AppGlobals.ProgramRunner().onTick.connect(self.UpdateInstanceView)
 
         self.editingParameterVisibility = False
 
@@ -46,9 +47,6 @@ class ProgramInstanceWidget(QFrame):
         layout.addWidget(parameterWidget)
         layout.addWidget(self.runButton)
         layout.addWidget(self._stopButton)
-        timer = QTimer(self)
-        timer.timeout.connect(self.UpdateInstanceView)
-        timer.start(30)
 
         self.UpdateInstanceView()
         self.UpdateParameterItems()

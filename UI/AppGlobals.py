@@ -21,6 +21,7 @@ class AppGlobals(QObject):
         self.rig.AddMock(48, "MOCK 3")
         self.rig.AddMock(72, "MOCK 4")
         self.programRunner = ProgramRunner()
+        self.programRunner.onValveChange.connect(self.onValveChanged.emit)
         self.programRunner.rig = self.rig
         self.chip = None
         self.onChipModified.connect(lambda: AppGlobals.Chip().Validate())
@@ -31,6 +32,7 @@ class AppGlobals(QObject):
     onChipModified = Signal()  # Invoked whenever the chip lists change
     onChipDataModified = Signal()  # Invoked whenever ANYTHING about the chip has been modified.
     onChipSaved = Signal()
+    onValveChanged = Signal()
 
     @staticmethod
     def Rig() -> Rig:

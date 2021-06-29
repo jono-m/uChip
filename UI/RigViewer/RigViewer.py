@@ -134,6 +134,7 @@ class DeviceItem(QObject):
         for i in range(24):
             AppGlobals.Rig().SetSolenoidState(self.device.startNumber + i, isOpen)
         AppGlobals.Rig().FlushStates()
+        AppGlobals.Instance().onValveChanged.emit()
 
     def SetStartNumber(self):
         self.device.startNumber = self.startNumberDial.value()
@@ -150,12 +151,14 @@ class DeviceItem(QObject):
                                           not AppGlobals.Rig().GetSolenoidState(self.device.startNumber + index))
         AppGlobals.Rig().FlushStates()
         self.Update()
+        AppGlobals.Instance().onValveChanged.emit()
 
     def TogglePolarity(self, button: 'SolenoidButton'):
         index = self._solenoidButtons.index(button)
         self.device.solenoidPolarities[index] = not self.device.solenoidPolarities[index]
         AppGlobals.Rig().FlushStates()
         self.Update()
+        AppGlobals.Instance().onValveChanged.emit()
 
     def Update(self):
         if not self.device.IsDeviceAvailable():
@@ -189,14 +192,13 @@ class SolenoidButton(QToolButton):
 
         self.clicked.connect(self.solenoidClicked.emit)
 
-        self.Update(number)
+        AppGlobals.Instance().onValveChanged.connect(self.UpdateValveState)
 
-        timer = QTimer(self)
-        timer.timeout.connect(self.UpdateValveState)
-        timer.start(30)
+        self.Update(number)
 
         self._number = number
         self._showOpen = None
+        self.UpdateValveState()
 
     def Update(self, number: int):
         self._number = number

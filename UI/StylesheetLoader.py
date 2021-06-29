@@ -46,6 +46,8 @@ class StylesheetLoader:
         self.stylesheet = None
         self.variables = None
 
+        self.TimerUpdate()
+
     def TimerUpdate(self):
         files = self.stylesheetDirectory.iterdir()
         reload = False
