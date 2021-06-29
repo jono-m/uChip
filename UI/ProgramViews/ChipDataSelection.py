@@ -1,7 +1,6 @@
 from typing import List
 
 from PySide6.QtWidgets import QComboBox
-from PySide6.QtCore import QTimer
 from Model.Program.Data import DataType
 from UI.AppGlobals import AppGlobals
 
@@ -10,15 +9,13 @@ class ChipDataSelection(QComboBox):
     def __init__(self, dataType: DataType):
         super().__init__()
 
+        self.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.dataType = dataType
 
         AppGlobals.Instance().onChipModified.connect(self.Repopulate)
+        AppGlobals.Instance().onChipDataModified.connect(self.UpdateNames)
 
         self.Repopulate()
-
-        timer = QTimer(self)
-        timer.timeout.connect(self.UpdateNames)
-        timer.start(30)
 
     def Select(self, data):
         for index in range(self.count()):
@@ -48,3 +45,6 @@ class ChipDataSelection(QComboBox):
             item = self.itemData(index)
             if item:
                 self.setItemText(index, item.name)
+
+        self.adjustSize()
+        self.topLevelWidget().adjustSize()

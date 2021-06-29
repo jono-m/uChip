@@ -18,7 +18,7 @@ class ProgramPresetItem(WidgetChipItem):
         self._presetNameField = QLineEdit(preset.name)
         self._presetNameField.textChanged.connect(self.UpdatePreset)
 
-        self._presetNameLabel = QLabel()
+        self._presetNameLabel = QLabel(preset.name)
         self._presetNameLabel.setAlignment(Qt.AlignCenter)
 
         self._instanceWidget = ProgramInstanceWidget(preset.instance, True)
@@ -31,7 +31,6 @@ class ProgramPresetItem(WidgetChipItem):
         layout.addWidget(self._instanceWidget)
         self.containerWidget.setLayout(layout)
 
-        self.Update()
         self.CheckForPreset()
 
     def SetEditDisplay(self, editing: bool):
@@ -53,6 +52,7 @@ class ProgramPresetItem(WidgetChipItem):
     def UpdatePreset(self):
         self._preset.name = self._presetNameField.text()
         AppGlobals.Instance().onChipDataModified.emit()
+        self._presetNameLabel.setText(self._preset.name)
 
     def CheckForPreset(self):
         if self._preset not in AppGlobals.Chip().programPresets:
@@ -72,10 +72,6 @@ class ProgramPresetItem(WidgetChipItem):
         AppGlobals.Chip().programPresets.append(newPreset)
         AppGlobals.Instance().onChipModified.emit()
         return ProgramPresetItem(newPreset)
-
-    def Update(self):
-        self._presetNameLabel.setText(self._preset.name)
-        super().Update()
 
     def RunPreset(self):
         AppGlobals.ProgramRunner().Run(self._preset.instance)

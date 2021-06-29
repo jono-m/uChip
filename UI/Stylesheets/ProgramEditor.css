@@ -1,9 +1,17 @@
 ProgramEditorWindow QTabWidget::pane {
     border-top: 2px solid @borderColor;
 }
+Instructions {
+    min-height: 200px;
+    border: 4px inset @borderColor;
+}
+Instructions QLabel{
+    padding: 10px;
+    background-color: @backgroundColor;
+}
 ProgramEditorTab {
     min-width: 1000;
-    min-height: 600;
+    min-height: 400;
 }
 ProgramEditorTab QLineEdit {
     padding: 5px;

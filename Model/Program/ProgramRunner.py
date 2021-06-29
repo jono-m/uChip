@@ -1,14 +1,20 @@
 import time
 import types
 from typing import Optional, Dict, List, Union
+from PySide6.QtCore import QObject, Signal
 
 from Model.Program.ProgramInstance import ProgramInstance, DataType
 from Model.Chip import Chip, ProgramPreset
 from Model.Rig import Rig
 
 
-class ProgramRunner:
+class ProgramRunner(QObject):
+    onValveChange = Signal()
+    onMessage = Signal()
+    onTick = Signal()
+
     def __init__(self):
+        super().__init__()
         # Info about each running program
         self.runningPrograms: Dict[ProgramInstance, RunningProgramInfo] = {}
 
@@ -43,9 +49,11 @@ class ProgramRunner:
         if message.isError:
             if self.IsRunning(message.programInstance):
                 self.StopAtRoot(message.programInstance)
+        self.onMessage.emit()
 
     def ClearMessages(self):
         self._messageList.clear()
+        self.onMessage.emit()
 
     def Tick(self):
         self._lastTickTime = time.time()
@@ -81,6 +89,8 @@ class ProgramRunner:
                 self.Report(ProgramRunnerMessage(programInstance, True, str(Exception(
                     "Yielded object must be of type WaitForSeconds, ProgramInstance, or NoneType."))))
 
+        self.onTick.emit()
+
     def IsPaused(self, instance: ProgramInstance):
         if isinstance(instance, ProgramPreset):
             return self.IsPaused(instance.instance)
@@ -98,7 +108,8 @@ class ProgramRunner:
             raise Exception("Program is not running")
         # Stop all child programs
         for programInstance in self.runningPrograms.copy():
-            if self.runningPrograms[programInstance].parentProgram == instance:
+            if programInstance in self.runningPrograms and \
+                    self.runningPrograms[programInstance].parentProgram == instance:
                 self.Stop(programInstance)
         # Remove it from the list
         del self.runningPrograms[instance]
@@ -151,7 +162,7 @@ class ProgramRunner:
             "Program": lambda programName, parameters=None: ProgramInstance.InstanceWithParameters(
                 self.chip.FindProgramWithName(programName), parameters),
             "Preset": lambda presetName: self.chip.FindPresetWithName(presetName).instance,
-            "SetValve": lambda valve, state: self.rig.SetSolenoidState(valve.solenoidNumber, state, True),
+            "SetValve": self.SetValve,
             "GetValve": lambda valve: self.rig.GetSolenoidState(valve.solenoidNumber),
             "Start": lambda programInstance: self.Run(programInstance, instance),
             "IsRunning": lambda programInstance: self.IsRunning(programInstance),
@@ -187,6 +198,10 @@ class ProgramRunner:
     def Print(self, instance: ProgramInstance, text: str):
         message = ProgramRunnerMessage(instance, False, text)
         self.Report(message)
+
+    def SetValve(self, valve, state):
+        self.rig.SetSolenoidState(valve.solenoidNumber, state, True)
+        self.onValveChange.emit()
 
 
 class ProgramRunnerMessage:

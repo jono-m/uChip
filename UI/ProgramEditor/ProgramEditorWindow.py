@@ -1,43 +1,47 @@
 from typing import List
 
-from PySide6.QtWidgets import QTabWidget, QFrame, QMessageBox, QVBoxLayout, QMainWindow
+from PySide6.QtWidgets import QTabWidget, QMessageBox, QMainWindow, QSplitter
 from UI.ProgramEditor.ProgramEditorTab import ProgramEditorTab, Program
-from PySide6.QtCore import QTimer
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
-from UI.AppGlobals import AppGlobals
 from UI.StylesheetLoader import StylesheetLoader
 from UI.ProgramEditor.MenuBar import MenuBar
+from UI.ProgramEditor.Instructions import Instructions
+from UI.AppGlobals import AppGlobals
 
 
 class ProgramEditorWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-
+        AppGlobals.Instance().onChipModified.connect(self.UpdateDisplay)
         StylesheetLoader.RegisterWidget(self)
         self.setWindowIcon(QIcon("Images/UCIcon.png"))
 
-        centralLayout = QVBoxLayout()
-        centralLayout.setContentsMargins(0, 0, 0, 0)
-        centralLayout.setSpacing(0)
-        centralWidget = QFrame()
-        centralWidget.setLayout(centralLayout)
+        centralWidget = QSplitter()
+        centralWidget.setChildrenCollapsible(False)
+        centralWidget.setOrientation(Qt.Orientation.Vertical)
         self.setCentralWidget(centralWidget)
 
         self._tabWidget = QTabWidget()
-        centralLayout.addWidget(self._tabWidget)
+        centralWidget.addWidget(self._tabWidget)
+        centralWidget.addWidget(Instructions())
+
+        centralWidget.setStretchFactor(0, 1)
+        centralWidget.setStretchFactor(1, 0)
 
         menuBar = MenuBar()
         self.setMenuBar(menuBar)
 
-        menuBar.saveProgram.connect(lambda: self._tabWidget.currentWidget().SaveProgram())
+        menuBar.saveProgram.connect(self.SaveProgram)
         menuBar.closeProgram.connect(lambda: self.RequestCloseTab(self._tabWidget.currentIndex()))
 
         self._tabWidget.tabCloseRequested.connect(self.RequestCloseTab)
+        self._tabWidget.currentChanged.connect(self.UpdateDisplay)
         self._tabWidget.setTabsClosable(True)
 
-        timer = QTimer(self)
-        timer.timeout.connect(self.CheckPrograms)
-        timer.start(30)
+    def SaveProgram(self):
+        self._tabWidget.currentWidget().SaveProgram()
+        self.UpdateDisplay()
 
     def OpenProgram(self, program: Program):
         for tab in self.tabs():
@@ -45,6 +49,7 @@ class ProgramEditorWindow(QMainWindow):
                 self._tabWidget.setCurrentWidget(tab)
                 return
         newTab = ProgramEditorTab(program)
+        newTab.onModified.connect(self.UpdateDisplay)
         self._tabWidget.addTab(newTab, program.name)
 
     def RequestCloseTab(self, index):
@@ -76,7 +81,7 @@ class ProgramEditorWindow(QMainWindow):
     def tabs(self) -> List[ProgramEditorTab]:
         return [self._tabWidget.widget(i) for i in range(self._tabWidget.count())]
 
-    def CheckPrograms(self):
+    def UpdateDisplay(self):
         modified = False
         for tab in self.tabs():
             title = tab.program.name
@@ -84,8 +89,6 @@ class ProgramEditorWindow(QMainWindow):
                 modified = True
                 title += "*"
             self._tabWidget.setTabText(self._tabWidget.indexOf(tab), title)
-            if tab.program not in AppGlobals.Chip().programs:
-                self.deleteLater()
 
         current: ProgramEditorTab = self._tabWidget.currentWidget()
         if current:
@@ -94,3 +97,5 @@ class ProgramEditorWindow(QMainWindow):
                 title += " *"
             title += " | uChip Program Editor"
             self.setWindowTitle(title)
+        else:
+            self.close()

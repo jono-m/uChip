@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import QFrame, QSplitter, QHBoxLayout, QLineEdit, QVBoxLayout, QLabel
+from PySide6.QtCore import Signal
 from Model.Program.Program import Program
 from UI.AppGlobals import AppGlobals
 from UI.ProgramEditor.CodeTextEditor import CodeTextEditor
@@ -6,6 +7,8 @@ from UI.ProgramEditor.ParameterEditor import ParameterEditor
 
 
 class ProgramEditorTab(QFrame):
+    onModified = Signal()
+
     def __init__(self, program: Program):
         super().__init__()
 
@@ -59,6 +62,7 @@ class ProgramEditorTab(QFrame):
 
     def ProgramEdited(self):
         self.modified = True
+        self.onModified.emit()
 
     def CheckForProgram(self):
         if self.program not in AppGlobals.Chip().programs:

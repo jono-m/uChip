@@ -43,9 +43,7 @@ class ProgramContextDisplay(QFrame):
 
         self.setFocusPolicy(Qt.ClickFocus)
 
-        timer = QTimer(self)
-        timer.timeout.connect(self.Reposition)
-        timer.start(30)
+        self.Reposition()
 
     def Reposition(self):
         self.show()

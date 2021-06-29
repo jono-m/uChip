@@ -69,9 +69,8 @@ class MainWindow(QMainWindow):
         AppGlobals.OpenChip(Chip())
 
         rect = self.screen().availableGeometry()
-        self.resize(rect.width()/2, rect.height()-35)
+        self.resize(rect.width() / 2, rect.height() - 35)
         self.move(rect.center().x(), 0)
-
 
     def NewChip(self):
         if self.CloseChip():
