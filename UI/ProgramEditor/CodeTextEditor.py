@@ -19,10 +19,12 @@ class CodeTextEditor(QFrame):
 
         self.textEdit.setAcceptRichText(False)
 
+        self._lineNumbers = CodeLineNumbers(self.textEdit)
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
         self.setLayout(layout)
+        layout.addWidget(self._lineNumbers)
         layout.addWidget(self.textEdit)
 
         self._highlighter = PythonSyntaxHighlighter(self.textEdit.document())
@@ -179,7 +181,11 @@ class CodeLineNumbers(QFrame):
     def paintEvent(self, event: QPaintEvent):
         painter = QPainter(self)
         metrics = QFontMetricsF(self._editorWidget.font())
-        lineHeight = metrics.boundingRect("T").height() + 3
+        fullRect = metrics.tightBoundingRect(self._editorWidget.toPlainText())
+        lines = len(self._editorWidget.toPlainText().split())
+        if not lines:
+            return
+        lineHeight = fullRect.height()/lines
         rectStart = event.rect().top() + 3 - self._editorWidget.verticalScrollBar().value()
         i = 0
         while rectStart < event.rect().bottom():
