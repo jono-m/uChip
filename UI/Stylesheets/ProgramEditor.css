@@ -16,7 +16,7 @@ ParameterEditor > QLabel {
 ParameterEditor > QPushButton {
     padding: 10px;
 }
-ProgramEditorTab QTextEdit {
+CodeTextEditorWidget {
     font-family: "Consolas";
     background-color: @darkColor;
 }

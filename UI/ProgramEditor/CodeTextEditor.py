@@ -1,7 +1,7 @@
-from PySide6.QtWidgets import QFrame, QTextEdit, QHBoxLayout, QLabel
+from PySide6.QtWidgets import QFrame, QPlainTextEdit, QHBoxLayout, QLabel, QTextEdit
 from PySide6.QtGui import QSyntaxHighlighter, QTextCharFormat, QFont, Qt, QBrush, QKeyEvent, QColor, QPaintEvent, \
-    QPainter, QFontMetricsF
-from PySide6.QtCore import Signal, QRegularExpression, Qt, QRect
+    QPainter, QFontMetricsF, QTextFormat, QTextBlock
+from PySide6.QtCore import Signal, QRegularExpression, Qt, QRect, QSize
 import keyword
 import re
 
@@ -14,17 +14,13 @@ class CodeTextEditor(QFrame):
 
         self.textEdit = CodeTextEditorWidget()
         self.textEdit.setTabStopDistance(20)
-        self.textEdit.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
+        self.textEdit.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
         self.textEdit.textChanged.connect(self.codeChanged.emit)
 
-        self.textEdit.setAcceptRichText(False)
-
-        self._lineNumbers = CodeLineNumbers(self.textEdit)
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
         self.setLayout(layout)
-        layout.addWidget(self._lineNumbers)
         layout.addWidget(self.textEdit)
 
         self._highlighter = PythonSyntaxHighlighter(self.textEdit.document())
@@ -115,7 +111,98 @@ class HighlightingRule:
         self.format = patternFormat
 
 
-class CodeTextEditorWidget(QTextEdit):
+class CodeTextEditorWidget(QPlainTextEdit):
+    def __init__(self):
+        super().__init__()
+
+        self._lineNumberArea = LineNumberArea(self)
+
+        self.blockCountChanged.connect(self.updateLineNumberAreaWidth)
+        self.updateRequest.connect(self.updateLineNumberArea)
+        self.cursorPositionChanged.connect(self.highlightCurrentLine)
+
+        self._leftPadding = 5
+        self._rightPadding = 20
+
+        self.updateLineNumberAreaWidth(0)
+        self.highlightCurrentLine()
+
+    def lineNumberAreaPaintEvent(self, event: QPaintEvent):
+        painter = QPainter(self._lineNumberArea)
+        painter.fillRect(event.rect(), QColor(40, 40, 40))
+        painter.setFont(self.font())
+
+        block = self.firstVisibleBlock()
+        blockNumber = block.blockNumber()
+        top = round(self.blockBoundingGeometry(block).translated(self.contentOffset()).top())
+        bottom = top + round(self.blockBoundingRect(block).height())
+
+        while block.isValid() and top <= event.rect().bottom():
+            if block.isVisible() and bottom >= event.rect().top():
+                number = blockNumber + 1
+                if number == self.lineNumber():
+                    painter.setPen(QColor(180, 180, 180))
+                else:
+                    painter.setPen(QColor(120, 120, 120))
+                self.setFont(self.font())
+                painter.drawText(0, top, self._lineNumberArea.width() - self._rightPadding, self.fontMetrics().height(), Qt.AlignRight, str(number))
+
+            block = block.next()
+            top = bottom
+            bottom = top + round(self.blockBoundingRect(block).height())
+            blockNumber += 1
+
+    def lineNumberAreaWidth(self) -> int:
+        digits = 1
+        maximum = max(1, self.blockCount())
+        while maximum >= 10:
+            maximum /= 10
+            digits += 1
+
+        space = self._leftPadding + self.fontMetrics().horizontalAdvance("9") * digits + self._rightPadding
+
+        return space
+
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+
+        rect = self.contentsRect()
+        self._lineNumberArea.setGeometry(QRect(rect.left(), rect.top(), self.lineNumberAreaWidth(), rect.height()))
+
+    def updateLineNumberAreaWidth(self, newBlockCount: int):
+        self.setViewportMargins(self.lineNumberAreaWidth(), 0, 0, 0)
+
+    def highlightCurrentLine(self):
+        extraSelections = []
+
+        if not self.isReadOnly():
+            selection = QTextEdit.ExtraSelection()
+            lineColor = QColor(40, 40, 40)
+            selection.format.setBackground(lineColor)
+            selection.format.setProperty(QTextFormat.FullWidthSelection, True)
+            selection.cursor = self.textCursor()
+            selection.cursor.clearSelection()
+            extraSelections.append(selection)
+
+        self.setExtraSelections(extraSelections)
+
+    def lineNumber(self):
+        cursor = self.textCursor()
+        text = self.toPlainText()
+        end = cursor.position()
+        preText = text[:end]
+        lines = len(preText.split("\n"))
+        return lines
+
+    def updateLineNumberArea(self, rect: QRect, dy: int):
+        if dy:
+            self._lineNumberArea.scroll(0, dy)
+        else:
+            self._lineNumberArea.update(0, rect.y(), self._lineNumberArea.width(), rect.height())
+
+        if rect.contains(self.viewport().rect()):
+            self.updateLineNumberAreaWidth(0)
+
     def keyPressEvent(self, e: QKeyEvent) -> None:
         if e.key() == Qt.Key.Key_Backtab:
             self.HandleTab(False)
@@ -170,32 +257,13 @@ class CodeTextEditorWidget(QTextEdit):
         self.setTextCursor(cursor)
 
 
-class CodeLineNumbers(QFrame):
-    def __init__(self, editorWidget: CodeTextEditorWidget):
-        super().__init__()
-        self._editorWidget = editorWidget
+class LineNumberArea(QFrame):
+    def __init__(self, editor: CodeTextEditorWidget):
+        super().__init__(editor)
+        self._editor = editor
 
-        self._lineHeight = 20
-        self.setFixedWidth(100)
+    def sizeHint(self):
+        return QSize(self._editor.lineNumberAreaWidth(), 0)
 
-    def paintEvent(self, event: QPaintEvent):
-        painter = QPainter(self)
-        metrics = QFontMetricsF(self._editorWidget.font())
-        fullRect = metrics.tightBoundingRect(self._editorWidget.toPlainText())
-        lines = len(self._editorWidget.toPlainText().split())
-        if not lines:
-            return
-        lineHeight = fullRect.height()/lines
-        rectStart = event.rect().top() + 3 - self._editorWidget.verticalScrollBar().value()
-        i = 0
-        while rectStart < event.rect().bottom():
-            newRect = QRect(event.rect().left(), rectStart, event.rect().width(), lineHeight)
-            if i % 2 == 0:
-                color = Qt.lightGray
-            else:
-                color = Qt.gray
-            i += 1
-            painter.fillRect(newRect, color)
-            painter.setFont(self._editorWidget.font())
-            painter.drawText(newRect, str(i))
-            rectStart += lineHeight
+    def paintEvent(self, event):
+        self._editor.lineNumberAreaPaintEvent(event)
