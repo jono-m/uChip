@@ -17,14 +17,16 @@
     font-weight: bold;
 }
 QAbstractButton, QSpinBox, QLineEdit, QMenuBar::item, QMenu::item, QListView::item, QScrollBar::handle, QTabBar::tab,
-    QComboBox {
+    QComboBox, QTabBar::close-button, QDockWidget::close-button {
     background-color: @controlNormalColor;
 }
 QAbstractButton::hover, QSpinBox::hover, QLineEdit::hover, QMenuBar::item:selected, QMenu::item:selected,
-    QListView::item:hover, QScrollBar::handle:hover, QTabBar::tab:hover, QComboBox::hover {
+    QListView::item:hover, QScrollBar::handle:hover, QTabBar::tab:hover, QComboBox::hover, QTabBar::close-button:hover,
+    QDockWidget::close-button:hover {
     background-color: @controlHoverColor;
 }
-QAbstractButton::pressed, QSpinBox::pressed, QLineEdit::pressed, QMenuBar::item:pressed, QListView::item:selected, QScrollBar::handle:pressed, QTabBar::tab:selected {
+QAbstractButton::pressed, QSpinBox::presse, QLineEdit::pressed, QMenuBar::item:pressed, QListView::item:selected,
+    QScrollBar::handle:pressed, QTabBar::tab:selected, QTabBar::close-button::pressed, QDockWidget::close-button:pressed {
     background-color: @controlPressColor;
 }
 QDockWidget {
@@ -32,12 +34,29 @@ QDockWidget {
     min-width: 200px;
     min-height: 200px;
 }
+QDockWidget {
+    titlebar-close-icon: url(Images/closeIcon.png);
+}
+QDockWidget::close-button {
+    subcontrol-origin: content;
+}
+QDockWidget::close-button:hover {
+    border: none;
+}
+QTabBar::close-button {
+    image: url(Images/closeIcon.png);
+    subcontrol-position: left;
+    padding: 5px;
+}
+QTabBar::tab {
+    padding: 5px 15px 5px 10px;
+}
 QDockWidget > QFrame {
     border: 2px solid @borderColor;
     border-top-width: 0px;
 }
 QDockWidget::title {
-    padding: 5px 0 0 5px;
+    padding: 5px 5px 0 5px;
     background-color: @barColor;
     border: 2px solid @borderColor;
     border-bottom-width: 0px;

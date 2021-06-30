@@ -235,7 +235,6 @@ class CodeTextEditorWidget(QPlainTextEdit):
         selectedText = cursor.selectedText()
         originalLines = selectedText.split("\u2029")
         lines = originalLines.copy()
-        print("L: " + str(lines))
         for lineNo in range(len(lines)):
             if indent:
                 count = len(re.match("\A *", lines[lineNo])[0])
