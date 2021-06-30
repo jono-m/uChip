@@ -1,6 +1,7 @@
 import PySide6
-from PySide6.QtGui import QKeyEvent
+from PySide6.QtGui import QKeyEvent, QIcon
 from PySide6.QtWidgets import QToolButton, QMenu, QHBoxLayout, QFileDialog, QInputDialog, QFrame
+from PySide6.QtCore import QSize
 from UI.ChipEditor.ChipSceneViewer import ChipSceneViewer
 from UI.ChipEditor.ValveChipItem import ValveChipItem, Valve
 from UI.ChipEditor.ImageChipItem import ImageChipItem, Image
@@ -30,16 +31,19 @@ class ChipEditor(QFrame):
 
         self._lockButton = QToolButton()
         self._lockButton.setProperty("Attention", True)
-        self._lockButton.setText("Done")
+        self._lockButton.setIcon(QIcon("Images/checkIcon.png"))
+        self._lockButton.setIconSize(QSize(30, 30))
         self._lockButton.clicked.connect(lambda: self.SetEditing(False))
         self._editButton = QToolButton()
         self._editButton.setProperty("Attention", True)
-        self._editButton.setText("Edit")
+        self._editButton.setIcon(QIcon("Images/Edit.png"))
+        self._editButton.setIconSize(QSize(30, 30))
         self._editButton.clicked.connect(lambda: self.SetEditing(True))
 
         self._plusButton = QToolButton()
         self._plusButton.setProperty("Attention", True)
-        self._plusButton.setText("+")
+        self._plusButton.setIcon(QIcon("Images/plusIcon.png"))
+        self._plusButton.setIconSize(QSize(30, 30))
         self._plusButton.setPopupMode(QToolButton.InstantPopup)
 
         actionsLayout.addWidget(self._plusButton)

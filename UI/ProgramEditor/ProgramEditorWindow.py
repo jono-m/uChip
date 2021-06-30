@@ -51,6 +51,7 @@ class ProgramEditorWindow(QMainWindow):
         newTab = ProgramEditorTab(program)
         newTab.onModified.connect(self.UpdateDisplay)
         self._tabWidget.addTab(newTab, program.name)
+        self._tabWidget.setCurrentIndex(self._tabWidget.count()-1)
 
     def RequestCloseTab(self, index):
         tab: ProgramEditorTab = self._tabWidget.widget(index)

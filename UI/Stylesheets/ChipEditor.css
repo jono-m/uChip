@@ -8,7 +8,6 @@ ChipSceneViewer > QFrame {
 }
 ChipEditor QToolButton {
     margin: 5px;
-    padding: 5px;
 	min-width: 50;
 	min-height: 50;
 	max-width: 50;
