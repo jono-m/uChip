@@ -21,7 +21,7 @@ class ProgramPresetItem(WidgetChipItem):
         self._presetNameLabel = QLabel(preset.name)
         self._presetNameLabel.setAlignment(Qt.AlignCenter)
 
-        self._instanceWidget = ProgramInstanceWidget(preset.instance, True)
+        self._instanceWidget = ProgramInstanceWidget(preset.instance, True, False)
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)

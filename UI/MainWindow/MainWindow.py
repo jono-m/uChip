@@ -28,7 +28,7 @@ class MainWindow(QMainWindow):
         self.chipEditor = ChipEditor()
 
         self.setCentralWidget(self.chipEditor)
-        self.setWindowIcon(QIcon("Images/UCIcon.png"))
+        self.setWindowIcon(QIcon("Images/icon.png"))
 
         self._rigViewer = RigViewer()
         self._editorWindow = ProgramEditorWindow()

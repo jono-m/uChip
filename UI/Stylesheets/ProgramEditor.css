@@ -2,7 +2,7 @@ ProgramEditorWindow QTabWidget::pane {
     border-top: 2px solid @borderColor;
 }
 Instructions {
-    min-height: 200px;
+    min-width: 450px;
     border: 4px inset @borderColor;
 }
 Instructions QLabel{
@@ -10,13 +10,13 @@ Instructions QLabel{
     background-color: @backgroundColor;
 }
 ProgramEditorTab {
-    min-width: 1000;
-    min-height: 400;
+    min-width: 1024;
+    min-height: 768;
 }
 ProgramEditorTab QLineEdit {
     padding: 5px;
 }
-ParameterEditor > QLabel {
+ParameterEditor > QLabel, #DescriptionLabel {
     font-weight: bold;
     background-color: @barColor;
     padding: 10px;
@@ -28,8 +28,9 @@ CodeTextEditorWidget {
     font-family: "Consolas";
     background-color: @darkColor;
 }
-CodeTextEditor {
+ProgramEditorTab > QFrame > QFrame > QPlainTextEdit {
     border: 4px inset @darkBorder;
+    background-color: @darkColor;
 }
 ParameterEditor QScrollArea {
     min-width: 250px;

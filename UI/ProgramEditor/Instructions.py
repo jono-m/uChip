@@ -9,8 +9,9 @@ instructions = """
     <i>Valve(name: str)</i>
             Returns the <i>Valve</i> object for the valve name <i>name</i>.
     <i>Program(programName: str, parameters: Dict[str, Any])</i>
-            Returns a new <i>Program instance</i> object to run the program named <i>programName</i> with parameters <i>parameters</i>.
-            <i>parameters</i> is a dictionary mapping from the parameter name to its value. 
+            Returns a new <i>Program instance</i> object to run the program named 
+            <i>programName</i> with parameters <i>parameters</i>. <i>parameters</i> 
+            is a dictionary mapping from the parameter name to its value. 
     <i>Preset(name: str)</i>
             Returns the <i>Program instance</i> for the program preset named <i>name</i>.
     <i>SetValve(valve: Valve object, state: [OPEN, CLOSED])</i>
@@ -32,7 +33,8 @@ instructions = """
     <i>print(text: str)</i>
             Prints <i>text</i> to the uChip console.
     <i>WaitForSeconds(seconds: float)</i>
-            To be used in a <i>yield</i> statement. Will pause execution for <i>seconds</i> seconds.
+            To be used in a <i>yield</i> statement. Will pause execution for 
+            <i>seconds</i> seconds.
     <i>OPEN</i>
             Valve state macro for an open valve 
     <i>CLOSED</i>
@@ -40,10 +42,16 @@ instructions = """
 
 <u><b>Program Control</b></u>
 
-    Use <i>yield</i> to pause program execution. This can be used to wait for a certain amount of time, until a different program is finished, or until the next program tick (to allow other programs to run concurrently).
-    <i>yield WaitForSeconds(seconds: float)</i> will pause the program for <i>seconds</i> seconds.
-    <i>yield [PROGRAM INSTANCE]</i> will pause the program until the given program instance is finished.
-    <i>yield</i> will pause the program for one tick, to let other programs update.  
+    Use <i>yield</i> to pause program execution. This can be used to wait for 
+    a certain amount of time, until a different program is finished, or until 
+    the next program tick (to allow other programs to run concurrently).
+    
+    <i>yield WaitForSeconds(seconds: float)</i> 
+            Pause the program for <i>seconds</i> seconds.
+    <i>yield [PROGRAM INSTANCE]</i> 
+            Pause the program until the given program instance is finished.
+    <i>yield</i> 
+            Pause the program for one tick, to let other programs update.  
 """[1:].replace("\n", "<br>").replace(" ", "&nbsp;")
 
 

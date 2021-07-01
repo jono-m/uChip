@@ -73,6 +73,9 @@ QListView::item:selected {
     color: white;
     border: none;
 }
+QListView::item {
+    padding: 5px 5px 5px 20px;
+}
  QScrollBar {
     border: none;
     background-color: @barColor;

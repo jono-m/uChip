@@ -1,6 +1,6 @@
 from typing import List
 
-from PySide6.QtWidgets import QTabWidget, QMessageBox, QMainWindow, QSplitter
+from PySide6.QtWidgets import QTabWidget, QMessageBox, QMainWindow, QSplitter, QFileDialog
 from UI.ProgramEditor.ProgramEditorTab import ProgramEditorTab, Program
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
@@ -15,11 +15,11 @@ class ProgramEditorWindow(QMainWindow):
         super().__init__()
         AppGlobals.Instance().onChipModified.connect(self.UpdateDisplay)
         StylesheetLoader.RegisterWidget(self)
-        self.setWindowIcon(QIcon("Images/UCIcon.png"))
+        self.setWindowIcon(QIcon("Images/icon.png"))
 
         centralWidget = QSplitter()
         centralWidget.setChildrenCollapsible(False)
-        centralWidget.setOrientation(Qt.Orientation.Vertical)
+        centralWidget.setOrientation(Qt.Orientation.Horizontal)
         self.setCentralWidget(centralWidget)
 
         self._tabWidget = QTabWidget()
@@ -33,6 +33,7 @@ class ProgramEditorWindow(QMainWindow):
         self.setMenuBar(menuBar)
 
         menuBar.saveProgram.connect(self.SaveProgram)
+        menuBar.exportProgram.connect(self.ExportProgram)
         menuBar.closeProgram.connect(lambda: self.RequestCloseTab(self._tabWidget.currentIndex()))
 
         self._tabWidget.tabCloseRequested.connect(self.RequestCloseTab)
@@ -43,6 +44,11 @@ class ProgramEditorWindow(QMainWindow):
         self._tabWidget.currentWidget().SaveProgram()
         self.UpdateDisplay()
 
+    def ExportProgram(self):
+        filename, filterType = QFileDialog.getSaveFileName(self, "Export Program", filter="uChip Program File (*.ucp)")
+        if filename:
+            self._tabWidget.currentWidget().ExportProgram(filename)
+
     def OpenProgram(self, program: Program):
         for tab in self.tabs():
             if tab.program is program:
@@ -51,7 +57,7 @@ class ProgramEditorWindow(QMainWindow):
         newTab = ProgramEditorTab(program)
         newTab.onModified.connect(self.UpdateDisplay)
         self._tabWidget.addTab(newTab, program.name)
-        self._tabWidget.setCurrentIndex(self._tabWidget.count()-1)
+        self._tabWidget.setCurrentIndex(self._tabWidget.count() - 1)
 
     def RequestCloseTab(self, index):
         tab: ProgramEditorTab = self._tabWidget.widget(index)
