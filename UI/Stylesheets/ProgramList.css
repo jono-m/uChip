@@ -2,3 +2,8 @@ ProgramList > QPushButton {
     padding: 10px;
     margin: 0px 0 0 0;
 }
+ProgramList > QLabel {
+    padding: 5px;
+    font-weight: bold;
+    background-color: @barColor;
+}

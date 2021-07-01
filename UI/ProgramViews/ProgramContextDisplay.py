@@ -9,7 +9,7 @@ class ProgramContextDisplay(QFrame):
     onDelete = Signal(Program)
     onEdit = Signal(Program)
 
-    def __init__(self, parent, programInstance: ProgramInstance, listWidget):
+    def __init__(self, parent, programInstance: ProgramInstance, listWidget, editable):
         super().__init__(parent)
 
         self._programInstance = programInstance
@@ -24,11 +24,6 @@ class ProgramContextDisplay(QFrame):
         self.setLayout(clayout)
         self.layout().addWidget(container)
 
-        self._editButton = QPushButton("Edit")
-        self._editButton.clicked.connect(lambda: self.onEdit.emit(self._programInstance.program))
-        self._deleteButton = QPushButton("Delete")
-        self._deleteButton.clicked.connect(lambda: self.onDelete.emit(self._programInstance.program))
-
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
@@ -36,10 +31,16 @@ class ProgramContextDisplay(QFrame):
 
         QApplication.instance().installEventFilter(self)
 
-        self._instanceWidget = ProgramInstanceWidget(programInstance, False)
+        self._instanceWidget = ProgramInstanceWidget(programInstance, True, True)
         layout.addWidget(self._instanceWidget)
-        layout.addWidget(self._editButton)
-        layout.addWidget(self._deleteButton)
+
+        if editable:
+            self._editButton = QPushButton("Edit")
+            self._editButton.clicked.connect(lambda: self.onEdit.emit(self._programInstance.program))
+            self._deleteButton = QPushButton("Delete")
+            self._deleteButton.clicked.connect(lambda: self.onDelete.emit(self._programInstance.program))
+            layout.addWidget(self._editButton)
+            layout.addWidget(self._deleteButton)
 
         self.setFocusPolicy(Qt.ClickFocus)
 

@@ -28,15 +28,27 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="99850780-df20-4af2-831c-10fab045648b" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/Model/Program/ProgramLibrary.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Images/closeIcon.aseprite" beforeDir="false" afterPath="$PROJECT_DIR$/Images/closeIcon.aseprite" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Images/closeIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Images/closeIcon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/icon.ico" beforeDir="false" afterPath="$PROJECT_DIR$/Images/icon.ico" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Images/icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Program/Program.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program/Program.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ChipEditor.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ChipEditor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProgramEditor/CodeTextEditor.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramEditor/CodeTextEditor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ProgramPresetItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ProgramPresetItem.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramEditor/Instructions.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramEditor/Instructions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramEditor/MenuBar.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramEditor/MenuBar.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramEditor/ProgramEditorTab.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramEditor/ProgramEditorTab.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/ProgramEditor/ProgramEditorWindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramEditor/ProgramEditorWindow.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/Stylesheets/ChipEditor.css" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Stylesheets/ChipEditor.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramViews/ProgramContextDisplay.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramViews/ProgramContextDisplay.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramViews/ProgramInstanceWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramViews/ProgramInstanceWidget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramViews/ProgramList.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramViews/ProgramList.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/StyleVariables.json" beforeDir="false" afterPath="$PROJECT_DIR$/UI/StyleVariables.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/Stylesheets/Globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Stylesheets/Globals.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/Stylesheets/ProgramContextDisplay.css" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Stylesheets/ProgramContextDisplay.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/Stylesheets/ProgramEditor.css" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Stylesheets/ProgramEditor.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/Stylesheets/ProgramInstanceWidget.css" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Stylesheets/ProgramInstanceWidget.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/Stylesheets/ProgramList.css" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Stylesheets/ProgramList.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

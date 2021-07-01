@@ -1,7 +1,9 @@
 from typing import List, Union
 
-from PySide6.QtWidgets import QFrame, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QToolButton
-from PySide6.QtCore import QTimer, Qt
+from PySide6.QtWidgets import QFrame, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QToolButton, QToolTip, \
+    QPlainTextEdit
+from PySide6.QtGui import QPixmap, QImage
+from PySide6.QtCore import QTimer, Qt, Signal, QPoint
 from UI.ProgramViews.DataValueWidget import DataValueWidget
 from Model.Program.ProgramInstance import ProgramInstance, Parameter
 from Model.Program.Data import DataType
@@ -9,7 +11,7 @@ from UI.AppGlobals import AppGlobals
 
 
 class ProgramInstanceWidget(QFrame):
-    def __init__(self, programInstance: ProgramInstance, uniqueRun):
+    def __init__(self, programInstance: ProgramInstance, uniqueRun, displayHelp):
         super().__init__()
 
         AppGlobals.Instance().onChipModified.connect(self.UpdateParameterItems)
@@ -23,10 +25,19 @@ class ProgramInstanceWidget(QFrame):
         self.programNameWidget = QLabel()
         self.programNameWidget.setAlignment(Qt.AlignCenter)
 
-        layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
-        self.setLayout(layout)
+        titleLayout = QHBoxLayout()
+        titleLayout.addWidget(self.programNameWidget)
+
+        self._helpLabel = QPlainTextEdit(programInstance.program.description)
+        self._helpLabel.setEnabled(False)
+
+        outerLayout = QHBoxLayout()
+        outerLayout.setContentsMargins(0, 0, 0, 0)
+        outerLayout.setSpacing(0)
+
+        innerLayout = QVBoxLayout()
+        innerLayout.setContentsMargins(0, 0, 0, 0)
+        innerLayout.setSpacing(0)
 
         self.runButton = QPushButton("Run")
         self.runButton.setProperty("Attention", True)
@@ -43,15 +54,26 @@ class ProgramInstanceWidget(QFrame):
         self._parametersLayout.setSpacing(0)
         self._parametersLayout.setContentsMargins(0, 0, 0, 0)
         parameterWidget.setLayout(self._parametersLayout)
-        layout.addWidget(self.programNameWidget)
-        layout.addWidget(parameterWidget)
-        layout.addWidget(self.runButton)
-        layout.addWidget(self._stopButton)
+        innerLayout.addLayout(titleLayout)
+        innerLayout.addWidget(parameterWidget)
+        innerLayout.addWidget(self.runButton)
+        innerLayout.addWidget(self._stopButton)
+        innerLayout.addStretch(1)
+
+        outerLayout.addLayout(innerLayout)
+        outerLayout.addWidget(self._helpLabel)
+        self.setLayout(outerLayout)
 
         self.UpdateInstanceView()
         self.UpdateParameterItems()
 
     def UpdateParameterItems(self):
+        if not self.programInstance.program.description:
+            text = "No description provided."
+        else:
+            text = self.programInstance.program.description
+        self._helpLabel.setPlainText(text)
+
         [item.deleteLater() for item in self.parameterItems]
         self.parameterItems = []
 

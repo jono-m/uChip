@@ -1,9 +1,10 @@
-from PySide6.QtWidgets import QFrame, QSplitter, QHBoxLayout, QLineEdit, QVBoxLayout, QLabel
-from PySide6.QtCore import Signal
+from PySide6.QtWidgets import QFrame, QSplitter, QHBoxLayout, QLineEdit, QVBoxLayout, QLabel, QPlainTextEdit
+from PySide6.QtCore import Signal, Qt
 from Model.Program.Program import Program
 from UI.AppGlobals import AppGlobals
 from UI.ProgramEditor.CodeTextEditor import CodeTextEditor
 from UI.ProgramEditor.ParameterEditor import ParameterEditor
+from pathlib import Path
 
 
 class ProgramEditorTab(QFrame):
@@ -30,6 +31,12 @@ class ProgramEditorTab(QFrame):
         self._programNameField = QLineEdit(program.name)
         self._programNameField.textChanged.connect(self.UpdateProgramName)
 
+        descriptionLabel = QLabel("Description")
+        descriptionLabel.setObjectName("DescriptionLabel")
+        descriptionLabel.setAlignment(Qt.AlignCenter)
+        self._descriptionField = QPlainTextEdit(program.description)
+        self._descriptionField.textChanged.connect(self.UpdateProgramName)
+
         self._parameterEditor = ParameterEditor(program)
         self._parameterEditor.onParametersChanged.connect(self.ProgramEdited)
 
@@ -37,7 +44,9 @@ class ProgramEditorTab(QFrame):
         sideLayout.setContentsMargins(0, 0, 0, 0)
         sideLayout.setSpacing(0)
         sideLayout.addWidget(self._programNameField)
-        sideLayout.addWidget(self._parameterEditor)
+        sideLayout.addWidget(self._parameterEditor, stretch=1)
+        sideLayout.addWidget(descriptionLabel)
+        sideLayout.addWidget(self._descriptionField, stretch=0)
         sideWidget = QFrame()
         sideWidget.setLayout(sideLayout)
 
@@ -56,9 +65,14 @@ class ProgramEditorTab(QFrame):
     def SaveProgram(self):
         self.program.script = self.codeEditor.Code()
         self.program.name = self._programNameField.text()
+        self.program.description = self._descriptionField.toPlainText()
         self._parameterEditor.Save()
         self.modified = False
         AppGlobals.Instance().onChipModified.emit()
+
+    def ExportProgram(self, path: Path):
+        self.SaveProgram()
+        self.program.Export(path)
 
     def ProgramEdited(self):
         self.modified = True
