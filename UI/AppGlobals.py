@@ -16,10 +16,6 @@ class AppGlobals(QObject):
     def __init__(self):
         super().__init__()
         self.rig = Rig()
-        self.rig.AddMock(0, "MOCK 1")
-        self.rig.AddMock(24, "MOCK 2")
-        self.rig.AddMock(48, "MOCK 3")
-        self.rig.AddMock(72, "MOCK 4")
         self.programRunner = ProgramRunner()
         self.programRunner.onValveChange.connect(self.onValveChanged.emit)
         self.programRunner.rig = self.rig
