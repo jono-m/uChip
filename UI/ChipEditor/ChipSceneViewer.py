@@ -263,6 +263,8 @@ class ChipSceneViewer(QGraphicsView):
 
         super().mousePressEvent(event)
 
+        self.update()
+
     def mouseMoveEvent(self, event: QMouseEvent):
         # Update position movement
         newCursorPosition = event.localPos()
@@ -283,6 +285,7 @@ class ChipSceneViewer(QGraphicsView):
         self.UpdateView()
 
         super().mouseMoveEvent(event)
+        self.update()
 
     def mouseReleaseEvent(self, event: QMouseEvent):
         if self._state == State.PANNING:
@@ -307,6 +310,7 @@ class ChipSceneViewer(QGraphicsView):
         self.UpdateView()
 
         super().mouseReleaseEvent(event)
+        self.update()
 
     def keyReleaseEvent(self, event: QKeyEvent):
         if event.key() == Qt.Key.Key_Delete:

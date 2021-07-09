@@ -80,8 +80,6 @@ class ProgramList(QFrame):
                                 "Are you sure you want to delete " + program.name + "?") is QMessageBox.Yes:
             AppGlobals.Chip().programs.remove(program)
             AppGlobals.Instance().onChipModified.emit()
-            if self._contextDisplay:
-                self._contextDisplay.deleteLater()
 
 
 class ProgramListItem(QListWidgetItem):

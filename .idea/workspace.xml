@@ -28,27 +28,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="99850780-df20-4af2-831c-10fab045648b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Model/Program/ProgramLibrary.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Images/icon.ico" beforeDir="false" afterPath="$PROJECT_DIR$/Images/icon.ico" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Images/icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Images/icon.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model/Program/Program.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Program/Program.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ChipEditor.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ChipEditor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ProgramPresetItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ProgramPresetItem.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProgramEditor/Instructions.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramEditor/Instructions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProgramEditor/MenuBar.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramEditor/MenuBar.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProgramEditor/ProgramEditorTab.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramEditor/ProgramEditorTab.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProgramEditor/ProgramEditorWindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramEditor/ProgramEditorWindow.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProgramViews/ProgramContextDisplay.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramViews/ProgramContextDisplay.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ProgramViews/ProgramInstanceWidget.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramViews/ProgramInstanceWidget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/Rig/RigDevice.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Rig/RigDevice.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProgramLibrary/test.ucp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/AppGlobals.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/AppGlobals.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ChipSceneViewer.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ChipSceneViewer.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/ProgramViews/ProgramList.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramViews/ProgramList.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/StyleVariables.json" beforeDir="false" afterPath="$PROJECT_DIR$/UI/StyleVariables.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/Stylesheets/Globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Stylesheets/Globals.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/Stylesheets/ProgramContextDisplay.css" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Stylesheets/ProgramContextDisplay.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/Stylesheets/ProgramEditor.css" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Stylesheets/ProgramEditor.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/Stylesheets/ProgramInstanceWidget.css" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Stylesheets/ProgramInstanceWidget.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/Stylesheets/ProgramList.css" beforeDir="false" afterPath="$PROJECT_DIR$/UI/Stylesheets/ProgramList.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -210,7 +195,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Model/Program/ProgramRunner.py</url>
-          <line>187</line>
+          <line>210</line>
           <option name="timeStamp" value="126" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -240,17 +225,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/UI/ChipEditor/ImageChipItem.py</url>
-          <line>140</line>
+          <line>142</line>
           <option name="timeStamp" value="159" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/UI/ChipEditor/ProgramPresetItem.py</url>
-          <line>71</line>
+          <line>72</line>
           <option name="timeStamp" value="166" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/UI/ProgramViews/RunningProgramsList.py</url>
-          <line>33</line>
+          <line>24</line>
           <option name="timeStamp" value="169" />
         </line-breakpoint>
       </breakpoints>

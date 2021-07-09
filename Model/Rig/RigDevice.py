@@ -63,6 +63,7 @@ class RigDevice:
 
     def __setstate__(self, state):
         state["serialPort"] = None
+        self.__dict__ = state
 
     def Connect(self):
         if not self.IsDeviceAvailable():
