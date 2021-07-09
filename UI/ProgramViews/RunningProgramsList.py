@@ -21,7 +21,7 @@ class RunningProgramsList(QFrame):
 
         self.setLayout(self.runningProgramsListLayout)
 
-        AppGlobals.ProgramRunner().onTick.connect(self.Update)
+        AppGlobals.ProgramRunner().onInstanceChange.connect(self.Update)
 
     def Update(self):
         for runningProgramListItem in self.runningProgramListItems.copy():

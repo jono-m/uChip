@@ -45,6 +45,3 @@ class ChipDataSelection(QComboBox):
             item = self.itemData(index)
             if item:
                 self.setItemText(index, item.name)
-
-        self.adjustSize()
-        self.topLevelWidget().adjustSize()

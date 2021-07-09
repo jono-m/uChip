@@ -11,7 +11,7 @@ from Model.Rig import Rig
 class ProgramRunner(QObject):
     onValveChange = Signal()
     onMessage = Signal()
-    onTick = Signal()
+    onInstanceChange = Signal()
 
     def __init__(self):
         super().__init__()
@@ -89,8 +89,6 @@ class ProgramRunner(QObject):
                 self.Report(ProgramRunnerMessage(programInstance, True, str(Exception(
                     "Yielded object must be of type WaitForSeconds, ProgramInstance, or NoneType."))))
 
-        self.onTick.emit()
-
     def IsPaused(self, instance: ProgramInstance):
         if isinstance(instance, ProgramPreset):
             return self.IsPaused(instance.instance)
@@ -113,6 +111,7 @@ class ProgramRunner(QObject):
                 self.Stop(programInstance)
         # Remove it from the list
         del self.runningPrograms[instance]
+        self.onInstanceChange.emit()
 
     def StopAtRoot(self, instance: ProgramInstance):
         if isinstance(instance, ProgramPreset):
@@ -128,6 +127,7 @@ class ProgramRunner(QObject):
         if not self.IsRunning(instance):
             raise Exception("Program is not running")
         self.runningPrograms[instance].isPaused = True
+        self.onInstanceChange.emit()
 
     def Resume(self, instance: ProgramInstance):
         if isinstance(instance, ProgramPreset):
@@ -135,6 +135,7 @@ class ProgramRunner(QObject):
         if not self.IsRunning(instance):
             raise Exception("Program is not running!")
         self.runningPrograms[instance].isPaused = False
+        self.onInstanceChange.emit()
 
     def Run(self, instance: ProgramInstance, parentInstance: Optional[ProgramInstance] = None):
         if isinstance(instance, ProgramPreset):
@@ -170,6 +171,7 @@ class ProgramRunner(QObject):
             "Pause": lambda programInstance: self.Pause(programInstance),
             "IsPaused": lambda programInstance: self.IsPaused(programInstance),
             "Resume": lambda programInstance: self.Resume(programInstance),
+            "SetParameter": lambda programInstance, name, value: self.SetParameter(programInstance, name, value),
             "print": lambda text: self.Print(instance, text),
             "WaitForSeconds": WaitForSeconds,
             "OPEN": True,
@@ -192,6 +194,7 @@ class ProgramRunner(QObject):
             # The new program is a coroutine, need to add it to the list of programs
             runInfo.iterator = iterator
             self.runningPrograms[instance] = runInfo
+            self.onInstanceChange.emit()
 
         return instance
 
@@ -200,8 +203,14 @@ class ProgramRunner(QObject):
         self.Report(message)
 
     def SetValve(self, valve, state):
-        self.rig.SetSolenoidState(valve.solenoidNumber, state, True)
-        self.onValveChange.emit()
+        lastState = self.rig.GetSolenoidState(valve.solenoidNumber)
+        if lastState != state:
+            self.rig.SetSolenoidState(valve.solenoidNumber, state, True)
+            self.onValveChange.emit()
+
+    def SetParameter(self, instance: ProgramInstance, name: str, value):
+        instance.SetParameter(name, value)
+        self.onInstanceChange.emit()
 
 
 class ProgramRunnerMessage:
