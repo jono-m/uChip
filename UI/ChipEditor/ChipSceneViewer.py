@@ -1,7 +1,8 @@
 from typing import Set, List
 
 from PySide6.QtWidgets import QGraphicsView, QGraphicsScene, QApplication
-from PySide6.QtGui import QPainter, QBrush, QColor, QTransform, QWheelEvent, QMouseEvent, QPen, QKeyEvent, QGuiApplication
+from PySide6.QtGui import QPainter, QBrush, QColor, QTransform, QWheelEvent, QMouseEvent, QPen, QKeyEvent, \
+    QGuiApplication
 from PySide6.QtCore import QPointF, Qt, QRectF, QSizeF, QLine, Signal, QTimer
 
 from UI.ChipEditor.ChipItem import ChipItem
@@ -66,6 +67,7 @@ class ChipSceneViewer(QGraphicsView):
         if not editing:
             self.DeselectAll()
 
+        self.UpdateView()
         self.update()
 
     def GetSelectedItems(self):
@@ -152,7 +154,7 @@ class ChipSceneViewer(QGraphicsView):
         cursorScene = self.mapToScene(self._currentCursorPosition.toPoint())
         if self._state is State.SELECTING:
             selectionRect = QRectF(0, 0, abs(self._boxSelectionRectAnchor.x() - cursorScene.x()),
-                                  abs(self._boxSelectionRectAnchor.y() - cursorScene.y()))
+                                   abs(self._boxSelectionRectAnchor.y() - cursorScene.y()))
             selectionRect.moveCenter((cursorScene + self._boxSelectionRectAnchor) / 2.0)
         else:
             selectionRect = QRectF(cursorScene, QSizeF())
@@ -259,9 +261,9 @@ class ChipSceneViewer(QGraphicsView):
                     if hoveredItem.CanMove(self.mapToScene(self._currentCursorPosition.toPoint())):
                         self._state = State.MOVING
 
-        self.UpdateView()
-
         super().mousePressEvent(event)
+        self.UpdateView()
+        self.update()
 
         self.update()
 
