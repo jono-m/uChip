@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QGraphicsView, QGraphicsScene, QApplication
 from PySide6.QtGui import QPainter, QBrush, QColor, QTransform, QWheelEvent, QMouseEvent, QPen, QKeyEvent, \
     QGuiApplication
 from PySide6.QtCore import QPointF, Qt, QRectF, QSizeF, QLine, Signal, QTimer
+from UI.AppGlobals import AppGlobals
 
 from UI.ChipEditor.ChipItem import ChipItem
 
@@ -53,6 +54,8 @@ class ChipSceneViewer(QGraphicsView):
         self.selectionBox.setVisible(False)
 
         self._state = State.IDLE
+
+        AppGlobals.Instance().onValveChanged.connect(self.update)
 
         self.UpdateView()
 
@@ -287,7 +290,7 @@ class ChipSceneViewer(QGraphicsView):
         self.UpdateView()
 
         super().mouseMoveEvent(event)
-        self.update()
+        # self.update()
 
     def mouseReleaseEvent(self, event: QMouseEvent):
         if self._state == State.PANNING:

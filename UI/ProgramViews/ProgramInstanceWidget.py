@@ -15,7 +15,7 @@ class ProgramInstanceWidget(QFrame):
         super().__init__()
 
         AppGlobals.Instance().onChipModified.connect(self.UpdateParameterItems)
-        AppGlobals.ProgramRunner().onTick.connect(self.UpdateInstanceView)
+        AppGlobals.ProgramRunner().onInstanceChange.connect(self.UpdateInstanceView)
 
         self.editingParameterVisibility = False
 
@@ -69,11 +69,6 @@ class ProgramInstanceWidget(QFrame):
         self.UpdateInstanceView()
         self.UpdateParameterItems()
 
-    def adjustSize(self) -> None:
-        self._parameterWidget.adjustSize()
-        self._helpLabel.adjustSize()
-        super().adjustSize()
-
     def UpdateParameterItems(self):
         if not self.programInstance.program.description:
             text = "No description provided."
@@ -95,7 +90,6 @@ class ProgramInstanceWidget(QFrame):
                 i += 1
 
         self.UpdateParameterVisibility()
-        self.adjustSize()
 
     def UpdateInstanceView(self):
         self.programNameWidget.setText(self.programInstance.program.name)
@@ -116,8 +110,6 @@ class ProgramInstanceWidget(QFrame):
             else:
                 item.setVisible(False)
             item.visibilityToggle.setVisible(self.editingParameterVisibility)
-
-        self.adjustSize()
 
     def RunProgram(self):
         if self.uniqueRun:
@@ -164,6 +156,7 @@ class ProgramParameterItem:
         self._programInstance.parameterVisibility[self.parameter] = not self._programInstance.parameterVisibility[
             self.parameter]
         AppGlobals.Instance().onChipDataModified.emit()
+        self.UpdateFields()
 
     def UpdateParameterValue(self):
         lastValue = self._programInstance.parameterValues[self.parameter]
@@ -178,6 +171,7 @@ class ProgramParameterItem:
 
         if self._programInstance.parameterValues[self.parameter] != lastValue:
             AppGlobals.Instance().onChipDataModified.emit()
+            self.UpdateFields()
 
     def UpdateFields(self):
         self.parameterName.setText(self.parameter.name)

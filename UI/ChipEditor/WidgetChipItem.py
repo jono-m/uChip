@@ -30,8 +30,7 @@ class WidgetChipItem(ChipItem):
         self.UpdateStyle()
 
     def SetEditDisplay(self, editing: bool):
-        self.containerWidget.adjustSize()
-        self.bigContainer.adjustSize()
+        pass
 
     def SetHovered(self, isHovered: bool):
         self._displayHovered = isHovered

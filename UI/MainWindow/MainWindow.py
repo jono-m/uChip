@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QMainWindow, QDockWidget, QMessageBox, QFileDialog, QApplication, QTabWidget
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 from UI.ChipEditor.ChipEditor import ChipEditor
 from UI.ProgramViews.ProgramList import ProgramList, Program
@@ -17,6 +17,7 @@ from pathlib import Path
 
 class MainWindow(QMainWindow):
     def __init__(self):
+
         super().__init__()
 
         AppGlobals.Instance().onChipDataModified.connect(self.UpdateTitle)
@@ -51,12 +52,8 @@ class MainWindow(QMainWindow):
         menuBar.zoomToFit.connect(self.chipEditor.viewer.Recenter)
 
         self.setTabPosition(Qt.AllDockWidgetAreas, QTabWidget.TabPosition.North)
-        self.updateWorker = ProgramRunnerWorker(self)
-        self.updateWorker.start()
 
-        killTimer = QTimer(self)
-        killTimer.timeout.connect(self.CheckForKill)
-        killTimer.start(1000)
+        self.updateWorker = ProgramRunnerWorker(self)
 
         self.setMenuBar(menuBar)
         self.ShowRigWidget()
@@ -132,14 +129,6 @@ class MainWindow(QMainWindow):
                 return False
 
         return True
-
-    def CheckForKill(self):
-        if AppGlobals.ProgramRunner().GetTickDelta() > 2:
-            self.updateWorker.terminate()
-            self.updateWorker.wait()
-            AppGlobals.ProgramRunner().StopAll()
-            self.updateWorker.start()
-            QMessageBox.critical(self, "Timeout", "Program timed out.")
 
     def closeEvent(self, event):
         if not self.CloseChip():
