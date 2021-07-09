@@ -31,7 +31,7 @@ instructions = """
     <i>Resume(instance: Program instance object)</i>
             Resumes the program instance <i>instance</i>.
     <i>print(text: str)</i>
-            Prints <i>text</i> to the uChip console.
+            Prints <i>text</i> to the μChip console.
     <i>WaitForSeconds(seconds: float)</i>
             To be used in a <i>yield</i> statement. Will pause execution for 
             <i>seconds</i> seconds.

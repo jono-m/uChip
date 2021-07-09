@@ -28,7 +28,7 @@ class MainWindow(QMainWindow):
         self.chipEditor = ChipEditor()
 
         self.setCentralWidget(self.chipEditor)
-        self.setWindowIcon(QIcon("Images/icon.png"))
+        self.setWindowIcon(QIcon("Assets/Images/icon.png"))
 
         self._rigViewer = RigViewer()
         self._editorWindow = ProgramEditorWindow()
@@ -78,7 +78,7 @@ class MainWindow(QMainWindow):
 
     def OpenChip(self):
         filename, filterType = QFileDialog.getOpenFileName(self, "Browse for Chip",
-                                                           filter="uChip Project File (*.ucc)")
+                                                           filter="μChip Project File (*.ucc)")
         if filename:
             if not self.CloseChip():
                 return
@@ -92,14 +92,14 @@ class MainWindow(QMainWindow):
             title = "New Chip"
         if AppGlobals.Chip().modified:
             title += "*"
-        title += " - uChip"
+        title += " - μChip"
         self.setWindowTitle(title)
 
     def SaveChip(self, saveAs=False) -> bool:
         if saveAs or not AppGlobals.Chip().HasBeenSaved():
 
             filename, filterType = QFileDialog.getSaveFileName(self, "Save Chip",
-                                                               filter="uChip Project File (*.ucc)")
+                                                               filter="μChip Project File (*.ucc)")
             if filename:
                 AppGlobals.Chip().SaveToFile(Path(filename))
                 AppGlobals.Instance().onChipSaved.emit()

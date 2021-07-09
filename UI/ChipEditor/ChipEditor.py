@@ -31,18 +31,18 @@ class ChipEditor(QFrame):
 
         self._lockButton = QToolButton()
         self._lockButton.setProperty("Attention", True)
-        self._lockButton.setIcon(QIcon("Images/checkIcon.png"))
+        self._lockButton.setIcon(QIcon("Assets/Images/checkIcon.png"))
         self._lockButton.setIconSize(QSize(20, 20))
         self._lockButton.clicked.connect(lambda: self.SetEditing(False))
         self._editButton = QToolButton()
         self._editButton.setProperty("Attention", True)
-        self._editButton.setIcon(QIcon("Images/Edit.png"))
+        self._editButton.setIcon(QIcon("Assets/Images/Edit.png"))
         self._editButton.setIconSize(QSize(20, 20))
         self._editButton.clicked.connect(lambda: self.SetEditing(True))
 
         self._plusButton = QToolButton()
         self._plusButton.setProperty("Attention", True)
-        self._plusButton.setIcon(QIcon("Images/plusIcon.png"))
+        self._plusButton.setIcon(QIcon("Assets/Images/plusIcon.png"))
         self._plusButton.setIconSize(QSize(20, 20))
         self._plusButton.setPopupMode(QToolButton.InstantPopup)
 

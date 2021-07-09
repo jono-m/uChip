@@ -19,6 +19,11 @@ class Parameter:
         self.maximumInteger: Optional[int] = 100
         self.listType = DataType.INTEGER
 
+    def __setstate__(self, state):
+        self.__dict__ = state
+        if 'listType' not in self.__dict__:
+            self.listType = DataType.INTEGER
+
     def ValidateDefaultValues(self):
         self.defaultValueDict[DataType.INTEGER] = self.ClampInteger(self.defaultValueDict[DataType.INTEGER])
         self.defaultValueDict[DataType.FLOAT] = self.ClampFloat(self.defaultValueDict[DataType.FLOAT])

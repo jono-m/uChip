@@ -1,7 +1,7 @@
 from typing import List, Union
 
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QToolButton, QToolTip, \
-    QPlainTextEdit
+    QPlainTextEdit, QGridLayout, QSizePolicy
 from PySide6.QtGui import QPixmap, QImage
 from PySide6.QtCore import QTimer, Qt, Signal, QPoint
 from UI.ProgramViews.DataValueWidget import DataValueWidget
@@ -29,7 +29,8 @@ class ProgramInstanceWidget(QFrame):
         titleLayout.addWidget(self.programNameWidget)
 
         self._helpLabel = QPlainTextEdit(programInstance.program.description)
-        self._helpLabel.setEnabled(False)
+        self._helpLabel.setReadOnly(True)
+        self._helpLabel.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.MinimumExpanding)
 
         outerLayout = QHBoxLayout()
         outerLayout.setContentsMargins(0, 0, 0, 0)
@@ -49,13 +50,14 @@ class ProgramInstanceWidget(QFrame):
 
         self.parameterItems: List[ProgramParameterItem] = []
 
-        parameterWidget = QFrame()
-        self._parametersLayout = QVBoxLayout()
+        self._parameterWidget = QFrame()
+        self._parametersLayout = QGridLayout()
+        self._parametersLayout.setAlignment(Qt.AlignTop)
         self._parametersLayout.setSpacing(0)
         self._parametersLayout.setContentsMargins(0, 0, 0, 0)
-        parameterWidget.setLayout(self._parametersLayout)
+        self._parameterWidget.setLayout(self._parametersLayout)
         innerLayout.addLayout(titleLayout)
-        innerLayout.addWidget(parameterWidget)
+        innerLayout.addWidget(self._parameterWidget)
         innerLayout.addWidget(self.runButton)
         innerLayout.addWidget(self._stopButton)
         innerLayout.addStretch(1)
@@ -67,6 +69,11 @@ class ProgramInstanceWidget(QFrame):
         self.UpdateInstanceView()
         self.UpdateParameterItems()
 
+    def adjustSize(self) -> None:
+        self._parameterWidget.adjustSize()
+        self._helpLabel.adjustSize()
+        super().adjustSize()
+
     def UpdateParameterItems(self):
         if not self.programInstance.program.description:
             text = "No description provided."
@@ -77,11 +84,15 @@ class ProgramInstanceWidget(QFrame):
         [item.deleteLater() for item in self.parameterItems]
         self.parameterItems = []
 
+        i = 0
         for parameter in self.programInstance.program.parameters:
             if parameter.dataType is not DataType.OTHER:
                 newItem = ProgramParameterItem(parameter, self.programInstance)
-                self._parametersLayout.addWidget(newItem)
+                self._parametersLayout.addLayout(newItem.visibilityToggleLayout, i, 0)
+                self._parametersLayout.addLayout(newItem.parameterNameLayout, i, 1)
+                self._parametersLayout.addWidget(newItem.valueField, i, 2)
                 self.parameterItems.append(newItem)
+                i += 1
 
         self.UpdateParameterVisibility()
         self.adjustSize()
@@ -118,30 +129,36 @@ class ProgramInstanceWidget(QFrame):
         AppGlobals.ProgramRunner().Stop(self.programInstance)
 
 
-class ProgramParameterItem(QFrame):
+class ProgramParameterItem:
     def __init__(self, parameter: Parameter, instance: ProgramInstance):
-        super().__init__()
-
-        layout = QHBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
-        self.setLayout(layout)
-
         self.parameter = parameter
         self._programInstance = instance
-        self._parameterName = QLabel()
+        self.parameterName = QLabel()
 
         self.visibilityToggle = QToolButton()
         self.visibilityToggle.clicked.connect(self.ToggleVisibility)
 
-        self._valueField = DataValueWidget(self.parameter.dataType, self.parameter.listType)
-        self._valueField.dataChanged.connect(self.UpdateParameterValue)
+        self.valueField = DataValueWidget(self.parameter.dataType, self.parameter.listType)
+        self.valueField.dataChanged.connect(self.UpdateParameterValue)
 
-        layout.addWidget(self.visibilityToggle)
-        layout.addWidget(self._parameterName)
-        layout.addWidget(self._valueField)
+        self.visibilityToggleLayout = QVBoxLayout()
+        self.visibilityToggleLayout.addWidget(self.visibilityToggle)
+        self.visibilityToggleLayout.addStretch(1)
+        self.parameterNameLayout = QVBoxLayout()
+        self.parameterNameLayout.addWidget(self.parameterName)
+        self.parameterNameLayout.addStretch(1)
 
         self.UpdateFields()
+
+    def deleteLater(self):
+        self.visibilityToggle.deleteLater()
+        self.valueField.deleteLater()
+        self.parameterName.deleteLater()
+
+    def setVisible(self, visible):
+        self.visibilityToggle.setVisible(visible)
+        self.valueField.setVisible(visible)
+        self.parameterName.setVisible(visible)
 
     def ToggleVisibility(self):
         self._programInstance.parameterVisibility[self.parameter] = not self._programInstance.parameterVisibility[
@@ -152,22 +169,22 @@ class ProgramParameterItem(QFrame):
         lastValue = self._programInstance.parameterValues[self.parameter]
 
         if self.parameter.dataType is DataType.INTEGER:
-            value = self.parameter.ClampInteger(self._valueField.GetData())
+            value = self.parameter.ClampInteger(self.valueField.GetData())
         elif self.parameter.dataType is DataType.FLOAT:
-            value = self.parameter.ClampFloat(self._valueField.GetData())
+            value = self.parameter.ClampFloat(self.valueField.GetData())
         else:
-            value = self._valueField.GetData()
+            value = self.valueField.GetData()
         self._programInstance.parameterValues[self.parameter] = value
 
         if self._programInstance.parameterValues[self.parameter] != lastValue:
             AppGlobals.Instance().onChipDataModified.emit()
 
     def UpdateFields(self):
-        self._parameterName.setText(self.parameter.name)
+        self.parameterName.setText(self.parameter.name)
 
         if self._programInstance.parameterVisibility[self.parameter]:
             self.visibilityToggle.setText("O")
         else:
             self.visibilityToggle.setText("X")
 
-        self._valueField.Update(self._programInstance.parameterValues[self.parameter])
+        self.valueField.Update(self._programInstance.parameterValues[self.parameter])
