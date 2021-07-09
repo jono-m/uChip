@@ -15,7 +15,7 @@ class ProgramEditorWindow(QMainWindow):
         super().__init__()
         AppGlobals.Instance().onChipModified.connect(self.UpdateDisplay)
         StylesheetLoader.RegisterWidget(self)
-        self.setWindowIcon(QIcon("Images/icon.png"))
+        self.setWindowIcon(QIcon("Assets/Images/icon.png"))
 
         centralWidget = QSplitter()
         centralWidget.setChildrenCollapsible(False)
@@ -45,7 +45,7 @@ class ProgramEditorWindow(QMainWindow):
         self.UpdateDisplay()
 
     def ExportProgram(self):
-        filename, filterType = QFileDialog.getSaveFileName(self, "Export Program", filter="uChip Program File (*.ucp)")
+        filename, filterType = QFileDialog.getSaveFileName(self, "Export Program", filter="μChip Program File (*.ucp)")
         if filename:
             self._tabWidget.currentWidget().ExportProgram(filename)
 
@@ -102,7 +102,7 @@ class ProgramEditorWindow(QMainWindow):
             title = current.program.name
             if modified:
                 title += " *"
-            title += " | uChip Program Editor"
+            title += " | μChip Program Editor"
             self.setWindowTitle(title)
         else:
             self.close()

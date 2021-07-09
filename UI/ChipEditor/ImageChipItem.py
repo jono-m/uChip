@@ -122,8 +122,6 @@ class ImageChipItem(WidgetChipItem):
             self._lastSize = self._image.size
             self.PositionHandles()
 
-        super().Update()
-
     def HandleResize(self, handle: 'MovingHandle', currentPosition: QPointF):
         imageRect = QRectF(self._image.position, self._image.size)
         currentPosition = self.GraphicsObject().mapToScene(self.bigContainer.mapFromGlobal(currentPosition))

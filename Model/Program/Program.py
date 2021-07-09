@@ -23,6 +23,13 @@ class Program:
         else:
             return header + "pass"
 
+    def __setstate__(self, state):
+        self.__dict__ = state
+        if 'libraryPath' not in self.__dict__:
+            self.libraryPath = None
+        if 'description' not in self.__dict__:
+            self.description = ""
+
     def Export(self, path):
         file = open(path, "wb+")
         dill.dump(self, file)

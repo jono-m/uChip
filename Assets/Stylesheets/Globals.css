@@ -35,7 +35,7 @@ QDockWidget {
     min-height: 200px;
 }
 QDockWidget {
-    titlebar-close-icon: url(Images/closeIcon.png);
+    titlebar-close-icon: url(Assets/Images/closeIcon.png);
 }
 QDockWidget::close-button {
     subcontrol-origin: content;
@@ -44,7 +44,7 @@ QDockWidget::close-button:hover {
     border: none;
 }
 QTabBar::close-button {
-    image: url(Images/closeIcon.png);
+    image: url(Assets/Images/closeIcon.png);
     subcontrol-position: left;
     padding: 5px;
 }

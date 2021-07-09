@@ -104,10 +104,10 @@ class DeviceItem(QObject):
         self._enableToggle.clicked.connect(self.ToggleEnable)
         self._enableToggle.setText("Disable")
 
-        self.openAllButton = QPushButton("Open All")
+        self.openAllButton = QPushButton("All On")
         self.openAllButton.clicked.connect(lambda: self.SetAll(True))
         self.openAllButton.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
-        self.closeAllButton = QPushButton("Close All")
+        self.closeAllButton = QPushButton("All Off")
         self.closeAllButton.clicked.connect(lambda: self.SetAll(False))
         self.closeAllButton.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
 
@@ -122,7 +122,7 @@ class DeviceItem(QObject):
         self.solenoidsLayout.addLayout(openCloseLayout)
         self._solenoidButtons: List[SolenoidButton] = []
         for solenoidNumber in range(24):
-            newButton = SolenoidButton(solenoidNumber)
+            newButton = SolenoidButton(solenoidNumber + self.device.startNumber)
             newButton.solenoidClicked.connect(lambda s=newButton: self.ToggleSolenoid(s))
             newButton.polarityClicked.connect(lambda s=newButton: self.TogglePolarity(s))
             self._solenoidButtons.append(newButton)

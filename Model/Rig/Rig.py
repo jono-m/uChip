@@ -20,6 +20,8 @@ class Rig:
             if device.IsDeviceAvailable() and device.isEnabled:
                 device.Connect()
 
+        self.FlushStates()
+
     def Rescan(self):
         foundSerialNumbers = RigDevice.Rescan()
         foundDevices = [device for device in self.savedDevices if device.IsDeviceAvailable() and device.isEnabled]
@@ -60,17 +62,18 @@ class Rig:
     def SaveDevices(self):
         file = open("devices.pkl", "wb")
         nonMock = {device for device in self.savedDevices if not isinstance(device, MockRigDevice)}
-        dill.dump(nonMock, file)
+        dill.dump((nonMock, self.solenoidStates), file)
         file.close()
 
     def LoadDevices(self):
         if Path("devices.pkl").exists():
             file = open("devices.pkl", "rb")
             try:
-                self.savedDevices = dill.load(file)
+                self.savedDevices, self.solenoidStates = dill.load(file)
             except Exception as e:
                 print("Error loading device: " + str(e))
-                self.savedDevices = set()
+                self.savedDevices, self.solenoidStates = (set(), {})
             file.close()
         else:
             self.savedDevices = set()
+            self.solenoidStates = {}

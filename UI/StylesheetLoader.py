@@ -40,8 +40,8 @@ class StylesheetLoader:
         self.stylesheetsLastModifiedTime = {}
         self.variablesLastModifiedTime = None
 
-        self.stylesheetDirectory = Path("UI/Stylesheets")
-        self.variablesFilename = "UI/StyleVariables.json"
+        self.stylesheetDirectory = Path("Assets/Stylesheets")
+        self.variablesFilename = "Assets/StyleVariables.json"
 
         self.stylesheet = None
         self.variables = None
