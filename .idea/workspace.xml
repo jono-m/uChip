@@ -28,10 +28,88 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="99850780-df20-4af2-831c-10fab045648b" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/build.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build_setup.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model/Rig/RigDevice.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/Rig/RigDevice.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/AppGlobals.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/AppGlobals.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ChipSceneViewer.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ChipSceneViewer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/Edit.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/Edit.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/LBIcon.ase" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/LBIcon.ase" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/LBIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/LBIcon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/LBIconNew.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/LBIconNew.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/LBIconPlus.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/LBIconPlus.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/UCIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/UCIcon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/UCIconNew.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/UCIconNew.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/checkIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/checkIcon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/checkboxIcon.aseprite" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/checkboxIcon.aseprite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/checkboxIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/checkboxIcon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/chipIcon.ase" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/chipIcon.ase" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/chipIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/chipIcon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/chipIconPlus.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/chipIconPlus.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/closeIcon.aseprite" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/closeIcon.aseprite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/closeIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/closeIcon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/conditionalIcon.aseprite" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/conditionalIcon.aseprite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/conditionalIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/conditionalIcon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/downArrow.aseprite" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/downArrow.aseprite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/downArrow.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/downArrow.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/helpIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/helpIcon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/icon.ico" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/icon.ico" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/imageIcon.aseprite" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/imageIcon.aseprite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/imageIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/imageIcon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/listIcon.aseprite" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/listIcon.aseprite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/listIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/listIcon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/locked.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/locked.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/logicIcon.aseprite" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/logicIcon.aseprite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/logicIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/logicIcon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/mathIcon.aseprite" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/mathIcon.aseprite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/mathIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/mathIcon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/maximizeIcon.aseprite" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/maximizeIcon.aseprite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/maximizeIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/maximizeIcon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/minimizeIcon.aseprite" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/minimizeIcon.aseprite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/minimizeIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/minimizeIcon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/numberIcon.aseprite" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/numberIcon.aseprite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/numberIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/numberIcon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/openIcon.ase" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/openIcon.ase" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/openIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/openIcon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/pencilIcon.aseprite" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/pencilIcon.aseprite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/pencilIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/pencilIcon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/playIcon.aseprite" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/playIcon.aseprite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/playIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/playIcon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/plusIcon.aseprite" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/plusIcon.aseprite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/plusIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/plusIcon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/saveAsIcon.aseprite" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/saveAsIcon.aseprite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/saveAsIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/saveAsIcon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/saveIcon.aseprite" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/saveIcon.aseprite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/saveIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/saveIcon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/solenoidsIcon.aseprite" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/solenoidsIcon.aseprite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/solenoidsIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/solenoidsIcon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/stopIcon.aseprite" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/stopIcon.aseprite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/stopIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/stopIcon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/testChip.PNG" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/testChip.PNG" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/timeIcon.aseprite" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/timeIcon.aseprite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/timeIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/timeIcon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/upArrow.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/upArrow.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/valveIcon.aseprite" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/valveIcon.aseprite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/valveIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Images/valveIcon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProgramLibrary/test.ucp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ChipEditor/ChipEditor.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ChipEditor/ChipEditor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/MainWindow/MainWindow.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramEditor/Instructions.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramEditor/Instructions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramEditor/ProgramEditorWindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramEditor/ProgramEditorWindow.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/ProgramViews/ProgramList.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/ProgramViews/ProgramList.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/StyleVariables.json" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StyleVariables.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/StylesheetLoader.py" beforeDir="false" afterPath="$PROJECT_DIR$/UI/StylesheetLoader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/Stylesheets/ChipEditor.css" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Stylesheets/ChipEditor.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/Stylesheets/Console.css" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Stylesheets/Console.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/Stylesheets/Dialogs.css" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Stylesheets/Dialogs.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/Stylesheets/Globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Stylesheets/Globals.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/Stylesheets/ProgramContextDisplay.css" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Stylesheets/ProgramContextDisplay.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/Stylesheets/ProgramEditor.css" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Stylesheets/ProgramEditor.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/Stylesheets/ProgramInstanceWidget.css" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Stylesheets/ProgramInstanceWidget.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/Stylesheets/ProgramList.css" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Stylesheets/ProgramList.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/Stylesheets/RigView.css" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Stylesheets/RigView.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/Stylesheets/RunningProgramList.css" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Stylesheets/RunningProgramList.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -94,11 +172,11 @@
       <recent name="C:\Users\jonoj\Repositories\uChip\500KChip" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\jonoj\Repositories\uChip\Assets" />
+      <recent name="C:\Users\jonoj\Repositories\uChip\Assets\Images" />
+      <recent name="C:\Users\jonoj\Repositories\uChip\Images" />
       <recent name="C:\Users\jonoj\Repositories\uChip\UI\Stylesheets" />
       <recent name="C:\Users\jonoj\Repositories\uChip\UI\ProgramViews" />
-      <recent name="C:\Users\jonoj\Repositories\uChip\Model\Program" />
-      <recent name="C:\Users\jonoj\Repositories\uChip\Model" />
-      <recent name="C:\Users\jonoj\Repositories\uChip\ProjectSystem" />
     </key>
   </component>
   <component name="RunManager">

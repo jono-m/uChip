@@ -59,7 +59,7 @@ class ProgramList(QFrame):
 
     def ImportProgram(self):
         filename, filterType = QFileDialog.getOpenFileName(self, "Browse for Progra",
-                                                           filter="uChip Program (*.ucp)")
+                                                           filter="μChip Program (*.ucp)")
         if filename:
             program = Program.LoadFromFile(filename)
             AppGlobals.Chip().programs.append(program)
