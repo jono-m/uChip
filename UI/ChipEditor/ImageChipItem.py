@@ -60,6 +60,10 @@ class ImageChipItem(WidgetChipItem):
         self.Move(QPointF())
         self.PositionHandles()
 
+    def CanMove(self, scenePoint: QPointF) -> bool:
+        childAt = self.bigContainer.childAt(self.GraphicsObject().mapFromScene(scenePoint).toPoint())
+        return childAt not in self._handles
+
     def SetSelected(self, isSelected: bool):
         self.PositionHandles()
         for handle in self._handles:
@@ -107,8 +111,6 @@ class ImageChipItem(WidgetChipItem):
             if self._rawImage and newImage.size() != self._rawImage.size():
                 self._image.size = newImage.size()
             self._rawImage = newImage
-            self.containerWidget.adjustSize()
-            self.bigContainer.adjustSize()
             self.PositionHandles()
 
         if self._image.size != self._lastSize:
@@ -117,8 +119,6 @@ class ImageChipItem(WidgetChipItem):
                 QPixmap(self._rawImage).scaled(size,
                                                Qt.AspectRatioMode.IgnoreAspectRatio))
             self.image.setFixedSize(size)
-            self.containerWidget.adjustSize()
-            self.bigContainer.adjustSize()
             self._lastSize = self._image.size
             self.PositionHandles()
 
@@ -167,6 +167,7 @@ class MovingHandle(QFrame):
 
     def mouseReleaseEvent(self, event) -> None:
         self._pressed = False
+
 
 class ImageLabel(QLabel):
     pass

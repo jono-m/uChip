@@ -16,6 +16,7 @@ class AppGlobals(QObject):
     def __init__(self):
         super().__init__()
         self.rig = Rig()
+        self.rig.AddMock(0, "Mock A")
         self.programRunner = ProgramRunner()
         self.programRunner.onValveChange.connect(self.onValveChanged.emit)
         self.programRunner.rig = self.rig
@@ -25,8 +26,8 @@ class AppGlobals(QObject):
         self.onChipModified.connect(self.programRunner.CheckPrograms)
 
     onChipOpened = Signal()  # Invoked whenever a new chip is opened
-    onChipModified = Signal()  # Invoked whenever the chip lists change
-    onChipDataModified = Signal()  # Invoked whenever ANYTHING about the chip has been modified.
+    onChipModified = Signal()  # Invoked whenever the chip data structure changes
+    onChipDataModified = Signal()  # Invoked whenever chip values change
     onChipSaved = Signal()
     onValveChanged = Signal()
 

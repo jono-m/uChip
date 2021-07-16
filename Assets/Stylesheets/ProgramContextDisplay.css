@@ -4,20 +4,10 @@ ProgramContextDisplay {
     border-width: 0 2px 2px 0;
     padding-left: 30px;
 }
-ProgramContextDisplay QPushButton {
-    padding: 5px;
-}
 ProgramContextDisplay QFrame, ProgramContextDisplay QLabel {
     background-color: transparent;
-}
-ProgramContextDisplay > QFrame > QLabel {
-    font-weight: bold;
 }
 ProgramContextDisplay > QFrame {
     border: 4px solid @borderColor;
     border-width: 0 0 0 2px;
-}
-
-ProgramContextDisplay * {
-    border: none;
 }

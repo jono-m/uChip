@@ -9,12 +9,6 @@ RigViewer > QPushButton {
     min-width: 80px;
     max-width: 80px;
 }
-SolenoidButton {
-	min-width: 25px;
-	max-width: 25px;
-	min-height: 40px;
-	max-height: 40px;
-}
 QAbstractButton[IsOpen=true] {
 	background-color: @valveOpenColor;
 }

@@ -11,3 +11,4 @@ class ProgramPreset:
 
         self.instance = ProgramInstance(program)
 
+        self.showDescription = True

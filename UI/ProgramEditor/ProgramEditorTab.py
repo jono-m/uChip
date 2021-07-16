@@ -13,7 +13,6 @@ class ProgramEditorTab(QFrame):
     def __init__(self, program: Program):
         super().__init__()
 
-        AppGlobals.Instance().onChipOpened.connect(self.CheckForProgram)
         AppGlobals.Instance().onChipModified.connect(self.CheckForProgram)
 
         self.program = program

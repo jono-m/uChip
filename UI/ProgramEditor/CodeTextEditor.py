@@ -1,6 +1,6 @@
-from PySide6.QtWidgets import QFrame, QPlainTextEdit, QHBoxLayout, QLabel, QTextEdit
+from PySide6.QtWidgets import QFrame, QPlainTextEdit, QHBoxLayout, QTextEdit
 from PySide6.QtGui import QSyntaxHighlighter, QTextCharFormat, QFont, Qt, QBrush, QKeyEvent, QColor, QPaintEvent, \
-    QPainter, QFontMetricsF, QTextFormat, QTextBlock
+    QPainter, QTextFormat
 from PySide6.QtCore import Signal, QRegularExpression, Qt, QRect, QSize
 import keyword
 import re
@@ -124,7 +124,7 @@ class CodeTextEditorWidget(QPlainTextEdit):
         self._leftPadding = 5
         self._rightPadding = 20
 
-        self.updateLineNumberAreaWidth(0)
+        self.updateLineNumberAreaWidth()
         self.highlightCurrentLine()
 
     def lineNumberAreaPaintEvent(self, event: QPaintEvent):
@@ -169,7 +169,7 @@ class CodeTextEditorWidget(QPlainTextEdit):
         rect = self.contentsRect()
         self._lineNumberArea.setGeometry(QRect(rect.left(), rect.top(), self.lineNumberAreaWidth(), rect.height()))
 
-    def updateLineNumberAreaWidth(self, newBlockCount: int):
+    def updateLineNumberAreaWidth(self):
         self.setViewportMargins(self.lineNumberAreaWidth(), 0, 0, 0)
 
     def highlightCurrentLine(self):
@@ -201,7 +201,7 @@ class CodeTextEditorWidget(QPlainTextEdit):
             self._lineNumberArea.update(0, rect.y(), self._lineNumberArea.width(), rect.height())
 
         if rect.contains(self.viewport().rect()):
-            self.updateLineNumberAreaWidth(0)
+            self.updateLineNumberAreaWidth()
 
     def keyPressEvent(self, e: QKeyEvent) -> None:
         if e.key() == Qt.Key.Key_Backtab:
@@ -237,11 +237,11 @@ class CodeTextEditorWidget(QPlainTextEdit):
         lines = originalLines.copy()
         for lineNo in range(len(lines)):
             if indent:
-                count = len(re.match("\A *", lines[lineNo])[0])
+                count = len(re.match(r"\A *", lines[lineNo])[0])
                 toAdd = 4 - (count % 4)
                 lines[lineNo] = " " * toAdd + lines[lineNo]
             else:
-                lines[lineNo] = re.sub("\A {1,4}", "", lines[lineNo])
+                lines[lineNo] = re.sub(r"\A {1,4}", "", lines[lineNo])
         newText = "\u2029".join(lines)
 
         cursor.removeSelectedText()

@@ -1,0 +1,18 @@
+Inspector {
+    padding: 0px;
+    margin: 20px;
+}
+Inspector > QFrame {
+    padding: 5px;
+}
+TitleWidget {
+    padding: 5px;
+    font-weight: bold;
+    background-color: @barColor;
+}
+Inspector > QFrame QLabel {
+    padding: 5px;
+}
+Inspector QCheckBox, Inspector QLineEdit {
+    padding: 10px;
+}

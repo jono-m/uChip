@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List
 import dill
 
 from Model.Program.Parameter import Parameter

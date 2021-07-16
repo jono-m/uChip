@@ -1,5 +1,5 @@
-from PySide6.QtWidgets import QGraphicsObject
-from PySide6.QtCore import QPointF, QTimer, Signal, QObject
+from PySide6.QtWidgets import QGraphicsObject, QFrame
+from PySide6.QtCore import QPointF, Signal, QObject
 from abc import abstractmethod
 
 
@@ -9,12 +9,13 @@ class ChipItem(QObject):
     def __init__(self, graphicsObject: QGraphicsObject):
         super().__init__()
         self._graphicsObject = graphicsObject
+        self._hoverWidget = QFrame()
+
+    def HoverWidget(self):
+        return self._hoverWidget
 
     def GraphicsObject(self):
         return self._graphicsObject
-
-    def SetEditDisplay(self, editing: bool):
-        pass
 
     @abstractmethod
     def CanSelect(self) -> bool:

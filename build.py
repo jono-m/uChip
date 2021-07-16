@@ -1,6 +1,4 @@
 from cx_Freeze import setup, Executable
-from os import path
-
 
 files = {"include_files": ['Assets/']}
 setup(name="μChip",

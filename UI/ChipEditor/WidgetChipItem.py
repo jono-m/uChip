@@ -1,5 +1,5 @@
-from PySide6.QtCore import QPointF
-from PySide6.QtWidgets import QGraphicsProxyWidget, QLabel, QFrame, QVBoxLayout
+from PySide6.QtCore import QPointF, QEvent
+from PySide6.QtWidgets import QGraphicsProxyWidget, QFrame, QVBoxLayout
 from UI.ChipEditor.ChipItem import ChipItem
 from UI.StylesheetLoader import StylesheetLoader
 
@@ -29,9 +29,6 @@ class WidgetChipItem(ChipItem):
 
         self.UpdateStyle()
 
-    def SetEditDisplay(self, editing: bool):
-        pass
-
     def SetHovered(self, isHovered: bool):
         self._displayHovered = isHovered
         self.UpdateStyle()
@@ -44,8 +41,7 @@ class WidgetChipItem(ChipItem):
         return True
 
     def CanMove(self, scenePoint: QPointF) -> bool:
-        childAt = self.bigContainer.childAt(self.GraphicsObject().mapFromScene(scenePoint).toPoint())
-        return childAt is None or childAt is self.containerWidget or isinstance(childAt, QLabel)
+        return True
 
     def CanDelete(self) -> bool:
         return True
@@ -79,7 +75,12 @@ class ClearingProxy(QGraphicsProxyWidget):
 
 
 class WidgetChipItemContainer(QFrame):
-    pass
+    def event(self, e) -> bool:
+        print(e.type())
+        if e.type() == QEvent.LayoutRequest:
+            self.adjustSize()
+        return super().event(e)
+
 
 
 class WidgetChipItemContents(QFrame):

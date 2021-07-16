@@ -18,6 +18,10 @@
   "attentionHoverColor": "rgb(212, 129, 51)",
   "attentionPressColor": "rgb(232, 152, 77)",
 
+  "badAttentionColor": "rgb(199, 33, 0)",
+  "badAttentionHoverColor": "rgb(214, 77, 49)",
+  "badAttentionPressColor": "rgb(219, 110, 88)",
+
   "controlNormalColor": "rgb(50, 50, 50)",
   "controlHoverColor": "rgb(60, 60, 60)",
   "controlPressColor": "rgb(80, 80, 80)",

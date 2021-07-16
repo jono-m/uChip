@@ -9,7 +9,7 @@ class ChipDataSelection(QComboBox):
     def __init__(self, dataType: DataType):
         super().__init__()
 
-        self.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.currentIndexChanged = None
         self.dataType = dataType
 
         AppGlobals.Instance().onChipModified.connect(self.Repopulate)

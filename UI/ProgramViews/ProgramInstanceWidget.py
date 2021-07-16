@@ -1,9 +1,8 @@
-from typing import List, Union
-
-from PySide6.QtWidgets import QFrame, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QToolButton, QToolTip, \
-    QPlainTextEdit, QGridLayout, QSizePolicy
-from PySide6.QtGui import QPixmap, QImage
-from PySide6.QtCore import QTimer, Qt, Signal, QPoint
+from typing import List
+from PySide6.QtWidgets import QFrame, QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QToolButton, QPlainTextEdit, \
+    QGridLayout, QSizePolicy
+from PySide6.QtGui import QIcon
+from PySide6.QtCore import Qt
 from UI.ProgramViews.DataValueWidget import DataValueWidget
 from Model.Program.ProgramInstance import ProgramInstance, Parameter
 from Model.Program.Data import DataType
@@ -11,16 +10,18 @@ from UI.AppGlobals import AppGlobals
 
 
 class ProgramInstanceWidget(QFrame):
-    def __init__(self, programInstance: ProgramInstance, uniqueRun, displayHelp):
+    def __init__(self, programInstance: ProgramInstance):
         super().__init__()
 
         AppGlobals.Instance().onChipModified.connect(self.UpdateParameterItems)
         AppGlobals.ProgramRunner().onInstanceChange.connect(self.UpdateInstanceView)
+        AppGlobals.Instance().onChipDataModified.connect(self.UpdateInstanceView)
 
-        self.editingParameterVisibility = False
+        self._showAllParameters = False
+        self._editParameterVisibility = False
 
         self.programInstance = programInstance
-        self.uniqueRun = uniqueRun
+        self.ownsInstance = False
 
         self.programNameWidget = QLabel()
         self.programNameWidget.setAlignment(Qt.AlignCenter)
@@ -28,9 +29,8 @@ class ProgramInstanceWidget(QFrame):
         titleLayout = QHBoxLayout()
         titleLayout.addWidget(self.programNameWidget)
 
-        self._helpLabel = QPlainTextEdit(programInstance.program.description)
-        self._helpLabel.setReadOnly(True)
-        self._helpLabel.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.MinimumExpanding)
+        self._description = QPlainTextEdit(programInstance.program.description)
+        self._description.setReadOnly(True)
 
         outerLayout = QHBoxLayout()
         outerLayout.setContentsMargins(0, 0, 0, 0)
@@ -45,7 +45,7 @@ class ProgramInstanceWidget(QFrame):
         self.runButton.clicked.connect(self.RunProgram)
 
         self._stopButton = QPushButton("Stop")
-        self._stopButton.setProperty("Attention", True)
+        self._stopButton.setProperty("BadAttention", True)
         self._stopButton.clicked.connect(self.StopProgram)
 
         self.parameterItems: List[ProgramParameterItem] = []
@@ -56,6 +56,7 @@ class ProgramInstanceWidget(QFrame):
         self._parametersLayout.setSpacing(0)
         self._parametersLayout.setContentsMargins(0, 0, 0, 0)
         self._parameterWidget.setLayout(self._parametersLayout)
+
         innerLayout.addLayout(titleLayout)
         innerLayout.addWidget(self._parameterWidget)
         innerLayout.addWidget(self.runButton)
@@ -63,19 +64,30 @@ class ProgramInstanceWidget(QFrame):
         innerLayout.addStretch(1)
 
         outerLayout.addLayout(innerLayout)
-        outerLayout.addWidget(self._helpLabel)
+        outerLayout.addWidget(self._description)
+
         self.setLayout(outerLayout)
 
-        self.UpdateInstanceView()
         self.UpdateParameterItems()
 
-    def UpdateParameterItems(self):
-        if not self.programInstance.program.description:
-            text = "No description provided."
-        else:
-            text = self.programInstance.program.description
-        self._helpLabel.setPlainText(text)
+    def SetTitleVisible(self, visible):
+        self.programNameWidget.setVisible(visible)
 
+    def SetDescriptionVisible(self, visisble):
+        self._description.setVisible(visisble)
+
+    def DescriptionVisible(self):
+        return self._description.isVisible()
+
+    def SetShowAllParameters(self, showAll):
+        self._showAllParameters = showAll
+        self.UpdateInstanceView()
+
+    def SetEditParameterVisibility(self, edit):
+        self._editParameterVisibility = edit
+        self.UpdateInstanceView()
+
+    def UpdateParameterItems(self):
         [item.deleteLater() for item in self.parameterItems]
         self.parameterItems = []
 
@@ -83,17 +95,25 @@ class ProgramInstanceWidget(QFrame):
         for parameter in self.programInstance.program.parameters:
             if parameter.dataType is not DataType.OTHER:
                 newItem = ProgramParameterItem(parameter, self.programInstance)
-                self._parametersLayout.addLayout(newItem.visibilityToggleLayout, i, 0)
-                self._parametersLayout.addLayout(newItem.parameterNameLayout, i, 1)
+                self._parametersLayout.addWidget(newItem.visibilityToggle, i, 0)
+                self._parametersLayout.addWidget(newItem.parameterName, i, 1)
                 self._parametersLayout.addWidget(newItem.valueField, i, 2)
                 self.parameterItems.append(newItem)
                 i += 1
 
-        self.UpdateParameterVisibility()
+        self.UpdateInstanceView()
 
     def UpdateInstanceView(self):
+        if not self.programInstance.program.description:
+            text = "No description provided."
+        else:
+            text = self.programInstance.program.description
+        if self._description.toPlainText() != text:
+            self._description.setPlainText(text)
+
         self.programNameWidget.setText(self.programInstance.program.name)
-        if self.uniqueRun:
+
+        if self.ownsInstance:
             self.runButton.setVisible(not AppGlobals.ProgramRunner().IsRunning(self.programInstance))
             self._stopButton.setVisible(AppGlobals.ProgramRunner().IsRunning(self.programInstance))
         else:
@@ -102,17 +122,15 @@ class ProgramInstanceWidget(QFrame):
 
         for item in self.parameterItems:
             item.UpdateFields()
-
-    def UpdateParameterVisibility(self):
-        for item in self.parameterItems:
-            if self.editingParameterVisibility or self.programInstance.parameterVisibility[item.parameter]:
+            if self._showAllParameters:
                 item.setVisible(True)
+                item.visibilityToggle.setVisible(self._editParameterVisibility)
             else:
-                item.setVisible(False)
-            item.visibilityToggle.setVisible(self.editingParameterVisibility)
+                item.setVisible(self.programInstance.parameterVisibility[item.parameter])
+                item.visibilityToggle.setVisible(False)
 
     def RunProgram(self):
-        if self.uniqueRun:
+        if self.ownsInstance:
             AppGlobals.ProgramRunner().Run(self.programInstance, None)
         else:
             AppGlobals.ProgramRunner().Run(self.programInstance.Clone(), None)
@@ -127,18 +145,11 @@ class ProgramParameterItem:
         self._programInstance = instance
         self.parameterName = QLabel()
 
-        self.visibilityToggle = QToolButton()
+        self.visibilityToggle = VisibilityToggle()
         self.visibilityToggle.clicked.connect(self.ToggleVisibility)
 
         self.valueField = DataValueWidget(self.parameter.dataType, self.parameter.listType)
         self.valueField.dataChanged.connect(self.UpdateParameterValue)
-
-        self.visibilityToggleLayout = QVBoxLayout()
-        self.visibilityToggleLayout.addWidget(self.visibilityToggle)
-        self.visibilityToggleLayout.addStretch(1)
-        self.parameterNameLayout = QVBoxLayout()
-        self.parameterNameLayout.addWidget(self.parameterName)
-        self.parameterNameLayout.addStretch(1)
 
         self.UpdateFields()
 
@@ -171,14 +182,17 @@ class ProgramParameterItem:
 
         if self._programInstance.parameterValues[self.parameter] != lastValue:
             AppGlobals.Instance().onChipDataModified.emit()
-            self.UpdateFields()
 
     def UpdateFields(self):
         self.parameterName.setText(self.parameter.name)
 
         if self._programInstance.parameterVisibility[self.parameter]:
-            self.visibilityToggle.setText("O")
+            self.visibilityToggle.setIcon(QIcon("Assets/Images/eyeOpen.png"))
         else:
-            self.visibilityToggle.setText("X")
+            self.visibilityToggle.setIcon(QIcon("Assets/Images/eyeClosed.png"))
 
         self.valueField.Update(self._programInstance.parameterValues[self.parameter])
+
+
+class VisibilityToggle(QToolButton):
+    pass

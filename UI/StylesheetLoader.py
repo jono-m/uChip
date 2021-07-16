@@ -35,7 +35,7 @@ class StylesheetLoader:
 
         self.updateTimer = QTimer(QApplication.topLevelWidgets()[0])
         self.updateTimer.timeout.connect(self.TimerUpdate)
-        # self.updateTimer.start(1000)
+        self.updateTimer.start(1000)
 
         self.stylesheetsLastModifiedTime = {}
         self.variablesLastModifiedTime = None
