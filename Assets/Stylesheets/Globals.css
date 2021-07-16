@@ -16,9 +16,22 @@
     background-color: @attentionPressColor;
     font-weight: bold;
 }
+*[BadAttention=true] {
+    background-color: @badAttentionColor;
+    font-weight: bold;
+}
+*[BadAttention=true]::hover {
+    background-color: @badAttentionHoverColor;
+    font-weight: bold;
+}
+*[BadAttention=true]::pressed {
+    background-color: @badAttentionPressColor;
+    font-weight: bold;
+}
 QAbstractButton, QSpinBox, QLineEdit, QMenuBar::item, QMenu::item, QListView::item, QScrollBar::handle, QTabBar::tab,
     QComboBox, QTabBar::close-button, QDockWidget::close-button {
     background-color: @controlNormalColor;
+    padding: 5px;
 }
 QAbstractButton::hover, QSpinBox::hover, QLineEdit::hover, QMenuBar::item:selected, QMenu::item:selected,
     QListView::item:hover, QScrollBar::handle:hover, QTabBar::tab:hover, QComboBox::hover, QTabBar::close-button:hover,
@@ -90,7 +103,4 @@ QListView::item {
  }
  QScrollBar::add-page, QScrollBar::sub-page {
     background: none;
- }
- QAbstractSpinBox {
-    padding-left: 10px;
  }

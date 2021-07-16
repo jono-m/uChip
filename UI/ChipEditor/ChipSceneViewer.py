@@ -3,7 +3,7 @@ from typing import Set, List
 from PySide6.QtWidgets import QGraphicsView, QGraphicsScene, QApplication
 from PySide6.QtGui import QPainter, QBrush, QColor, QTransform, QWheelEvent, QMouseEvent, QPen, QKeyEvent, \
     QGuiApplication
-from PySide6.QtCore import QPointF, Qt, QRectF, QSizeF, QLine, Signal, QTimer
+from PySide6.QtCore import QPointF, Qt, QRectF, QSizeF, QLine, Signal
 from UI.AppGlobals import AppGlobals
 
 from UI.ChipEditor.ChipItem import ChipItem
@@ -55,17 +55,12 @@ class ChipSceneViewer(QGraphicsView):
 
         self._state = State.IDLE
 
-        AppGlobals.Instance().onValveChanged.connect(self.update)
-
         self.UpdateView()
 
     def SetEditing(self, editing: bool):
         self._editing = editing
 
         self.showGrid = editing
-
-        for item in self._sceneItems:
-            item.SetEditDisplay(editing)
 
         if not editing:
             self.DeselectAll()
@@ -82,7 +77,6 @@ class ChipSceneViewer(QGraphicsView):
             item.Move(QPointF())
             item.onRemoved.connect(self.RemoveItem)
             self.scene().addItem(item.GraphicsObject())
-        item.SetEditDisplay(self._editing)
         return item
 
     def RemoveItem(self, item: ChipItem):
@@ -93,6 +87,7 @@ class ChipSceneViewer(QGraphicsView):
         if item in self._sceneItems:
             self._sceneItems.remove(item)
             self.scene().removeItem(item.GraphicsObject())
+        self.selectionChanged.emit(self._selectedItems)
 
     def GetItems(self):
         return self._sceneItems
@@ -137,6 +132,9 @@ class ChipSceneViewer(QGraphicsView):
         currentCenter = item.GraphicsObject().sceneBoundingRect().center()
         delta = sceneCenter - currentCenter
         item.Move(delta)
+        self.DeselectAll()
+        self.SelectItem(item)
+        self.selectionChanged.emit(self._selectedItems)
 
     def UpdateView(self):
         matrix = QTransform()
@@ -164,9 +162,6 @@ class ChipSceneViewer(QGraphicsView):
         return selectionRect
 
     def UpdateHoveredItems(self):
-        if self._state is State.PANNING:
-            return
-
         if not self._editing or self._state is State.MOVING:
             hoveredChipItems = []
         else:
@@ -187,6 +182,21 @@ class ChipSceneViewer(QGraphicsView):
             if item not in hoveredChipItems:
                 item.SetHovered(False)
         self._hoveredItems = hoveredChipItems
+
+        goalCursor = None
+        if self._state == State.PANNING:
+            goalCursor = Qt.ClosedHandCursor
+        elif self._state == State.MOVING:
+            goalCursor = Qt.SizeAllCursor
+        elif self._state == State.IDLE and self.GetSelectionMode() != SelectionMode.MODIFY:
+            if len(self._hoveredItems) > 0 and self._hoveredItems[0].CanMove(
+                    self.mapToScene(self._currentCursorPosition.toPoint())):
+                goalCursor = Qt.SizeAllCursor
+        if goalCursor is None and QGuiApplication.overrideCursor() is not None:
+            QGuiApplication.restoreOverrideCursor()
+        elif QGuiApplication.overrideCursor() != goalCursor:
+            QGuiApplication.restoreOverrideCursor()
+            QGuiApplication.setOverrideCursor(goalCursor)
 
     def UpdateSelectionBox(self):
         if self._state == State.SELECTING:
@@ -245,7 +255,6 @@ class ChipSceneViewer(QGraphicsView):
             return
 
         if event.button() == Qt.RightButton:
-            QGuiApplication.setOverrideCursor(Qt.SizeAllCursor)
             self._state = State.PANNING
         elif event.button() == Qt.LeftButton and self._editing:
             if len(self._hoveredItems) == 0:
@@ -295,7 +304,6 @@ class ChipSceneViewer(QGraphicsView):
     def mouseReleaseEvent(self, event: QMouseEvent):
         if self._state == State.PANNING:
             if event.button() == Qt.RightButton:
-                QGuiApplication.restoreOverrideCursor()
                 self._state = State.IDLE
         elif self._state == State.SELECTING:
             if event.button() == Qt.LeftButton:
@@ -333,7 +341,7 @@ class ChipSceneViewer(QGraphicsView):
 
     def DuplicateSelected(self):
         newItems = []
-        for item in self.GetSelectedItems():
+        for item in self.GetSelectedItems().copy():
             if item.CanDuplicate():
                 newItem = item.Duplicate()
                 newItem.Move(QPointF(50, 50))

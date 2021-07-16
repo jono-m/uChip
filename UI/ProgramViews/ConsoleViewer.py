@@ -1,9 +1,6 @@
-from typing import List
-
 from PySide6.QtWidgets import QFrame, QLabel, QVBoxLayout, QPushButton, QHBoxLayout, QScrollArea
-from PySide6.QtCore import QTimer, Signal, Qt
+from PySide6.QtCore import Qt
 from UI.AppGlobals import AppGlobals
-from Model.Program.ProgramInstance import ProgramInstance
 from Model.Program.ProgramRunner import ProgramRunnerMessage
 
 

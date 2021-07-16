@@ -20,7 +20,6 @@ class RigViewer(QFrame):
         rescanButton = QPushButton("Rescan")
         rescanButton.setProperty("Attention", True)
         rescanButton.clicked.connect(self.Rescan)
-        rescanButton.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Preferred)
         self._deviceLayout = QGridLayout()
         self._deviceLayout.setAlignment(Qt.AlignTop)
         self._deviceLayout.setContentsMargins(0, 0, 0, 0)
@@ -191,6 +190,7 @@ class SolenoidButton(QToolButton):
         super().__init__()
 
         self.clicked.connect(self.solenoidClicked.emit)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         AppGlobals.Instance().onValveChanged.connect(self.UpdateValveState)
 

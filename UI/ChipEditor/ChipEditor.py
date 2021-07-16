@@ -1,11 +1,11 @@
-import PySide6
-from PySide6.QtGui import QKeyEvent, QIcon
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QToolButton, QMenu, QHBoxLayout, QFileDialog, QInputDialog, QFrame
-from PySide6.QtCore import QSize
+from PySide6.QtCore import QSize, Signal, QEvent
 from UI.ChipEditor.ChipSceneViewer import ChipSceneViewer
 from UI.ChipEditor.ValveChipItem import ValveChipItem, Valve
 from UI.ChipEditor.ImageChipItem import ImageChipItem, Image
 from UI.ChipEditor.ProgramPresetItem import ProgramPresetItem, ProgramPreset
+from UI.ChipEditor.Inspector import Inspector
 from UI.AppGlobals import AppGlobals
 from pathlib import Path
 
@@ -26,7 +26,8 @@ class ChipEditor(QFrame):
         actionsLayout = QHBoxLayout()
         actionsLayout.setContentsMargins(0, 0, 0, 0)
         actionsLayout.setSpacing(0)
-        self._actionsWidget = QFrame(self.viewer)
+        self._actionsWidget = FloatingWidget(self)
+        self._actionsWidget.onResize.connect(self.FloatWidgets)
         self._actionsWidget.setLayout(actionsLayout)
 
         self._lockButton = QToolButton()
@@ -50,6 +51,16 @@ class ChipEditor(QFrame):
         actionsLayout.addWidget(self._lockButton)
         actionsLayout.addWidget(self._editButton)
 
+        self._inspector = Inspector(self)
+        self.viewer.selectionChanged.connect(self._inspector.SetSelection)
+        inspectorLayout = QHBoxLayout()
+        inspectorLayout.setContentsMargins(0, 0, 0, 0)
+        inspectorLayout.setSpacing(0)
+        inspectorLayout.addWidget(self._inspector)
+        self._inspectorWidget = FloatingWidget(self)
+        self._inspectorWidget.onResize.connect(self.FloatWidgets)
+        self._inspectorWidget.setLayout(inspectorLayout)
+
         menu = QMenu(self._plusButton)
         menu.addAction("Valve").triggered.connect(self.AddValve)
         menu.addAction("Program Preset...").triggered.connect(self.SelectProgramPreset)
@@ -67,6 +78,11 @@ class ChipEditor(QFrame):
         self._mode = Mode.VIEWING
 
         AppGlobals.Instance().onChipOpened.connect(self.LoadChip)
+
+        self._actionsWidget.raise_()
+        self._inspectorWidget.raise_()
+
+        self.FloatWidgets()
 
     def AddValve(self):
         newValve = Valve()
@@ -98,6 +114,10 @@ class ChipEditor(QFrame):
             AppGlobals.Instance().onChipModified.emit()
             self.viewer.CenterItem(self.viewer.AddItem(ProgramPresetItem(newPreset)))
 
+    def resizeEvent(self, event) -> None:
+        self.FloatWidgets()
+        super().resizeEvent(event)
+
     def SetEditing(self, editing):
         self.viewer.SetEditing(editing)
 
@@ -109,13 +129,11 @@ class ChipEditor(QFrame):
 
         self.FloatWidgets()
 
-    def resizeEvent(self, event: PySide6.QtGui.QResizeEvent) -> None:
-        super().resizeEvent(event)
-        self.FloatWidgets()
-
     def FloatWidgets(self):
         self._actionsWidget.adjustSize()
-        self._actionsWidget.move(self.viewer.rect().topRight() - self._actionsWidget.rect().topRight())
+        self._inspectorWidget.adjustSize()
+        self._actionsWidget.move(self.rect().topRight() - self._actionsWidget.rect().topRight())
+        self._inspectorWidget.move(self.rect().bottomRight() - self._inspectorWidget.rect().bottomRight())
 
     def LoadChip(self):
         self.viewer.RemoveAll()
@@ -130,3 +148,17 @@ class ChipEditor(QFrame):
         self.viewer.Recenter()
 
         self.SetEditing(AppGlobals.Chip().editingMode)
+
+
+class FloatingWidget(QFrame):
+    onResize = Signal()
+
+    def resizeEvent(self, event) -> None:
+        super().resizeEvent(event)
+        self.onResize.emit()
+        print("Resize")
+
+    def event(self, e) -> bool:
+        if e.type() == QEvent.LayoutRequest:
+            self.onResize.emit()
+        return super().event(e)

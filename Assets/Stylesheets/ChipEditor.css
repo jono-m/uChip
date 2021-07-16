@@ -2,7 +2,7 @@
 ChipSceneViewer {
     border: 5px inset @darkBorder;
 }
-ChipSceneViewer > QFrame {
+FloatingWidget {
     background-color: transparent;
     margin: 20px;
 }
@@ -35,21 +35,6 @@ WidgetChipItemContents[state='HoverAndSelect'] {
     border: 6px solid @editorBorderSelect;
     margin: 2px;
 }
-WidgetChipItemContents QLabel {
-    padding: 0 20px 0 20px;
-}
-WidgetChipItemContents > QLabel {
-    padding: 10px;
-}
-WidgetChipItemContents > ImageLabel {
-    padding: 0;
-}
-WidgetChipItemContents > QPushButton {
-    padding: 5px;
-}
-WidgetChipItemContents QLineEdit, WidgetChipItemContents QAbstractSpinBox, WidgetChipItemContents QComboBox {
-    padding: 10px;
-}
 MovingHandle {
     min-width: 30px;
     max-width: 30px;
@@ -59,4 +44,8 @@ MovingHandle {
 }
 MovingHandle::hover {
     background-color: @attentionPressColor;
+}
+WidgetChipItemContents > QLabel {
+    background-color: @barColor;
+    padding: 5px;
 }

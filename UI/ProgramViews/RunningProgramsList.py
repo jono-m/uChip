@@ -1,7 +1,7 @@
 from typing import List
 
-from PySide6.QtWidgets import QFrame, QLabel, QVBoxLayout, QPushButton, QHBoxLayout, QSizePolicy
-from PySide6.QtCore import QTimer, Signal, Qt
+from PySide6.QtWidgets import QFrame, QLabel, QVBoxLayout, QPushButton, QHBoxLayout
+from PySide6.QtCore import Signal, Qt
 from UI.AppGlobals import AppGlobals
 from Model.Program.ProgramInstance import ProgramInstance
 
@@ -66,6 +66,7 @@ class RunningProgramItem(QFrame):
 
         programNameLabel = QLabel(programInstance.program.name)
         stopButton = QPushButton("STOP")
+        stopButton.setProperty("BadAttention", True)
         stopButton.clicked.connect(lambda: self.onStopClicked.emit(self.instance))
         stopButton.setVisible(stoppable)
         infoLayout = QHBoxLayout()

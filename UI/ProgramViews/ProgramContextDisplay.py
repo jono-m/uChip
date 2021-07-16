@@ -1,7 +1,7 @@
 from Model.Program.ProgramInstance import ProgramInstance, Program
 
 from PySide6.QtWidgets import QFrame, QVBoxLayout, QApplication, QPushButton
-from PySide6.QtCore import Qt, QTimer, QEvent, Signal
+from PySide6.QtCore import Qt, QEvent, Signal
 from UI.ProgramViews.ProgramInstanceWidget import ProgramInstanceWidget
 
 
@@ -31,7 +31,9 @@ class ProgramContextDisplay(QFrame):
 
         QApplication.instance().installEventFilter(self)
 
-        self._instanceWidget = ProgramInstanceWidget(programInstance, True, True)
+        self._instanceWidget = ProgramInstanceWidget(programInstance)
+        self._instanceWidget.SetShowAllParameters(True)
+        self._instanceWidget.ownsInstance = False
         layout.addWidget(self._instanceWidget)
 
         if editable:
@@ -47,9 +49,9 @@ class ProgramContextDisplay(QFrame):
         self.Reposition()
 
     def Reposition(self):
+        self.adjustSize()
         self.show()
         self.raise_()
-        self.resize(self.sizeHint())
         topLeft = self.mapToGlobal(self.rect().topLeft())
 
         matches = [item for item in [self.listWidget.item(row) for row in range(self.listWidget.count())] if

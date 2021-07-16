@@ -1,5 +1,5 @@
-from PySide6.QtCore import QPointF, Qt
-from PySide6.QtWidgets import QPushButton, QSpinBox, QLabel, QGridLayout, QLineEdit, QVBoxLayout
+from PySide6.QtCore import QPointF
+from PySide6.QtWidgets import QPushButton, QSpinBox, QLabel, QGridLayout, QLineEdit, QHBoxLayout
 
 from UI.ChipEditor.WidgetChipItem import WidgetChipItem, ChipItem
 from Model.Valve import Valve
@@ -27,7 +27,7 @@ class ValveChipItem(WidgetChipItem):
         self.valveNameField = QLineEdit(self._valve.name)
         self.valveNameField.textChanged.connect(self.UpdateValve)
 
-        mainLayout = QVBoxLayout()
+        mainLayout = QHBoxLayout()
         mainLayout.setContentsMargins(0, 0, 0, 0)
         mainLayout.setSpacing(0)
         mainLayout.addWidget(self.valveToggleButton)
@@ -39,8 +39,8 @@ class ValveChipItem(WidgetChipItem):
         layout.addWidget(self.valveNameField, 0, 1)
         layout.addWidget(self.valveNumberLabel, 1, 0)
         layout.addWidget(self.valveNumberDial, 1, 1)
+        self.HoverWidget().setLayout(layout)
 
-        mainLayout.addLayout(layout)
         self.containerWidget.setLayout(mainLayout)
         self.valveToggleButton.clicked.connect(self.Toggle)
 
@@ -59,13 +59,6 @@ class ValveChipItem(WidgetChipItem):
         self._valve.position += delta
         self.GraphicsObject().setPos(self._valve.position)
         super().Move(delta)
-
-    def SetEditDisplay(self, editing: bool):
-        self.valveNameField.setVisible(editing)
-        self.valveNameLabel.setVisible(editing)
-        self.valveNumberLabel.setVisible(editing)
-        self.valveNumberDial.setVisible(editing)
-        super().SetEditDisplay(editing)
 
     def UpdateValve(self):
         self._valve.solenoidNumber = self.valveNumberDial.value()

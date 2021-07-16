@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QMainWindow, QDockWidget, QMessageBox, QFileDialog, QApplication, QTabWidget
+from PySide6.QtWidgets import QMainWindow, QDockWidget, QMessageBox, QFileDialog, QTabWidget
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 from UI.ChipEditor.ChipEditor import ChipEditor

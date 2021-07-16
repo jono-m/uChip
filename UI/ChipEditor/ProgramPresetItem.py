@@ -1,5 +1,5 @@
 from PySide6.QtCore import QPointF, Qt
-from PySide6.QtWidgets import QLineEdit, QVBoxLayout, QLabel
+from PySide6.QtWidgets import QLineEdit, QVBoxLayout, QLabel, QHBoxLayout, QCheckBox
 
 from UI.ChipEditor.WidgetChipItem import WidgetChipItem, ChipItem
 from UI.ProgramViews.ProgramInstanceWidget import ProgramInstanceWidget
@@ -15,31 +15,46 @@ class ProgramPresetItem(WidgetChipItem):
 
         self._preset = preset
 
-        self._presetNameField = QLineEdit(preset.name)
-        self._presetNameField.textChanged.connect(self.UpdatePreset)
-
         self._presetNameLabel = QLabel(preset.name)
         self._presetNameLabel.setAlignment(Qt.AlignCenter)
 
-        self._instanceWidget = ProgramInstanceWidget(preset.instance, True, False)
+        self._instanceWidget = ProgramInstanceWidget(preset.instance)
+        self._instanceWidget.SetTitleVisible(False)
+        self._instanceWidget.ownsInstance = True
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
-        layout.addWidget(self._presetNameField)
         layout.addWidget(self._presetNameLabel)
         layout.addWidget(self._instanceWidget)
         self.containerWidget.setLayout(layout)
 
-        self.CheckForPreset()
+        inspLayout = QVBoxLayout()
+        inspLayout.setContentsMargins(0, 0, 0, 0)
+        inspLayout.setSpacing(0)
+        nameLayout = QHBoxLayout()
+        nameLayout.setContentsMargins(0, 0, 0, 0)
+        nameLayout.setSpacing(0)
+        inspLayout.addLayout(nameLayout)
+        self.HoverWidget().setLayout(inspLayout)
+        nameLayout.addWidget(QLabel("Preset Name"))
+        self._presetNameField = QLineEdit(preset.name)
+        self._presetNameField.textChanged.connect(self.UpdatePreset)
+        self._showDescriptionField = QCheckBox("Show Description")
+        self._showDescriptionField.setChecked(self._preset.showDescription)
+        self._showDescriptionField.stateChanged.connect(self.UpdatePreset)
+        nameLayout.addWidget(self._presetNameField)
+        inspLayout.addWidget(self._showDescriptionField)
 
-    def SetEditDisplay(self, editing: bool):
-        self._presetNameField.setVisible(editing)
-        self._presetNameLabel.setVisible(not editing)
-        self._instanceWidget.programNameWidget.setVisible(editing)
-        self._instanceWidget.editingParameterVisibility = editing
-        self._instanceWidget.UpdateParameterVisibility()
-        super().SetEditDisplay(editing)
+        self._inspectorInstance = ProgramInstanceWidget(preset.instance)
+        self._inspectorInstance.SetShowAllParameters(True)
+        self._inspectorInstance.SetEditParameterVisibility(True)
+        self._inspectorInstance.SetDescriptionVisible(False)
+        self._inspectorInstance.ownsInstance = True
+        inspLayout.addWidget(self._inspectorInstance)
+
+        self.UpdatePresetView()
+        self.CheckForPreset()
 
     def Move(self, delta: QPointF):
         if delta != QPointF():
@@ -48,10 +63,21 @@ class ProgramPresetItem(WidgetChipItem):
         self.GraphicsObject().setPos(self._preset.position)
         super().Move(delta)
 
+    def CanMove(self, scenePoint: QPointF) -> bool:
+        childAt = self.bigContainer.childAt(self.GraphicsObject().mapFromScene(scenePoint).toPoint())
+        return isinstance(childAt, QLabel)
+
     def UpdatePreset(self):
         self._preset.name = self._presetNameField.text()
+        self._preset.showDescription = self._showDescriptionField.isChecked()
         AppGlobals.Instance().onChipDataModified.emit()
-        self._presetNameLabel.setText(self._preset.name)
+        self.UpdatePresetView()
+
+    def UpdatePresetView(self):
+        self._presetNameLabel.setText(
+            "<b>" + self._preset.name + "</b> <i>(" + self._preset.instance.program.name + ")</i>")
+        if self._instanceWidget.DescriptionVisible() != self._preset.showDescription:
+            self._instanceWidget.SetDescriptionVisible(self._preset.showDescription)
 
     def CheckForPreset(self):
         if self._preset not in AppGlobals.Chip().programPresets:
