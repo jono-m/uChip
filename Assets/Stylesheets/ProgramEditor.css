@@ -10,8 +10,8 @@ Instructions QLabel{
     background-color: @backgroundColor;
 }
 ProgramEditorTab {
-    min-width: 1024;
-    min-height: 768;
+    min-width: 640;
+    min-height: 480;
 }
 ProgramEditorTab QLineEdit {
     padding: 5px;

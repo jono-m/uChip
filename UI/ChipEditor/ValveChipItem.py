@@ -10,7 +10,7 @@ class ValveChipItem(WidgetChipItem):
     def __init__(self, valve: Valve):
         super().__init__()
 
-        AppGlobals.Instance().onChipModified.connect(self.CheckForValve)
+        AppGlobals.Instance().onChipAddRemove.connect(self.CheckForValve)
         AppGlobals.Instance().onValveChanged.connect(self.UpdateDisplay)
 
         self._valve = valve
@@ -73,7 +73,7 @@ class ValveChipItem(WidgetChipItem):
 
     def RequestDelete(self):
         AppGlobals.Chip().valves.remove(self._valve)
-        AppGlobals.Instance().onChipModified.emit()
+        AppGlobals.Instance().onChipAddRemove.emit()
 
     def Duplicate(self) -> 'ChipItem':
         newValve = Valve()
@@ -82,7 +82,7 @@ class ValveChipItem(WidgetChipItem):
         newValve.solenoidNumber = AppGlobals.Chip().NextSolenoidNumber()
 
         AppGlobals.Chip().valves.append(newValve)
-        AppGlobals.Instance().onChipModified.emit()
+        AppGlobals.Instance().onChipAddRemove.emit()
         return ValveChipItem(newValve)
 
     def UpdateDisplay(self):
@@ -92,6 +92,7 @@ class ValveChipItem(WidgetChipItem):
 
         newState = AppGlobals.Rig().GetSolenoidState(self._valve.solenoidNumber)
         if newState != self._showOpen:
-            self.valveToggleButton.setProperty("IsOpen", newState)
+            self.valveToggleButton.setProperty("On", newState)
+            self.valveToggleButton.setProperty("Off", not newState)
             self.valveToggleButton.setStyle(self.valveToggleButton.style())
             self._showOpen = newState

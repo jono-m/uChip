@@ -9,10 +9,9 @@ class ChipDataSelection(QComboBox):
     def __init__(self, dataType: DataType):
         super().__init__()
 
-        self.currentIndexChanged = None
         self.dataType = dataType
 
-        AppGlobals.Instance().onChipModified.connect(self.Repopulate)
+        AppGlobals.Instance().onChipAddRemove.connect(self.Repopulate)
         AppGlobals.Instance().onChipDataModified.connect(self.UpdateNames)
 
         self.Repopulate()

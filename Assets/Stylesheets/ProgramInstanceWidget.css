@@ -13,5 +13,8 @@ ProgramInstanceWidget QPlainTextEdit {
     min-height: 200px;
 }
 ProgramInstanceWidget > QFrame > QLabel {
-    padding: 5px;
+    padding: 10px;
+}
+ProgramInstanceWidget QAbstractSpinBox {
+    min-width: 50px;
 }

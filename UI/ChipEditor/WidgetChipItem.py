@@ -76,11 +76,9 @@ class ClearingProxy(QGraphicsProxyWidget):
 
 class WidgetChipItemContainer(QFrame):
     def event(self, e) -> bool:
-        print(e.type())
         if e.type() == QEvent.LayoutRequest:
             self.adjustSize()
         return super().event(e)
-
 
 
 class WidgetChipItemContents(QFrame):

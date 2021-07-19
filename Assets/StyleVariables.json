@@ -1,31 +1,27 @@
 {
-  "backgroundColor": "rgb(60, 60, 60)",
-  "lightColor": "rgb(70, 70, 70)",
-  "darkColor": "rgb(30, 30, 30)",
-  "barColor": "rgb(40, 40, 40)",
-  "borderColor": "rgb(35, 35, 35)",
-  "textColor": "rgb(220, 220, 220)",
-  "darkBorder": "rgb(15, 15, 15)",
+  "backgroundColor": "hsv(0, 0, 60)",
+  "lightColor": "hsv(0, 0, 70)",
+  "darkColor": "hsv(0, 0, 30)",
+  "barColor": "hsv(0, 0, 40)",
+  "borderColor": "hsv(0, 0, 35)",
+  "textColor": "hsv(0, 0, 220)",
+  "disabledTextColor": "hsv(0, 0, 110)",
+  "darkBorder": "hsv(0, 0, 15)",
+  "transparentBorderColor": "hsva(0, 0, 0, 100)",
 
-  "valveOpenColor": "rgb(90, 140, 0)",
-  "valveOpenColorHover": "rgb(131, 172, 59)",
-  "valveOpenColorPress": "rgb(54, 83, 0)",
-  "valveClosedColor": "rgb(100, 30, 30)",
-  "valveClosedColorHover": "rgb(148, 61, 61)",
-  "valveClosedColorPress": "rgb(74, 20, 20)",
+  "controlNormalColor": "hsv(0, 0, 50)",
+  "controlHoverColor": "hsv(0, 0, 90)",
+  "controlPressColor": "hsv(0, 0, 80)",
 
-  "attentionColor": "rgb(199, 96, 0)",
-  "attentionHoverColor": "rgb(212, 129, 51)",
-  "attentionPressColor": "rgb(232, 152, 77)",
+  "accentColor": "hsv(200, 200, 150)",
+  "accentHoverColor": "hsv(200, 210, 250)",
+  "accentPressColor": "hsv(200, 210, 240)",
 
-  "badAttentionColor": "rgb(199, 33, 0)",
-  "badAttentionHoverColor": "rgb(214, 77, 49)",
-  "badAttentionPressColor": "rgb(219, 110, 88)",
+  "onColor": "hsv(85, 180, 130)",
+  "onHoverColor": "hsv(85, 180, 150)",
+  "onPressColor": "hsv(85, 180, 180)",
 
-  "controlNormalColor": "rgb(50, 50, 50)",
-  "controlHoverColor": "rgb(60, 60, 60)",
-  "controlPressColor": "rgb(80, 80, 80)",
-
-  "editorBorderHighlight": "rgb(35, 159, 168)",
-  "editorBorderSelect": "rgb(52, 222, 235)"
+  "offColor": "hsv(7, 180, 150)",
+  "offHoverColor": "hsv(7, 180, 190)",
+  "offPressColor": "hsv(7, 180, 210)"
 }

@@ -11,7 +11,7 @@ class ProgramPresetItem(WidgetChipItem):
     def __init__(self, preset: ProgramPreset):
         super().__init__()
 
-        AppGlobals.Instance().onChipModified.connect(self.CheckForPreset)
+        AppGlobals.Instance().onChipAddRemove.connect(self.CheckForPreset)
 
         self._preset = preset
 
@@ -37,7 +37,6 @@ class ProgramPresetItem(WidgetChipItem):
         nameLayout.setSpacing(0)
         inspLayout.addLayout(nameLayout)
         self.HoverWidget().setLayout(inspLayout)
-        nameLayout.addWidget(QLabel("Preset Name"))
         self._presetNameField = QLineEdit(preset.name)
         self._presetNameField.textChanged.connect(self.UpdatePreset)
         self._showDescriptionField = QCheckBox("Show Description")
@@ -50,6 +49,8 @@ class ProgramPresetItem(WidgetChipItem):
         self._inspectorInstance.SetShowAllParameters(True)
         self._inspectorInstance.SetEditParameterVisibility(True)
         self._inspectorInstance.SetDescriptionVisible(False)
+        self._inspectorInstance.SetTitleVisible(False)
+        self._inspectorInstance.SetRunVisible(False)
         self._inspectorInstance.ownsInstance = True
         inspLayout.addWidget(self._inspectorInstance)
 
@@ -65,7 +66,7 @@ class ProgramPresetItem(WidgetChipItem):
 
     def CanMove(self, scenePoint: QPointF) -> bool:
         childAt = self.bigContainer.childAt(self.GraphicsObject().mapFromScene(scenePoint).toPoint())
-        return isinstance(childAt, QLabel)
+        return isinstance(childAt, QLabel) or childAt == self.containerWidget
 
     def UpdatePreset(self):
         self._preset.name = self._presetNameField.text()
@@ -86,7 +87,7 @@ class ProgramPresetItem(WidgetChipItem):
     def RequestDelete(self):
         super().RequestDelete()
         AppGlobals.Chip().programPresets.remove(self._preset)
-        AppGlobals.Instance().onChipModified.emit()
+        AppGlobals.Instance().onChipAddRemove.emit()
 
     def Duplicate(self) -> 'ChipItem':
         newPreset = ProgramPreset(self._preset.instance.program)
@@ -95,7 +96,7 @@ class ProgramPresetItem(WidgetChipItem):
         newPreset.name = self._preset.name
 
         AppGlobals.Chip().programPresets.append(newPreset)
-        AppGlobals.Instance().onChipModified.emit()
+        AppGlobals.Instance().onChipAddRemove.emit()
         return ProgramPresetItem(newPreset)
 
     def RunPreset(self):

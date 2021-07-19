@@ -30,22 +30,13 @@ class ChipEditor(QFrame):
         self._actionsWidget.onResize.connect(self.FloatWidgets)
         self._actionsWidget.setLayout(actionsLayout)
 
-        self._lockButton = QToolButton()
-        self._lockButton.setProperty("Attention", True)
-        self._lockButton.setIcon(QIcon("Assets/Images/checkIcon.png"))
-        self._lockButton.setIconSize(QSize(20, 20))
-        self._lockButton.clicked.connect(lambda: self.SetEditing(False))
-        self._editButton = QToolButton()
-        self._editButton.setProperty("Attention", True)
-        self._editButton.setIcon(QIcon("Assets/Images/Edit.png"))
-        self._editButton.setIconSize(QSize(20, 20))
-        self._editButton.clicked.connect(lambda: self.SetEditing(True))
+        self._lockButton = ActionButtonFrame("Assets/Images/checkIcon.png")
+        self._lockButton.button.clicked.connect(lambda: self.SetEditing(False))
+        self._editButton = ActionButtonFrame("Assets/Images/Edit.png")
+        self._editButton.button.clicked.connect(lambda: self.SetEditing(True))
 
-        self._plusButton = QToolButton()
-        self._plusButton.setProperty("Attention", True)
-        self._plusButton.setIcon(QIcon("Assets/Images/plusIcon.png"))
-        self._plusButton.setIconSize(QSize(20, 20))
-        self._plusButton.setPopupMode(QToolButton.InstantPopup)
+        self._plusButton = ActionButtonFrame("Assets/Images/plusIcon.png")
+        self._plusButton.button.setPopupMode(QToolButton.InstantPopup)
 
         actionsLayout.addWidget(self._plusButton)
         actionsLayout.addWidget(self._lockButton)
@@ -66,7 +57,7 @@ class ChipEditor(QFrame):
         menu.addAction("Program Preset...").triggered.connect(self.SelectProgramPreset)
         menu.addAction("Image...").triggered.connect(self.BrowseForImage)
 
-        self._plusButton.setMenu(menu)
+        self._plusButton.button.setMenu(menu)
 
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -88,7 +79,7 @@ class ChipEditor(QFrame):
         newValve = Valve()
         newValve.solenoidNumber = AppGlobals.Chip().NextSolenoidNumber()
         AppGlobals.Chip().valves.append(newValve)
-        AppGlobals.Instance().onChipModified.emit()
+        AppGlobals.Instance().onChipAddRemove.emit()
         self.viewer.CenterItem(self.viewer.AddItem(ValveChipItem(newValve)))
 
     def BrowseForImage(self):
@@ -97,7 +88,7 @@ class ChipEditor(QFrame):
         if filename:
             newImage = Image(Path(filename))
             AppGlobals.Chip().images.append(newImage)
-            AppGlobals.Instance().onChipModified.emit()
+            AppGlobals.Instance().onChipAddRemove.emit()
             self.viewer.CenterItem(self.viewer.AddItem(ImageChipItem(newImage)))
 
     def SelectProgramPreset(self):
@@ -111,7 +102,7 @@ class ChipEditor(QFrame):
             selected = [program for program in AppGlobals.Chip().programs if program.name == presetSelection][0]
             newPreset = ProgramPreset(selected)
             AppGlobals.Chip().programPresets.append(newPreset)
-            AppGlobals.Instance().onChipModified.emit()
+            AppGlobals.Instance().onChipAddRemove.emit()
             self.viewer.CenterItem(self.viewer.AddItem(ProgramPresetItem(newPreset)))
 
     def resizeEvent(self, event) -> None:
@@ -162,3 +153,17 @@ class FloatingWidget(QFrame):
         if e.type() == QEvent.LayoutRequest:
             self.onResize.emit()
         return super().event(e)
+
+
+class ActionButtonFrame(QFrame):
+    def __init__(self, icon):
+        super().__init__()
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        self.setLayout(layout)
+
+        self.button = QToolButton()
+        self.button.setProperty("Attention", True)
+        self.button.setIcon(QIcon(icon))
+        layout.addWidget(self.button)

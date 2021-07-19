@@ -6,12 +6,15 @@ FloatingWidget {
     background-color: transparent;
     margin: 20px;
 }
-ChipEditor QToolButton {
-    margin: 5px;
-	min-width: 50;
-	min-height: 50;
-	max-width: 50;
-	max-height: 50;
+ActionButtonFrame {
+    margin: 10px;
+    border: 5px solid @transparentBorderColor;
+    border-width: -10px 10px 10px -10px;
+    background-color: transparent;
+}
+ActionButtonFrame QToolButton {
+    padding: 10px;
+    border: none;
 }
 WidgetChipItemContainer {
     background: transparent;
@@ -20,30 +23,33 @@ WidgetChipItemContents {
     background-color: @backgroundColor;
 }
 WidgetChipItemContents[state='None'] {
-    border: 4px solid @lightColor;
-    margin: 4px;
+    border: 1px solid @lightColor;
+    margin: 3px;
 }
 WidgetChipItemContents[state='Hover'] {
-    border: 4px solid @editorBorderHighlight;
-    margin: 4px;
+    border: 2px solid @accentColor;
+    margin: 2px;
 }
 WidgetChipItemContents[state='Select'] {
-    border: 4px solid @editorBorderSelect;
-    margin: 4px;
+    border: 2px solid @accentHoverColor;
+    margin: 2px;
 }
 WidgetChipItemContents[state='HoverAndSelect'] {
-    border: 6px solid @editorBorderSelect;
-    margin: 2px;
+    border: 4px solid @accentPressColor;
+    margin: 0px;
 }
 MovingHandle {
     min-width: 30px;
     max-width: 30px;
     min-height: 30px;
     max-height: 30px;
-    background-color: @attentionColor;
+    background-color: @accentColor;
 }
 MovingHandle::hover {
-    background-color: @attentionPressColor;
+    background-color: @accentHoverColor;
+}
+MovingHandle::pressed {
+    background-color: @accentPressColor;
 }
 WidgetChipItemContents > QLabel {
     background-color: @barColor;

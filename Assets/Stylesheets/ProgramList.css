@@ -6,4 +6,5 @@ ProgramList > QLabel {
     padding: 5px;
     font-weight: bold;
     background-color: @barColor;
+    border: 2px solid @borderColor;
 }

@@ -4,83 +4,76 @@
     border-color: @borderColor;
     border: none;
 }
-*[Attention=true] {
-    background-color: @attentionColor;
-    font-weight: bold;
-}
-*[Attention=true]::hover {
-    background-color: @attentionHoverColor;
-    font-weight: bold;
-}
-*[Attention=true]::pressed {
-    background-color: @attentionPressColor;
-    font-weight: bold;
-}
-*[BadAttention=true] {
-    background-color: @badAttentionColor;
-    font-weight: bold;
-}
-*[BadAttention=true]::hover {
-    background-color: @badAttentionHoverColor;
-    font-weight: bold;
-}
-*[BadAttention=true]::pressed {
-    background-color: @badAttentionPressColor;
-    font-weight: bold;
+*::disabled {
+    color: @disabledTextColor;
 }
 QAbstractButton, QSpinBox, QLineEdit, QMenuBar::item, QMenu::item, QListView::item, QScrollBar::handle, QTabBar::tab,
-    QComboBox, QTabBar::close-button, QDockWidget::close-button {
+    QComboBox {
     background-color: @controlNormalColor;
     padding: 5px;
 }
+QMainWindow::separator {
+    background-color: @controlNormalColor;
+}
+QMenuBar::item, QMenu::item {
+    border: none;
+    padding: 5px 10px 5px 10px;
+}
+QMenuBar {
+    border: 0px solid @darkBorder;
+    border-width: 0 0 3px 0;
+    padding: 0 0 10px 0px;
+}
 QAbstractButton::hover, QSpinBox::hover, QLineEdit::hover, QMenuBar::item:selected, QMenu::item:selected,
-    QListView::item:hover, QScrollBar::handle:hover, QTabBar::tab:hover, QComboBox::hover, QTabBar::close-button:hover,
-    QDockWidget::close-button:hover {
+    QListView::item:hover, QScrollBar::handle:hover, QTabBar::tab:hover, QComboBox::hover,
+    QMainWindow::separator:hover {
     background-color: @controlHoverColor;
 }
 QAbstractButton::pressed, QSpinBox::presse, QLineEdit::pressed, QMenuBar::item:pressed, QListView::item:selected,
-    QScrollBar::handle:pressed, QTabBar::tab:selected, QTabBar::close-button::pressed, QDockWidget::close-button:pressed {
+    QScrollBar::handle:pressed, QTabBar::tab:selected, QMainWindow::separator:pressed {
     background-color: @controlPressColor;
 }
 QDockWidget {
     font-weight: bold;
     min-width: 200px;
     min-height: 200px;
-}
-QDockWidget {
-    titlebar-close-icon: url(Assets/Images/closeIcon.png);
-}
-QDockWidget::close-button {
-    subcontrol-origin: content;
-}
-QDockWidget::close-button:hover {
-    border: none;
-}
-QTabBar::close-button {
-    image: url(Assets/Images/closeIcon.png);
-    subcontrol-position: left;
-    padding: 5px;
-}
-QTabBar::tab {
-    padding: 5px 15px 5px 10px;
+    titlebar-close-icon: none;
 }
 QDockWidget > QFrame {
     border: 2px solid @borderColor;
     border-top-width: 0px;
 }
 QDockWidget::title {
-    padding: 5px 5px 0 5px;
+    padding: 5px;
     background-color: @barColor;
     border: 2px solid @borderColor;
-    border-bottom-width: 0px;
+}
+QDockWidget::close-button {
+    subcontrol-origin: content;
+    max-height: 2000;
+    max-width: 2000;
+    padding: 0px;
+    border: none;
+    background-color: transparent;
+    image: url(Assets/Images/closeIcon.png);
+}
+QDockWidget::close-button:hover, QTabBar::close-button:hover {
+    image: url(Assets/Images/closeIconHover.png);
+}
+QDockWidget::close-button:pressed, QTabBar::close-button:pressed {
+    image: url(Assets/Images/closeIconPress.png);
+}
+QTabBar::close-button {
+    image: url(Assets/Images/closeIcon.png);
+    padding: 1px;
+    background-color: transparent;
+}
+QTabBar::tab {
+    padding: 5px 10px 5px 15px;
 }
 QMenuBar {
-    min-height: 30px;
+    min-height: 20px;
     background-color: @controlNormalColor;
-}
-QMenu::separator {
-    height: 1px;
-    background-color: @lightColor;
 }
 QListView::item:selected {
     color: white;
@@ -89,18 +82,36 @@ QListView::item:selected {
 QListView::item {
     padding: 5px 5px 5px 20px;
 }
- QScrollBar {
+QScrollBar {
     border: none;
     background-color: @barColor;
- }
- QScrollBar::handle {
+}
+QScrollBar::handle {
     border: none;
     margin: 2px;
- }
- QScrollBar::add-line, QScrollBar::sub-line {
+}
+QScrollBar::add-line, QScrollBar::sub-line {
     height: 0;
     width: 0;
- }
- QScrollBar::add-page, QScrollBar::sub-page {
+}
+QScrollBar::add-page, QScrollBar::sub-page {
     background: none;
- }
+}
+*[On=true] {
+	background-color: @onColor;
+}
+*[Off=true]{
+	background-color: @offColor;
+}
+*[On=true]::hover {
+	background-color: @onHoverColor;
+}
+*[Off=true]::hover{
+	background-color: @offHoverColor;
+}
+*[On=true]::pressed {
+	background-color: @onPressColor;
+}
+*[Off=true]::pressed {
+	background-color: @offPressColor;
+}

@@ -21,12 +21,12 @@ class AppGlobals(QObject):
         self.programRunner.onValveChange.connect(self.onValveChanged.emit)
         self.programRunner.rig = self.rig
         self.chip = None
-        self.onChipModified.connect(lambda: AppGlobals.Chip().Validate())
-        self.onChipModified.connect(self.onChipDataModified.emit)
-        self.onChipModified.connect(self.programRunner.CheckPrograms)
+        self.onChipAddRemove.connect(lambda: AppGlobals.Chip().Validate())
+        self.onChipAddRemove.connect(self.onChipDataModified.emit)
+        self.onChipAddRemove.connect(self.programRunner.CheckPrograms)
 
     onChipOpened = Signal()  # Invoked whenever a new chip is opened
-    onChipModified = Signal()  # Invoked whenever the chip data structure changes
+    onChipAddRemove = Signal()  # Invoked whenever the chip data structure changes
     onChipDataModified = Signal()  # Invoked whenever chip values change
     onChipSaved = Signal()
     onValveChanged = Signal()

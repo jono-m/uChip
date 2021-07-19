@@ -19,7 +19,7 @@ class ImageChipItem(WidgetChipItem):
 
         self.image = ImageLabel()
 
-        AppGlobals.Instance().onChipModified.connect(self.CheckForImage)
+        AppGlobals.Instance().onChipAddRemove.connect(self.CheckForImage)
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -82,7 +82,7 @@ class ImageChipItem(WidgetChipItem):
 
     def RequestDelete(self):
         AppGlobals.Chip().images.remove(self._image)
-        AppGlobals.Instance().onChipModified.emit()
+        AppGlobals.Instance().onChipAddRemove.emit()
 
     def Duplicate(self) -> 'ChipItem':
         newImage = Image(self._image.path)
@@ -90,7 +90,7 @@ class ImageChipItem(WidgetChipItem):
         newImage.size = QSizeF(self._image.size)
 
         AppGlobals.Chip().images.append(newImage)
-        AppGlobals.Instance().onChipModified.emit()
+        AppGlobals.Instance().onChipAddRemove.emit()
         return ImageChipItem(newImage)
 
     def PositionHandles(self):

@@ -1,29 +1,16 @@
 /* Rig View */
-RigViewer > * {
-    border: 1px solid @borderColor;
-}
 RigViewer > *[IsHeader=true] {
-    padding: 10px;
+    padding: 0 10px 0 10px;
+    border: 5px solid @borderColor;
+    border-width: 0 1px 4px 0;
 }
-RigViewer > QPushButton {
-    min-width: 80px;
-    max-width: 80px;
+SolenoidButton {
+    padding: 3px;
+    border: 1px inset rgba(0, 0, 0, 100);
 }
-QAbstractButton[IsOpen=true] {
-	background-color: @valveOpenColor;
+SolenoidButton::disabled {
+    background-color: transparent;
 }
-QAbstractButton[IsOpen=false]{
-	background-color: @valveClosedColor;
-}
-QAbstractButton[IsOpen=true]::hover {
-	background-color: @valveOpenColorHover;
-}
-QAbstractButton[IsOpen=false]::hover{
-	background-color: @valveClosedColorHover;
-}
-QAbstractButton[IsOpen=true]::pressed {
-	background-color: @valveOpenColorPress;
-}
-QAbstractButton[IsOpen=false]::pressed {
-	background-color: @valveClosedColorPress;
+#RescanButton {
+    padding: 5px;
 }

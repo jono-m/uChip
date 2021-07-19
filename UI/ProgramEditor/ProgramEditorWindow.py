@@ -13,7 +13,7 @@ from UI.AppGlobals import AppGlobals
 class ProgramEditorWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        AppGlobals.Instance().onChipModified.connect(self.UpdateDisplay)
+        AppGlobals.Instance().onChipAddRemove.connect(self.UpdateDisplay)
         StylesheetLoader.RegisterWidget(self)
         self.setWindowIcon(QIcon("Assets/Images/icon.png"))
 

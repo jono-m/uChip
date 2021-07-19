@@ -16,7 +16,7 @@ class ProgramList(QFrame):
         super().__init__(parent)
         self._programsList = QListWidget()
 
-        AppGlobals.Instance().onChipModified.connect(self.SyncInstances)
+        AppGlobals.Instance().onChipAddRemove.connect(self.SyncInstances)
         AppGlobals.Instance().onChipOpened.connect(self.SyncInstances)
 
         self._newButton = QPushButton("New Program")
@@ -63,12 +63,12 @@ class ProgramList(QFrame):
         if filename:
             program = Program.LoadFromFile(filename)
             AppGlobals.Chip().programs.append(program)
-            AppGlobals.Instance().onChipModified.emit()
+            AppGlobals.Instance().onChipAddRemove.emit()
 
     def NewProgram(self):
         newProgram = Program()
         AppGlobals.Chip().programs.append(newProgram)
-        AppGlobals.Instance().onChipModified.emit()
+        AppGlobals.Instance().onChipAddRemove.emit()
         for item in [self._chipPrograms.item(row) for row in range(self._chipPrograms.count())]:
             if item.program is newProgram:
                 self._chipPrograms.setCurrentItem(item)
@@ -79,7 +79,7 @@ class ProgramList(QFrame):
         if QMessageBox.question(self, "Confirm Deletion",
                                 "Are you sure you want to delete " + program.name + "?") is QMessageBox.Yes:
             AppGlobals.Chip().programs.remove(program)
-            AppGlobals.Instance().onChipModified.emit()
+            AppGlobals.Instance().onChipAddRemove.emit()
 
 
 class ProgramListItem(QListWidgetItem):

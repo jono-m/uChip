@@ -17,7 +17,7 @@ class Inspector(QFrame):
 
         self.setLayout(layout)
 
-        self._titleWidget = TitleWidget("Inspector")
+        self._titleWidget = TitleWidget("Properties")
         layout.addWidget(self._titleWidget)
         layout.addLayout(self._itemsLayout)
         self.SetSelection([])

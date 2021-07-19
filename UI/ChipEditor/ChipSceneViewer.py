@@ -36,8 +36,8 @@ class ChipSceneViewer(QGraphicsView):
         self.gridZoomThreshold = -1.5
         self.showGrid = True
 
-        self.selectionBoxStrokeColor = QColor(52, 222, 235)
-        self.selectionBoxFillColor = QColor(52, 222, 235, 50)
+        self.selectionBoxStrokeColor = QColor.fromHsv(200, 210, 250, 255)
+        self.selectionBoxFillColor = QColor.fromHsv(200, 210, 250, 50)
         self.selectionBoxThickness = 2
         self._editing = True
 
@@ -64,6 +64,7 @@ class ChipSceneViewer(QGraphicsView):
 
         if not editing:
             self.DeselectAll()
+            self.selectionChanged.emit(self._selectedItems)
 
         self.UpdateView()
         self.update()
@@ -277,8 +278,6 @@ class ChipSceneViewer(QGraphicsView):
         self.UpdateView()
         self.update()
 
-        self.update()
-
     def mouseMoveEvent(self, event: QMouseEvent):
         # Update position movement
         newCursorPosition = event.localPos()
@@ -295,11 +294,11 @@ class ChipSceneViewer(QGraphicsView):
         elif self._state is State.MOVING:
             for selectedItem in self._selectedItems:
                 selectedItem.Move(deltaScene)
+            self.update()
 
         self.UpdateView()
 
         super().mouseMoveEvent(event)
-        # self.update()
 
     def mouseReleaseEvent(self, event: QMouseEvent):
         if self._state == State.PANNING:

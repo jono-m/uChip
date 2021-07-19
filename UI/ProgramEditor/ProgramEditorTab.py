@@ -13,7 +13,7 @@ class ProgramEditorTab(QFrame):
     def __init__(self, program: Program):
         super().__init__()
 
-        AppGlobals.Instance().onChipModified.connect(self.CheckForProgram)
+        AppGlobals.Instance().onChipAddRemove.connect(self.CheckForProgram)
 
         self.program = program
         self.modified = False
@@ -67,7 +67,7 @@ class ProgramEditorTab(QFrame):
         self.program.description = self._descriptionField.toPlainText()
         self._parameterEditor.Save()
         self.modified = False
-        AppGlobals.Instance().onChipModified.emit()
+        AppGlobals.Instance().onChipAddRemove.emit()
 
     def ExportProgram(self, path: Path):
         self.SaveProgram()

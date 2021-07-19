@@ -2,6 +2,7 @@ from typing import List
 
 from PySide6.QtWidgets import QFrame, QVBoxLayout, QHBoxLayout, QLabel, QSpinBox, QToolButton, QPushButton, QGridLayout, \
     QSizePolicy
+from PySide6.QtGui import QIcon
 from PySide6.QtCore import Signal, Qt, QTimer, QObject
 from UI.AppGlobals import AppGlobals
 from Model.Rig.RigDevice import RigDevice
@@ -17,8 +18,9 @@ class RigViewer(QFrame):
         mainLayout.setAlignment(Qt.AlignTop)
         self.setLayout(mainLayout)
 
-        rescanButton = QPushButton("Rescan")
-        rescanButton.setProperty("Attention", True)
+        rescanButton = QPushButton()
+        rescanButton.setIcon(QIcon("Assets/Images/refreshArrows.png"))
+        rescanButton.setObjectName("RescanButton")
         rescanButton.clicked.connect(self.Rescan)
         self._deviceLayout = QGridLayout()
         self._deviceLayout.setAlignment(Qt.AlignTop)
@@ -29,7 +31,7 @@ class RigViewer(QFrame):
         self._deviceLayout.addWidget(QLabel("Status"), 0, 1)
         self._deviceLayout.addWidget(QLabel("Start Number"), 0, 2)
         solenoidLayout = QHBoxLayout()
-        solenoidLayout.addWidget(QLabel("Solenoids"))
+        solenoidLayout.addWidget(QLabel("Solenoids"), stretch=1)
         solenoidLayout.addWidget(rescanButton, stretch=0)
         self._deviceLayout.addLayout(solenoidLayout, 0, 3)
         mainLayout.addLayout(self._deviceLayout, stretch=0)
@@ -101,7 +103,10 @@ class DeviceItem(QObject):
         self._enableToggle = QPushButton()
         self._enableToggle.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         self._enableToggle.clicked.connect(self.ToggleEnable)
-        self._enableToggle.setText("Disable")
+
+        self._enableIcon = QIcon("Assets/Images/powerIconOn.png")
+        self._disableIcon = QIcon("Assets/Images/powerIcon.png")
+        self._errorIcon = QIcon("Assets/Images/powerIconError.png")
 
         self.openAllButton = QPushButton("All On")
         self.openAllButton.clicked.connect(lambda: self.SetAll(True))
@@ -115,7 +120,7 @@ class DeviceItem(QObject):
         self.statusLayout.addWidget(self._enableToggle, stretch=0)
 
         self.solenoidsLayout = QHBoxLayout()
-        openCloseLayout = QVBoxLayout()
+        openCloseLayout = QHBoxLayout()
         openCloseLayout.addWidget(self.openAllButton)
         openCloseLayout.addWidget(self.closeAllButton)
         self.solenoidsLayout.addLayout(openCloseLayout)
@@ -164,16 +169,16 @@ class DeviceItem(QObject):
             self.deleteLater()
             return
 
-        if self.device.isConnected:
-            self._statusLabel.setText("Connected.")
-        else:
-            if self.device.isEnabled:
-                self._statusLabel.setText(self.device.errorMessage)
+        if self.device.isEnabled:
+            if self.device.isConnected:
+                self._statusLabel.setText("Connected.")
+                self._enableToggle.setIcon(self._enableIcon)
             else:
-                self._statusLabel.setText("Disabled.")
-
-        self._enableToggle.setText({False: "Enable",
-                                    True: "Disable"}[self.device.isEnabled])
+                self._statusLabel.setText(self.device.errorMessage)
+                self._enableToggle.setIcon(self._errorIcon)
+        else:
+            self._enableToggle.setIcon(self._disableIcon)
+            self._statusLabel.setText("Disabled.")
         self.startNumberDial.setEnabled(self.device.isEnabled and self.device.isConnected)
         self.openAllButton.setEnabled(self.device.isEnabled and self.device.isConnected)
         self.closeAllButton.setEnabled(self.device.isEnabled and self.device.isConnected)
@@ -207,6 +212,6 @@ class SolenoidButton(QToolButton):
     def UpdateValveState(self):
         showOpen = AppGlobals.Rig().GetSolenoidState(self._number)
         if showOpen != self._showOpen:
-            self.setProperty("IsOpen", showOpen)
+            self.setProperty("On", showOpen)
             self._showOpen = showOpen
             self.setStyle(self.style())
