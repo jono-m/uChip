@@ -1,14 +1,15 @@
 Inspector {
     padding: 0px;
     margin: 20px;
-    border: 5px solid @transparentBorderColor;
     background-color: transparent;
-    border-width: -10px 10px 10px -10px;
+    border: 1px solid @darkBorder;
 }
 TitleWidget {
     padding: 5px;
     font-weight: bold;
-    background-color: @accentHoverColor;
+    background-color: @accentColor;
+    border: 1px solid @borderColor;
+    border-width: 0 0 1px 0;
 }
 Inspector > QFrame, Inspector > QFrame QLabel {
     padding: 5px;

@@ -1,5 +1,5 @@
 ConsoleViewer QPushButton {
-    padding: 10px;
+    padding: 0 25px 0 25px;
 }
 ConsoleViewer QLabel {
     padding: 5px;

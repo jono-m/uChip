@@ -194,6 +194,11 @@ class ProgramParameterItem:
     def UpdateFields(self):
         self.parameterName.setText(self.parameter.name)
 
+        if self.parameter.dataType is DataType.LIST:
+            self.parameterName.setAlignment(Qt.AlignTop)
+        else:
+            self.parameterName.setAlignment(Qt.AlignVCenter)
+
         if self._programInstance.parameterVisibility[self.parameter]:
             self.visibilityToggle.setIcon(QIcon("Assets/Images/eyeOpen.png"))
         else:

@@ -9,8 +9,6 @@ class Program:
         self.parameters: List[Parameter] = []
         self.name = "New Program"
 
-        self.libraryPath = None
-
         self.description = ""
 
         self.script = """"""
@@ -22,13 +20,6 @@ class Program:
             return header + self.script.replace("\n", "\n    ").replace("\t", "    ")
         else:
             return header + "pass"
-
-    def __setstate__(self, state):
-        self.__dict__ = state
-        if 'libraryPath' not in self.__dict__:
-            self.libraryPath = None
-        if 'description' not in self.__dict__:
-            self.description = ""
 
     def Export(self, path):
         file = open(path, "wb+")

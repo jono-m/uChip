@@ -1,9 +1,9 @@
 from typing import Dict, List
 from PySide6.QtWidgets import QFrame, QLabel, QListWidget, QPushButton, QMessageBox, QListWidgetItem, QVBoxLayout, \
-    QFileDialog
+    QFileDialog, QToolButton, QHBoxLayout
+from PySide6.QtGui import QIcon
 from PySide6.QtCore import Signal, Qt, QSize
 from Model.Program.Program import Program
-from Model.Program.ProgramLibrary import ProgramLibrary
 from Model.Program.ProgramInstance import ProgramInstance
 from UI.AppGlobals import AppGlobals
 from UI.ProgramViews.ProgramContextDisplay import ProgramContextDisplay
@@ -19,26 +19,32 @@ class ProgramList(QFrame):
         AppGlobals.Instance().onChipAddRemove.connect(self.SyncInstances)
         AppGlobals.Instance().onChipOpened.connect(self.SyncInstances)
 
-        self._newButton = QPushButton("New Program")
+        self._newButton = QToolButton()
+        self._newButton.setIcon(QIcon("Assets/Images/plusIcon.png"))
         self._newButton.setProperty("Attention", True)
         self._newButton.clicked.connect(self.NewProgram)
-        self._importButton = QPushButton("Import...")
+        self._importButton = QToolButton()
+        self._importButton.setIcon(QIcon("Assets/Images/importIcon.png"))
         self._importButton.clicked.connect(self.ImportProgram)
 
         self._chipPrograms = ProgramListWidget()
         self._chipPrograms.onItemClicked.connect(lambda item: self.SelectProgram(item, self._chipPrograms, True))
         self._chipPrograms.onItemDoubleClicked.connect(self.EditProgram)
-        self._libraryPrograms = ProgramListWidget()
-        self._libraryPrograms.onItemClicked.connect(lambda item: self.SelectProgram(item, self._libraryPrograms, False))
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
+        buttonLayout = QHBoxLayout()
+        buttonLayout.setAlignment(Qt.AlignRight)
+        buttonLayout.addWidget(self._newButton)
+        buttonLayout.addWidget(self._importButton)
+        buttonLayout.setSpacing(0)
+        buttonLayout.setContentsMargins(0, 0, 0, 0)
+        buttonWidget = QFrame()
+        buttonWidget.setObjectName("ButtonPanel")
+        buttonWidget.setLayout(buttonLayout)
+        layout.addWidget(buttonWidget)
         layout.addWidget(self._chipPrograms)
-        layout.addWidget(self._newButton)
-        layout.addWidget(self._importButton)
-        layout.addWidget(QLabel("Program Library"))
-        layout.addWidget(self._libraryPrograms)
 
         self._contextDisplay = None
 
@@ -53,12 +59,10 @@ class ProgramList(QFrame):
         self._contextDisplay.onEdit.connect(self.onProgramEditRequest)
 
     def SyncInstances(self):
-        ProgramLibrary.ReloadLibrary(AppGlobals.Chip())
         self._chipPrograms.SyncInstances(AppGlobals.Chip().programs)
-        self._libraryPrograms.SyncInstances(ProgramLibrary.Library())
 
     def ImportProgram(self):
-        filename, filterType = QFileDialog.getOpenFileName(self, "Browse for Progra",
+        filename, filterType = QFileDialog.getOpenFileName(self, "Browse for Program",
                                                            filter="μChip Program (*.ucp)")
         if filename:
             program = Program.LoadFromFile(filename)

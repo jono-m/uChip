@@ -16,6 +16,8 @@ class ValveChipItem(WidgetChipItem):
         self._valve = valve
 
         self.valveToggleButton = QPushButton()
+        self.valveToggleButton.setObjectName("ValveButton")
+        self.containerWidget.setObjectName("ValveContainer")
         self.valveNumberLabel = QLabel("Number")
         self.valveNumberDial = QSpinBox()
         self.valveNumberDial.setMinimum(0)

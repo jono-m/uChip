@@ -76,3 +76,8 @@ class ProgramContextDisplay(QFrame):
                 widget = widget.parent()
             self.deleteLater()
         return False
+
+    def event(self, e) -> bool:
+        if e.type() == QEvent.LayoutRequest:
+            self.adjustSize()
+        return super().event(e)

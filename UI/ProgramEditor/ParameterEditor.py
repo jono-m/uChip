@@ -6,6 +6,7 @@ from Model.Program.Data import DataType
 
 from PySide6.QtWidgets import QFrame, QVBoxLayout, QHBoxLayout, QScrollArea, QLabel, QPushButton, QLineEdit, \
     QComboBox, QSpinBox, QDoubleSpinBox, QToolButton, QGridLayout
+from PySide6.QtGui import QIcon
 from PySide6.QtCore import Signal, Qt
 
 
@@ -115,7 +116,7 @@ class ParameterEditorItem(QFrame):
         self.parameter = parameter
 
         deleteButton = QToolButton()
-        deleteButton.setText("X")
+        deleteButton.setIcon(QIcon("Assets/Images/trashIcon.png"))
         deleteButton.clicked.connect(lambda: self.onRemoveParameter.emit(self.parameter))
         upButton = QToolButton()
         upButton.setText("\u2191")

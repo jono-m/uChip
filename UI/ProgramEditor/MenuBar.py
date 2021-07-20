@@ -7,6 +7,7 @@ class MenuBar(QMenuBar):
     saveProgram = Signal()
     closeProgram = Signal()
     exportProgram = Signal()
+    helpAction = Signal()
 
     def __init__(self):
         super().__init__()
@@ -17,3 +18,7 @@ class MenuBar(QMenuBar):
         saveAction.setShortcut(QKeySequence("Ctrl+S"))
         self._fileMenu.addAction("Export").triggered.connect(self.exportProgram.emit)
         self._fileMenu.addAction("Close").triggered.connect(self.closeProgram.emit)
+
+        self._helpMenu = self.addMenu("&Help")
+        helpAction = self._helpMenu.addAction("Reference...")
+        helpAction.triggered.connect(self.helpAction.emit)

@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QFrame, QLabel, QVBoxLayout, QScrollArea
+from PySide6.QtWidgets import QFrame, QLabel, QVBoxLayout, QScrollArea, QDialog, QPushButton
 from PySide6.QtCore import Qt
 
 instructions = """
@@ -55,9 +55,9 @@ instructions = """
 """[1:].replace("\n", "<br>").replace(" ", "&nbsp;")
 
 
-class Instructions(QFrame):
-    def __init__(self):
-        super().__init__()
+class Instructions(QDialog):
+    def __init__(self, parent):
+        super().__init__(parent)
 
         instructionsArea = QScrollArea()
         instructionsLabel = QLabel(instructions)

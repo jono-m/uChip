@@ -8,13 +8,10 @@ FloatingWidget {
 }
 ActionButtonFrame {
     margin: 10px;
-    border: 5px solid @transparentBorderColor;
-    border-width: -10px 10px 10px -10px;
     background-color: transparent;
 }
 ActionButtonFrame QToolButton {
     padding: 10px;
-    border: none;
 }
 WidgetChipItemContainer {
     background: transparent;
@@ -23,7 +20,7 @@ WidgetChipItemContents {
     background-color: @backgroundColor;
 }
 WidgetChipItemContents[state='None'] {
-    border: 1px solid @lightColor;
+    border: 1px solid @darkBorder;
     margin: 3px;
 }
 WidgetChipItemContents[state='Hover'] {

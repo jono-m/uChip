@@ -16,18 +16,9 @@ class ProgramEditorWindow(QMainWindow):
         AppGlobals.Instance().onChipAddRemove.connect(self.UpdateDisplay)
         StylesheetLoader.RegisterWidget(self)
         self.setWindowIcon(QIcon("Assets/Images/icon.png"))
-
-        centralWidget = QSplitter()
-        centralWidget.setChildrenCollapsible(False)
-        centralWidget.setOrientation(Qt.Orientation.Horizontal)
-        self.setCentralWidget(centralWidget)
-
         self._tabWidget = QTabWidget()
-        centralWidget.addWidget(self._tabWidget)
-        centralWidget.addWidget(Instructions())
 
-        centralWidget.setStretchFactor(0, 1)
-        centralWidget.setStretchFactor(1, 0)
+        self.setCentralWidget(self._tabWidget)
 
         menuBar = MenuBar()
         self.setMenuBar(menuBar)
@@ -35,6 +26,10 @@ class ProgramEditorWindow(QMainWindow):
         menuBar.saveProgram.connect(self.SaveProgram)
         menuBar.exportProgram.connect(self.ExportProgram)
         menuBar.closeProgram.connect(lambda: self.RequestCloseTab(self._tabWidget.currentIndex()))
+        menuBar.helpAction.connect(self.ShowInstructions)
+
+        self._instructionsWindow = Instructions(self)
+        self._instructionsWindow.setVisible(False)
 
         self._tabWidget.tabCloseRequested.connect(self.RequestCloseTab)
         self._tabWidget.currentChanged.connect(self.UpdateDisplay)
@@ -48,6 +43,9 @@ class ProgramEditorWindow(QMainWindow):
         filename, filterType = QFileDialog.getSaveFileName(self, "Export Program", filter="μChip Program File (*.ucp)")
         if filename:
             self._tabWidget.currentWidget().ExportProgram(filename)
+
+    def ShowInstructions(self):
+        self._instructionsWindow.show()
 
     def OpenProgram(self, program: Program):
         for tab in self.tabs():

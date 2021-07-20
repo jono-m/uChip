@@ -53,6 +53,7 @@ class ProgramEditorTab(QFrame):
         splitter.addWidget(self.codeEditor)
         splitter.setStretchFactor(0, 0)
         splitter.setStretchFactor(1, 1)
+        splitter.handle(1).setAttribute(Qt.WA_Hover, True)
 
         self.codeEditor.SetCode(self.program.script)
 

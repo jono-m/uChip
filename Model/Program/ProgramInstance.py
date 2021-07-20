@@ -21,7 +21,8 @@ class ProgramInstance:
 
         for oldParameter in oldParameterValues:
             if oldParameter in self.parameterValues:
-                self.parameterValues[oldParameter] = oldParameterValues[oldParameter]
+                if isinstance(self.parameterValues[oldParameter], type(oldParameterValues[oldParameter])):
+                    self.parameterValues[oldParameter] = oldParameterValues[oldParameter]
 
         oldParameterVisiblities = self.parameterVisibility
         self.parameterVisibility = {parameter: True for parameter in self.program.parameters}

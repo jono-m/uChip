@@ -4,9 +4,12 @@ RigViewer > *[IsHeader=true] {
     border: 5px solid @borderColor;
     border-width: 0 1px 4px 0;
 }
+RigViewer > * {
+    border: 1px solid @borderColor;
+    border-width: 0 1px 1px 0;
+}
 SolenoidButton {
     padding: 3px;
-    border: 1px inset rgba(0, 0, 0, 100);
 }
 SolenoidButton::disabled {
     background-color: transparent;

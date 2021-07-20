@@ -10,8 +10,8 @@ Instructions QLabel{
     background-color: @backgroundColor;
 }
 ProgramEditorTab {
-    min-width: 640;
-    min-height: 480;
+    min-width: 1024;
+    min-height: 768;
 }
 ProgramEditorTab QLineEdit {
     padding: 5px;
@@ -37,16 +37,16 @@ ParameterEditor QScrollArea {
 }
 ParameterEditorItem {
     border: 1px solid @borderColor;
-    border-width: 0 0 2px 0;
+    border-width: 0 0 1px 0;
     background-color: @lightColor;
-}
-ParameterEditorItem QAbstractSpinBox, ParameterEditorItem QLineEdit, ParameterEditorItem QComboBox {
-    padding: 7px;
 }
 ParameterEditorItem QLabel {
     padding: 5px;
+    min-width: 80px;
 }
 ParameterEditorItem QToolButton {
-    min-width: 30px;
-    min-height: 30px;
+    max-width: 13px;
+    max-height: 13px;
+    padding: 8px;
+    font-size: 15px;
 }

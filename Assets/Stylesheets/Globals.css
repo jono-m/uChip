@@ -12,7 +12,7 @@ QAbstractButton, QSpinBox, QLineEdit, QMenuBar::item, QMenu::item, QListView::it
     background-color: @controlNormalColor;
     padding: 5px;
 }
-QMainWindow::separator {
+QMainWindow::separator, QSplitter::handle {
     background-color: @controlNormalColor;
 }
 QMenuBar::item, QMenu::item {
@@ -26,11 +26,11 @@ QMenuBar {
 }
 QAbstractButton::hover, QSpinBox::hover, QLineEdit::hover, QMenuBar::item:selected, QMenu::item:selected,
     QListView::item:hover, QScrollBar::handle:hover, QTabBar::tab:hover, QComboBox::hover,
-    QMainWindow::separator:hover {
+    QMainWindow::separator:hover, QSplitter::handle:hover {
     background-color: @controlHoverColor;
 }
 QAbstractButton::pressed, QSpinBox::presse, QLineEdit::pressed, QMenuBar::item:pressed, QListView::item:selected,
-    QScrollBar::handle:pressed, QTabBar::tab:selected, QMainWindow::separator:pressed {
+    QScrollBar::handle:pressed, QTabBar::tab:selected, QMainWindow::separator:pressed, QSplitter::handle:pressed {
     background-color: @controlPressColor;
 }
 QDockWidget {
@@ -75,9 +75,11 @@ QMenuBar {
     min-height: 20px;
     background-color: @controlNormalColor;
 }
+QListView {
+    outline: 0;
+}
 QListView::item:selected {
     color: white;
-    border: none;
 }
 QListView::item {
     padding: 5px 5px 5px 20px;
@@ -114,4 +116,9 @@ QScrollBar::add-page, QScrollBar::sub-page {
 }
 *[Off=true]::pressed {
 	background-color: @offPressColor;
+}
+#ButtonPanel {
+    background-color: @barColor;
+    border: 1px solid @darkColor;
+    border-width: 0 0 1px 0;
 }

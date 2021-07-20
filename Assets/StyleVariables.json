@@ -21,7 +21,7 @@
   "onHoverColor": "hsv(85, 180, 150)",
   "onPressColor": "hsv(85, 180, 180)",
 
-  "offColor": "hsv(7, 180, 150)",
-  "offHoverColor": "hsv(7, 180, 190)",
-  "offPressColor": "hsv(7, 180, 210)"
+  "offColor": "hsv(0, 180, 150)",
+  "offHoverColor": "hsv(0, 180, 190)",
+  "offPressColor": "hsv(0, 180, 210)"
 }
