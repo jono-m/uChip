@@ -122,3 +122,6 @@ QScrollBar::add-page, QScrollBar::sub-page {
     border: 1px solid @darkColor;
     border-width: 0 0 1px 0;
 }
+QComboBox QAbstractItemView {
+    min-width: 200px;
+}

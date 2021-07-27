@@ -54,7 +54,8 @@ class ProgramList(QFrame):
         self.onProgramEditRequest.emit(selectedProgram.program)
 
     def SelectProgram(self, selectedProgram: 'ProgramListItem', listWidget: QListWidget, editable):
-        self._contextDisplay = ProgramContextDisplay(self.topLevelWidget(), selectedProgram.instance, listWidget, editable)
+        self._contextDisplay = ProgramContextDisplay(self.topLevelWidget(), selectedProgram.instance, listWidget,
+                                                     editable)
         self._contextDisplay.onDelete.connect(self.DeleteProgram)
         self._contextDisplay.onEdit.connect(self.onProgramEditRequest)
 
