@@ -1,9 +1,10 @@
 from PySide6.QtWidgets import QMessageBox
 from PySide6.QtCore import QThread, QTimer
 from UI.AppGlobals import AppGlobals
+from Model.Rig.Rig import Rig
 
 
-class ProgramRunnerWorker(QThread):
+class RigWatchdogWorker(QThread):
     def __init__(self, parent):
         super().__init__(parent)
         self._parent = parent
@@ -12,20 +13,17 @@ class ProgramRunnerWorker(QThread):
         self._isRunning = False
 
         if self._runMultiThreaded:
-            killTimer = QTimer(self._parent)
-            killTimer.timeout.connect(self.CheckForKill)
-            killTimer.start(2000)
             self.start()
         else:
             runTimer = QTimer(self._parent)
-            runTimer.timeout.connect(lambda: AppGlobals.ProgramRunner().Tick())
-            runTimer.start(50)
+            runTimer.timeout.connect(self.Tick)
+            runTimer.start(3000)
 
     def run(self) -> None:
         self._isRunning = True
         while self._isRunning:
-            AppGlobals.ProgramRunner().Tick()
-            self.msleep(50)
+            self.Tick()
+            self.msleep(3000)
 
     def stop(self):
         self._isRunning = False
@@ -36,10 +34,9 @@ class ProgramRunnerWorker(QThread):
         else:
             return
 
-    def CheckForKill(self):
-        if AppGlobals.ProgramRunner().GetTickDelta() > 2:
-            self.terminate()
-            self.wait()
-            AppGlobals.ProgramRunner().StopAll()
-            self.start()
-            QMessageBox.critical(self._parent, "Timeout", "Program timed out.")
+    def Tick(self):
+        lastActiveDevices = AppGlobals.Rig().GetActiveDevices()
+        AppGlobals.Rig().RescanPorts()
+        newActiveDevices = AppGlobals.Rig().GetActiveDevices()
+        if lastActiveDevices != newActiveDevices:
+            AppGlobals.Instance().onRigChanged.emit()

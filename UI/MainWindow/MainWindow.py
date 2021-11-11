@@ -6,6 +6,7 @@ from UI.ProgramViews.ProgramList import ProgramList, Program
 from UI.StylesheetLoader import StylesheetLoader
 from UI.MainWindow.MenuBar import MenuBar
 from UI.RigViewer.RigViewer import RigViewer
+from UI.MainWindow.RigWatchdogWorker import RigWatchdogWorker
 from UI.AppGlobals import AppGlobals, Chip
 from UI.ProgramEditor.ProgramEditorWindow import ProgramEditorWindow
 from UI.MainWindow.ProgramRunnerWorker import ProgramRunnerWorker
@@ -54,6 +55,7 @@ class MainWindow(QMainWindow):
         self.setTabPosition(Qt.AllDockWidgetAreas, QTabWidget.TabPosition.North)
 
         self.updateWorker = ProgramRunnerWorker(self)
+        self.rigWatchdog = RigWatchdogWorker(self)
 
         self.setMenuBar(menuBar)
         self.ShowRigWidget()
@@ -135,6 +137,7 @@ class MainWindow(QMainWindow):
             event.ignore()
             return
         self.updateWorker.terminate()
+        self.rigWatchdog.terminate()
         AppGlobals.Rig().SaveDevices()
         super().closeEvent(event)
 

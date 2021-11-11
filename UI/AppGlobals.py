@@ -31,6 +31,7 @@ class AppGlobals(QObject):
     onChipDataModified = Signal()  # Invoked whenever chip values change
     onChipSaved = Signal()
     onValveChanged = Signal()
+    onRigChanged = Signal()
 
     @staticmethod
     def Rig() -> Rig:
