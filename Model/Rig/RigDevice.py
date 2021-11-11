@@ -97,7 +97,7 @@ class RigDevice:
         RigDevice.lastScannedPorts = list_ports.comports()
 
         return [port.serial_number for port in RigDevice.lastScannedPorts if
-                isinstance(port.serial_number, str) and port.serial_number[:3] == "ELX"]
+                isinstance(port.serial_number, str) and port.serial_number[:2] == "EL"]
 
 
 class DeviceError(Exception):
