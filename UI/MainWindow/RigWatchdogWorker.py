@@ -35,8 +35,8 @@ class RigWatchdogWorker(QThread):
             return
 
     def Tick(self):
-        lastActiveDevices = AppGlobals.Rig().GetActiveDevices()
+        lastAvailableDevices = AppGlobals.Rig().GetAvailableDevices()
         AppGlobals.Rig().RescanPorts()
-        newActiveDevices = AppGlobals.Rig().GetActiveDevices()
-        if lastActiveDevices != newActiveDevices:
-            AppGlobals.Instance().onRigChanged.emit()
+        newAvailableDevices = AppGlobals.Rig().GetAvailableDevices()
+        if lastAvailableDevices != newAvailableDevices:
+            AppGlobals.Instance().onDevicesChanged.emit()

@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QFrame, QVBoxLayout, QHBoxLayout, QLabel, QToolBut
 from PySide6.QtCore import Signal, Qt
 from UI.AppGlobals import AppGlobals
 from Model.Rig.RigDevice import RigDevice
+from UI.RigViewer.RigSettingsWidget import RigSettingsWidget
 
 
 class RigViewer(QFrame):
@@ -39,7 +40,7 @@ class RigViewer(QFrame):
 
         self._deviceItems: List[DeviceItem] = []
 
-        AppGlobals.Instance().onRigChanged.connect(self.UpdateList)
+        AppGlobals.Instance().onDevicesChanged.connect(self.UpdateList)
 
         self.UpdateList()
 
@@ -61,7 +62,8 @@ class RigViewer(QFrame):
             self._rigStatusLabel.setText("<i>Connected to %d devices.</i>" % len(self._deviceItems))
 
     def OpenSettings(self):
-        print("Opening settings...")
+        settingsWindow = RigSettingsWidget(self)
+        settingsWindow.exec()
 
 
 class DeviceItem(QFrame):

@@ -18,7 +18,11 @@ class RigDevice:
     def IsAvailable(self):
         return self.livePortInfo is not None
 
-    def IsActive(self):
+    def Name(self):
+        return "%s (%s, %s)" % (
+            self.livePortInfo.name, self.livePortInfo.serial_number, self.livePortInfo.device)
+
+    def IsConnected(self):
         return self.enabled and self._serialPort is not None and self._serialPort.is_open
 
     def __getstate__(self):
@@ -59,6 +63,9 @@ class RigDevice:
         self._Write(b'C' + self._StateToByte(cState))
 
     def Connect(self):
+        if self.IsConnected():
+            return
+
         try:
             self._serialPort = Serial(self.livePortInfo.device)
         except Exception as e:

@@ -49,7 +49,7 @@ class Rig:
         return self.solenoidStates[number]
 
     def GetActiveDevices(self):
-        return [device for device in self.allDevices if device.IsActive()]
+        return [device for device in self.allDevices if device.IsConnected()]
 
     def GetAvailableDevices(self):
         return [device for device in self.allDevices if device.livePortInfo is not None]
