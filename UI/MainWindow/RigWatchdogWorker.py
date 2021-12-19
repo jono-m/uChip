@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QMessageBox
 from PySide6.QtCore import QThread, QTimer
 from UI.AppGlobals import AppGlobals
+import sys
 from Model.Rig.Rig import Rig
 
 
@@ -22,7 +23,7 @@ class RigWatchdogWorker(QThread):
     def run(self) -> None:
         self._isRunning = True
         while self._isRunning:
-            self.Tick()
+            # self.Tick()
             self.msleep(3000)
 
     def stop(self):
@@ -35,8 +36,4 @@ class RigWatchdogWorker(QThread):
             return
 
     def Tick(self):
-        lastAvailableDevices = AppGlobals.Rig().GetAvailableDevices()
-        AppGlobals.Rig().RescanPorts()
-        newAvailableDevices = AppGlobals.Rig().GetAvailableDevices()
-        if lastAvailableDevices != newAvailableDevices:
-            AppGlobals.Instance().onDevicesChanged.emit()
+        AppGlobals.UpdateRig()

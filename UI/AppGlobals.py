@@ -16,8 +16,6 @@ class AppGlobals(QObject):
     def __init__(self):
         super().__init__()
         self.rig = Rig()
-        # self.rig.AddMock(0, "Mock A")
-        # self.rig.AddMock(24, "Mock B")
         self.programRunner = ProgramRunner()
         self.programRunner.onValveChange.connect(self.onValveChanged.emit)
         self.programRunner.rig = self.rig
@@ -36,6 +34,17 @@ class AppGlobals(QObject):
     @staticmethod
     def Rig() -> Rig:
         return AppGlobals.Instance().rig
+
+    @staticmethod
+    def UpdateRig(force=False):
+        lastAvailableDevices = AppGlobals.Rig().GetAvailableDevices()
+        lastActiveDevices = AppGlobals.Rig().GetActiveDevices()
+        AppGlobals.Rig().RescanPorts()
+        newAvailableDevices = AppGlobals.Rig().GetAvailableDevices()
+        newActiveDevices = AppGlobals.Rig().GetActiveDevices()
+
+        if force or lastAvailableDevices != newAvailableDevices or lastActiveDevices != newActiveDevices:
+            AppGlobals.Instance().onDevicesChanged.emit()
 
     @staticmethod
     def OpenChip(chip: Chip):

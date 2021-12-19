@@ -67,7 +67,7 @@ class RigDevice:
             return
 
         try:
-            self._serialPort = Serial(self.livePortInfo.device)
+            self._serialPort = Serial(self.livePortInfo.device, timeout=0, writeTimeout=0)
         except Exception as e:
             self.ReportError("Could not connect to " + self.livePortInfo.device + ". Error:\n" + str(e))
 

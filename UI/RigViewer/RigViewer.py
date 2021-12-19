@@ -34,7 +34,7 @@ class RigViewer(QFrame):
         mainLayout.setSpacing(0)
         mainLayout.setAlignment(Qt.AlignTop)
         mainLayout.addWidget(self._headerWidget, stretch=0)
-        mainLayout.addWidget(self._devicesListWidget, stretch=1)
+        mainLayout.addWidget(self._devicesListWidget, stretch=0)
         mainLayout.addStretch(1)
         self.setLayout(mainLayout)
 
@@ -88,12 +88,10 @@ class DeviceItem(QFrame):
         for solenoidNumber in range(24):
             newButton = SolenoidButton(solenoidNumber + self.device.startNumber)
             newButton.solenoidClicked.connect(lambda s=newButton: self.ToggleSolenoid(s))
-            newButton.polarityClicked.connect(lambda s=newButton: self.TogglePolarity(s))
             self._solenoidButtons.append(newButton)
             self.solenoidsLayout.addWidget(newButton, stretch=0)
 
         self.setLayout(self.solenoidsLayout)
-        self.Update()
 
     def SetAll(self, isOpen: bool):
         for i in range(24):
@@ -110,7 +108,6 @@ class DeviceItem(QFrame):
 
 class SolenoidButton(QToolButton):
     solenoidClicked = Signal()
-    polarityClicked = Signal()
 
     def __init__(self, number):
         super().__init__()

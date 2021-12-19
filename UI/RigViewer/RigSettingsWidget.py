@@ -191,6 +191,7 @@ class DeviceInfoWidget(QFrame):
         self._currentDevice.startNumber = self.startNumber.value()
         self._modified = False
         self.saveButton.setEnabled(False)
+        AppGlobals.UpdateRig(True)
 
     def _Modified(self):
         self._modified = True

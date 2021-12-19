@@ -36,7 +36,7 @@ class Rig:
             newDevice.serialNumber = foundDevice.serial_number
             self.allDevices.add(newDevice)
 
-        [device.Connect() for device in self.GetActiveDevices()]
+        [device.Connect() for device in self.GetAvailableDevices() if device.enabled]
 
     def SetSolenoidState(self, number: int, state: bool, flush=False):
         self.solenoidStates[number] = state
