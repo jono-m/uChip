@@ -191,7 +191,10 @@ class DeviceInfoWidget(QFrame):
         self._currentDevice.startNumber = self.startNumber.value()
         self._modified = False
         self.saveButton.setEnabled(False)
-        AppGlobals.UpdateRig(True)
+        try:
+            AppGlobals.UpdateRig(True)
+        except Exception as e:
+            QMessageBox.critical(self, "Rig Device Error!", str(e))
 
     def _Modified(self):
         self._modified = True

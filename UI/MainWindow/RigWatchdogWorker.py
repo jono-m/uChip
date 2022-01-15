@@ -36,4 +36,7 @@ class RigWatchdogWorker(QThread):
             return
 
     def Tick(self):
-        AppGlobals.UpdateRig()
+        try:
+            AppGlobals.UpdateRig()
+        except Exception as e:
+            QMessageBox.critical(self._parent, "Rig error!", str(e))

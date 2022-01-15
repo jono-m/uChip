@@ -8,4 +8,4 @@ port = serial.Serial(portToOpen, timeout=0)
 while True:
     line = port.read()
     if line:
-        print(line.decode())
+        print(line)
