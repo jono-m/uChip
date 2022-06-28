@@ -42,9 +42,9 @@ class ProgramInstanceWidget(QFrame):
         self.runButton.setProperty("On", True)
         self.runButton.clicked.connect(self.RunProgram)
 
-        self._stopButton = QPushButton("Stop")
-        self._stopButton.setProperty("Off", True)
-        self._stopButton.clicked.connect(self.StopProgram)
+        self.stopButton = QPushButton("Stop")
+        self.stopButton.setProperty("Off", True)
+        self.stopButton.clicked.connect(self.StopProgram)
 
         self.parameterItems: List[ProgramParameterItem] = []
 
@@ -58,7 +58,7 @@ class ProgramInstanceWidget(QFrame):
         innerLayout.addWidget(self.programNameWidget)
         innerLayout.addWidget(self._parameterWidget)
         innerLayout.addWidget(self.runButton)
-        innerLayout.addWidget(self._stopButton)
+        innerLayout.addWidget(self.stopButton)
         innerLayout.addStretch(1)
 
         outerLayout.addLayout(innerLayout)
@@ -90,7 +90,6 @@ class ProgramInstanceWidget(QFrame):
         self.UpdateInstanceView()
 
     def UpdateParameterItems(self):
-        print("Updating")
         [item.deleteLater() for item in self.parameterItems]
         self.parameterItems = []
 
@@ -121,10 +120,10 @@ class ProgramInstanceWidget(QFrame):
         running = AppGlobals.ProgramRunner().IsRunning(self.programInstance)
         if not self._runVisible:
             self.runButton.setVisible(False)
-            self._stopButton.setVisible(False)
+            self.stopButton.setVisible(False)
         else:
             self.runButton.setVisible(not running)
-            self._stopButton.setVisible(running)
+            self.stopButton.setVisible(running)
 
         for item in self.parameterItems:
             if item.parameter not in self.programInstance.parameterValues:

@@ -51,6 +51,9 @@ class ValveChipItem(WidgetChipItem):
         self.UpdateDisplay()
         self.Move(QPointF())
 
+    def SetEditing(self, isEditing: bool):
+        self.valveToggleButton.blockSignals(isEditing)
+
     def CheckForValve(self):
         if self._valve not in AppGlobals.Chip().valves:
             self.RemoveItem()

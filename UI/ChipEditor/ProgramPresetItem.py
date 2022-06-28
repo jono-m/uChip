@@ -57,6 +57,10 @@ class ProgramPresetItem(WidgetChipItem):
         self.UpdatePresetView()
         self.CheckForPreset()
 
+    def SetEditing(self, isEditing: bool):
+        self._instanceWidget.runButton.setEnabled(not isEditing)
+        self._instanceWidget.stopButton.setEnabled(not isEditing)
+
     def Move(self, delta: QPointF):
         if delta != QPointF():
             AppGlobals.Instance().onChipDataModified.emit()

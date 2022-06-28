@@ -1,46 +1,42 @@
-from typing import Set, Dict
+from typing import Set, Dict, Optional
 import dill
 from pathlib import Path
 from Model.Rig.RigDevice import RigDevice
-from Model.Rig.MockRigDevice import MockRigDevice
+from serial.tools.list_ports import comports
 
 
 class Rig:
     def __init__(self):
         super().__init__()
-        self.savedDevices: Set[RigDevice] = set()
+        self.allDevices: Set[RigDevice] = set()
 
         self.solenoidStates: Dict[int, bool] = {}
 
         self.LoadDevices()
 
-        self.Rescan()
-
-        for device in self.savedDevices:
-            if device.IsDeviceAvailable() and device.isEnabled:
-                device.Connect()
+        self.RescanPorts()
 
         self.FlushStates()
 
-    def Rescan(self):
-        foundSerialNumbers = RigDevice.Rescan()
-        foundDevices = [device for device in self.savedDevices if device.IsDeviceAvailable() and device.isEnabled]
-        if foundDevices:
-            highestNumber = max([device.startNumber for device in foundDevices]) + 24
-        else:
-            highestNumber = 0
+    def RescanPorts(self):
+        foundDevices = comports()
 
-        for foundSerialNumber in foundSerialNumbers:
-            if foundSerialNumber not in [device.serialNumber for device in self.savedDevices]:
-                newDevice = RigDevice(highestNumber, foundSerialNumber)
-                newDevice.Connect()
-                self.savedDevices.add(newDevice)
-                highestNumber += 24
+        for device in self.allDevices:
+            matches = [foundDevice for foundDevice in foundDevices if foundDevice.serial_number == device.serialNumber]
+            if len(matches) > 0:
+                device.livePortInfo = matches[0]
+                foundDevices.remove(matches[0])
+            else:
+                device.livePortInfo = None
+                device.Disconnect()
 
-    def AddMock(self, start: int, serialNo: str):
-        newDevice = MockRigDevice(start, serialNo)
-        newDevice.Connect()
-        self.savedDevices.add(newDevice)
+        for foundDevice in foundDevices:
+            newDevice = RigDevice()
+            newDevice.livePortInfo = foundDevice
+            newDevice.serialNumber = foundDevice.serial_number
+            self.allDevices.add(newDevice)
+
+        [device.Connect() for device in self.GetAvailableDevices() if device.enabled]
 
     def SetSolenoidState(self, number: int, state: bool, flush=False):
         self.solenoidStates[number] = state
@@ -52,28 +48,32 @@ class Rig:
             self.solenoidStates[number] = False
         return self.solenoidStates[number]
 
+    def GetActiveDevices(self):
+        return [device for device in self.allDevices if device.IsConnected()]
+
+    def GetAvailableDevices(self):
+        return [device for device in self.allDevices if device.livePortInfo is not None]
+
     def FlushStates(self):
-        for device in self.savedDevices:
-            if device.isConnected and device.isEnabled:
-                states = [self.GetSolenoidState(i) for i in
-                          range(device.startNumber, device.startNumber + len(device.solenoidPolarities))]
-                device.SetStates(states)
+        for device in self.GetActiveDevices():
+            states = [self.GetSolenoidState(i) for i in
+                      range(device.startNumber, device.startNumber + 24)]
+            device.SetStates(states)
 
     def SaveDevices(self):
         file = open("devices.pkl", "wb")
-        nonMock = {device for device in self.savedDevices if not isinstance(device, MockRigDevice)}
-        dill.dump((nonMock, self.solenoidStates), file)
+        dill.dump((self.allDevices, self.solenoidStates), file)
         file.close()
 
     def LoadDevices(self):
         if Path("devices.pkl").exists():
             file = open("devices.pkl", "rb")
             try:
-                self.savedDevices, self.solenoidStates = dill.load(file)
+                self.allDevices, self.solenoidStates = dill.load(file)
             except Exception as e:
                 print("Error loading device: " + str(e))
-                self.savedDevices, self.solenoidStates = (set(), {})
+                self.allDevices, self.solenoidStates = (set(), {})
             file.close()
         else:
-            self.savedDevices = set()
+            self.allDevices = set()
             self.solenoidStates = {}

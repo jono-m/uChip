@@ -147,7 +147,6 @@ class FloatingWidget(QFrame):
     def resizeEvent(self, event) -> None:
         super().resizeEvent(event)
         self.onResize.emit()
-        print("Resize")
 
     def event(self, e) -> bool:
         if e.type() == QEvent.LayoutRequest:

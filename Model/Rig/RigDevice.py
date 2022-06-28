@@ -1,103 +1,89 @@
 from typing import List, Optional
 from serial import Serial
-from serial.tools import list_ports
-
 from serial.tools.list_ports_common import ListPortInfo
 
 
 class RigDevice:
-    lastScannedPorts: List[ListPortInfo] = []
+    def __init__(self):
+        self.serialNumber = "None"
+        self.startNumber = 0
+        self.polarities = [False, False, False]
+        self.enabled = False
 
-    def __init__(self, startNumber, serialNumber: str):
-        self.isConnected = False
-        self.isEnabled = True
-        self.solenoidPolarities = [False] * 24
-        self.startNumber = startNumber
-        self.serialNumber = serialNumber
-        self.serialPort: Optional[Serial] = None
+        self.livePortInfo: Optional[ListPortInfo] = None
+        self._serialPort: Optional[Serial] = None
 
         self.errorMessage = ""
 
-    def SetEnabled(self, enabled: bool):
-        self.isEnabled = enabled
-        if self.isConnected and not self.isEnabled:
-            self.Disconnect()
-        if not self.isConnected and self.isEnabled:
-            self.Connect()
+    def IsAvailable(self):
+        return self.livePortInfo is not None
+
+    def Name(self):
+        return "%s (%s, %s)" % (
+            self.livePortInfo.name, self.livePortInfo.serial_number, self.livePortInfo.device)
+
+    def IsConnected(self):
+        return self.enabled and self._serialPort is not None and self._serialPort.is_open
+
+    def __getstate__(self):
+        state = self.__dict__
+        del state["_serialPort"]
+        del state["livePortInfo"]
+        del state["errorMessage"]
+        return state
+
+    def __setstate__(self, state):
+        state["_serialPort"] = None
+        state["livePortInfo"] = None
+        state["errorMessage"] = ""
+        self.__dict__ = state
 
     @staticmethod
-    def StateToByte(state):
+    def _StateToByte(state):
         number = 0
         for i in range(8):
             if state[i]:
                 number += 1 << i
         return bytes([number])
 
-    def Write(self, data: bytes):
-        if self.isConnected:
+    def _Write(self, data: bytes):
+        if self._serialPort:
             try:
-                self.serialPort.write(data)
+                self._serialPort.write(data)
             except Exception as e:
-                self.isConnected = False
-                if self.serialPort.is_open:
-                    self.serialPort.close()
-                raise DeviceError(self, "Could not write to device " + self.GetName() + ". Error: \n" + str(e))
+                self.ReportError("Could not write to device. Error: \n" + str(e))
 
     def SetStates(self, solenoidStates: List[bool]):
-        solenoidStates = [solenoidStates[i] != self.solenoidPolarities[i] for i in range(24)]
+        solenoidStates = [state != self.polarities[int(i / 8)] for (i, state) in enumerate(solenoidStates)]
         aState = solenoidStates[0:8]
         bState = solenoidStates[8:16]
         cState = solenoidStates[16:24]
-        self.Write(b'A' + self.StateToByte(aState))
-        self.Write(b'B' + self.StateToByte(bState))
-        self.Write(b'C' + self.StateToByte(cState))
-
-    def IsDeviceAvailable(self) -> bool:
-        return self.serialNumber in [port.serial_number for port in self.lastScannedPorts]
-
-    def __getstate__(self):
-        myDict = self.__dict__.copy()
-        del myDict["serialPort"]
-        myDict["isConnected"] = False
-        return myDict
-
-    def __setstate__(self, state):
-        state["serialPort"] = None
-        self.__dict__ = state
+        self._Write(b'A' + self._StateToByte(aState))
+        self._Write(b'B' + self._StateToByte(bState))
+        self._Write(b'C' + self._StateToByte(cState))
 
     def Connect(self):
-        if not self.IsDeviceAvailable():
-            raise DeviceError(self, "Could not find device " + self.GetName())
-
-        if self.isConnected:
+        if self.IsConnected():
             return
 
         try:
-            self.serialPort = Serial(
-                [port.device for port in self.lastScannedPorts if port.serial_number == self.serialNumber][0])
+            self._serialPort = Serial(self.livePortInfo.device, timeout=0, writeTimeout=0)
         except Exception as e:
-            self.isConnected = False
-            raise DeviceError(self, "Could not connect to " + self.GetName() + ". Error:\n" + str(e))
+            self.ReportError("Could not connect to " + self.livePortInfo.device + ". Error:\n" + str(e))
 
-        self.isConnected = True
-        self.Write(b'!A' + bytes([0]))
-        self.Write(b'!B' + bytes([0]))
-        self.Write(b'!C' + bytes([0]))
+        self._Write(b'!A' + bytes([0]))
+        self._Write(b'!B' + bytes([0]))
+        self._Write(b'!C' + bytes([0]))
 
     def Disconnect(self):
-        if self.isConnected and self.serialPort.isOpen():
-            self.serialPort.close()
-        self.isConnected = False
+        if self._serialPort is not None and self._serialPort.is_open:
+            self._serialPort.close()
+        self._serialPort = None
 
-    def GetName(self):
-        return "Elexol Device: " + self.serialNumber
-
-    @staticmethod
-    def Rescan() -> List[str]:
-        RigDevice.lastScannedPorts = list_ports.comports()
-
-        return [port.serial_number for port in RigDevice.lastScannedPorts if
-                isinstance(port.serial_number, str) and port.serial_number[:2] == "EL"]
+    def ReportError(self, error, fatal=True):
+        if fatal:
+            self.Disconnect()
+        raise DeviceError(self, error)
 
 
 class DeviceError(Exception):

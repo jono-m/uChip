@@ -62,6 +62,9 @@ class ChipSceneViewer(QGraphicsView):
 
         self.showGrid = editing
 
+        for item in self._sceneItems:
+            item.SetEditing(editing)
+
         if not editing:
             self.DeselectAll()
             self.selectionChanged.emit(self._selectedItems)
@@ -78,6 +81,7 @@ class ChipSceneViewer(QGraphicsView):
             item.Move(QPointF())
             item.onRemoved.connect(self.RemoveItem)
             self.scene().addItem(item.GraphicsObject())
+            item.SetEditing(self._editing)
         return item
 
     def RemoveItem(self, item: ChipItem):

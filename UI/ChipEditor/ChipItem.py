@@ -14,6 +14,9 @@ class ChipItem(QObject):
     def HoverWidget(self):
         return self._hoverWidget
 
+    def SetEditing(self, isEditing: bool):
+        pass
+    
     def GraphicsObject(self):
         return self._graphicsObject
 

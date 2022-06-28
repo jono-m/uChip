@@ -1,112 +1,76 @@
 from typing import List
 
-from PySide6.QtWidgets import QFrame, QVBoxLayout, QHBoxLayout, QLabel, QSpinBox, QToolButton, QPushButton, QGridLayout, \
-    QSizePolicy
-from PySide6.QtGui import QIcon
-from PySide6.QtCore import Signal, Qt, QTimer, QObject
+from PySide6.QtWidgets import QFrame, QVBoxLayout, QHBoxLayout, QLabel, QToolButton, QPushButton, QSizePolicy
+from PySide6.QtCore import Signal, Qt
 from UI.AppGlobals import AppGlobals
 from Model.Rig.RigDevice import RigDevice
+from UI.RigViewer.RigSettingsWidget import RigSettingsWidget
 
 
 class RigViewer(QFrame):
     def __init__(self):
         super().__init__()
 
+        self._headerWidget = QFrame()
+        headerLayout = QHBoxLayout()
+        self._headerWidget.setLayout(headerLayout)
+        headerLayout.setContentsMargins(0, 0, 0, 0)
+        headerLayout.setSpacing(0)
+        self._rigStatusLabel = QLabel()
+        headerLayout.addWidget(self._rigStatusLabel, stretch=1)
+        settingsButton = QPushButton("Configure devices...")
+        settingsButton.clicked.connect(self.OpenSettings)
+        headerLayout.addWidget(settingsButton, stretch=0)
+
+        self._devicesListWidget = QFrame()
+        self._deviceLayout = QVBoxLayout()
+        self._deviceLayout.setAlignment(Qt.AlignTop)
+        self._deviceLayout.setContentsMargins(0, 0, 0, 0)
+        self._deviceLayout.setSpacing(0)
+        self._devicesListWidget.setLayout(self._deviceLayout)
+
         mainLayout = QVBoxLayout()
         mainLayout.setContentsMargins(0, 0, 0, 0)
         mainLayout.setSpacing(0)
         mainLayout.setAlignment(Qt.AlignTop)
-        self.setLayout(mainLayout)
-
-        rescanButton = QPushButton()
-        rescanButton.setIcon(QIcon("Assets/Images/refreshArrows.png"))
-        rescanButton.setObjectName("RescanButton")
-        rescanButton.clicked.connect(self.Rescan)
-        self._deviceLayout = QGridLayout()
-        self._deviceLayout.setAlignment(Qt.AlignTop)
-        self._deviceLayout.setContentsMargins(0, 0, 0, 0)
-        self._deviceLayout.setSpacing(0)
-
-        self._deviceLayout.addWidget(QLabel("Device Name"), 0, 0)
-        self._deviceLayout.addWidget(QLabel("Status"), 0, 1)
-        self._deviceLayout.addWidget(QLabel("Start Number"), 0, 2)
-        solenoidLayout = QHBoxLayout()
-        solenoidLayout.addWidget(QLabel("Solenoids"), stretch=1)
-        solenoidLayout.addWidget(rescanButton, stretch=0)
-        self._deviceLayout.addLayout(solenoidLayout, 0, 3)
-        mainLayout.addLayout(self._deviceLayout, stretch=0)
+        mainLayout.addWidget(self._headerWidget, stretch=0)
+        mainLayout.addWidget(self._devicesListWidget, stretch=0)
         mainLayout.addStretch(1)
         self.setLayout(mainLayout)
 
-        even = False
-        for item in self.children():
-            item.setProperty("IsHeader", True)
-            item.setProperty("IsColumnEven", even)
-            even = not even
-            if isinstance(item, QLabel):
-                item.setAlignment(Qt.AlignCenter)
-
         self._deviceItems: List[DeviceItem] = []
 
-        self.UpdateList()
+        AppGlobals.Instance().onDevicesChanged.connect(self.UpdateList)
 
-    def Rescan(self):
-        AppGlobals.Rig().Rescan()
         self.UpdateList()
 
     def UpdateList(self):
         for item in self._deviceItems:
             item.deleteLater()
         self._deviceItems = []
-        for device in AppGlobals.Rig().savedDevices:
-            if device.IsDeviceAvailable() and \
-                    device not in [deviceItem.device for deviceItem in self._deviceItems]:
+        devices = AppGlobals.Rig().GetActiveDevices()
+        devices.sort(key=lambda x: x.startNumber)
+        for device in devices:
+            if device.enabled and device not in [deviceItem.device for deviceItem in self._deviceItems]:
                 newItem = DeviceItem(device)
-                newItem.numberChanged.connect(self.SortList)
                 self._deviceItems.append(newItem)
+                self._deviceLayout.addWidget(newItem)
 
-        self.SortList()
+        if len(self._deviceItems) == 0:
+            self._rigStatusLabel.setText("<i>No configured devices found.</i>")
+        else:
+            self._rigStatusLabel.setText("<i>Connected to %d devices.</i>" % len(self._deviceItems))
 
-    def SortList(self):
-        self._deviceItems.sort(key=lambda deviceItem: deviceItem.device.startNumber)
-        self.FillList()
-
-    def FillList(self):
-        for row in range(1, self._deviceLayout.rowCount()):
-            [self._deviceLayout.removeItem(self._deviceLayout.itemAtPosition(row, column)) for column in range(4)]
-        for row, item in enumerate(self._deviceItems):
-            self._deviceLayout.addWidget(item.nameLabel, row + 1, 0)
-            self._deviceLayout.addLayout(item.statusLayout, row + 1, 1)
-            self._deviceLayout.addWidget(item.startNumberDial, row + 1, 2)
-            self._deviceLayout.addLayout(item.solenoidsLayout, row + 1, 3)
+    def OpenSettings(self):
+        settingsWindow = RigSettingsWidget(self)
+        settingsWindow.exec()
 
 
-class DeviceItem(QObject):
-    numberChanged = Signal()
-
+class DeviceItem(QFrame):
     def __init__(self, device: RigDevice):
         super().__init__()
 
         self.device = device
-
-        self.nameLabel = QLabel(device.serialNumber)
-        self.nameLabel.setAlignment(Qt.AlignCenter)
-        self._statusLabel = QLabel("")
-        self._statusLabel.setAlignment(Qt.AlignCenter)
-        self.startNumberDial = QSpinBox()
-        self.startNumberDial.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
-        self.startNumberDial.setMinimum(0)
-        self.startNumberDial.setMaximum(9999)
-        self.startNumberDial.setValue(device.startNumber)
-        self.startNumberDial.valueChanged.connect(self.SetStartNumber)
-
-        self._enableToggle = QPushButton()
-        self._enableToggle.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
-        self._enableToggle.clicked.connect(self.ToggleEnable)
-
-        self._enableIcon = QIcon("Assets/Images/powerIconOn.png")
-        self._disableIcon = QIcon("Assets/Images/powerIcon.png")
-        self._errorIcon = QIcon("Assets/Images/powerIconError.png")
 
         self.openAllButton = QPushButton("All On")
         self.openAllButton.clicked.connect(lambda: self.SetAll(True))
@@ -114,10 +78,6 @@ class DeviceItem(QObject):
         self.closeAllButton = QPushButton("All Off")
         self.closeAllButton.clicked.connect(lambda: self.SetAll(False))
         self.closeAllButton.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
-
-        self.statusLayout = QHBoxLayout()
-        self.statusLayout.addWidget(self._statusLabel, stretch=1)
-        self.statusLayout.addWidget(self._enableToggle, stretch=0)
 
         self.solenoidsLayout = QHBoxLayout()
         openCloseLayout = QHBoxLayout()
@@ -128,11 +88,10 @@ class DeviceItem(QObject):
         for solenoidNumber in range(24):
             newButton = SolenoidButton(solenoidNumber + self.device.startNumber)
             newButton.solenoidClicked.connect(lambda s=newButton: self.ToggleSolenoid(s))
-            newButton.polarityClicked.connect(lambda s=newButton: self.TogglePolarity(s))
             self._solenoidButtons.append(newButton)
             self.solenoidsLayout.addWidget(newButton, stretch=0)
 
-        self.Update()
+        self.setLayout(self.solenoidsLayout)
 
     def SetAll(self, isOpen: bool):
         for i in range(24):
@@ -140,56 +99,15 @@ class DeviceItem(QObject):
         AppGlobals.Rig().FlushStates()
         AppGlobals.Instance().onValveChanged.emit()
 
-    def SetStartNumber(self):
-        self.device.startNumber = self.startNumberDial.value()
-        self.Update()
-        self.numberChanged.emit()
-
-    def ToggleEnable(self):
-        self.device.SetEnabled(not self.device.isEnabled)
-        self.Update()
-
     def ToggleSolenoid(self, button: 'SolenoidButton'):
         index = self._solenoidButtons.index(button)
         AppGlobals.Rig().SetSolenoidState(self.device.startNumber + index,
-                                          not AppGlobals.Rig().GetSolenoidState(self.device.startNumber + index))
-        AppGlobals.Rig().FlushStates()
-        self.Update()
+                                          not AppGlobals.Rig().GetSolenoidState(self.device.startNumber + index), True)
         AppGlobals.Instance().onValveChanged.emit()
-
-    def TogglePolarity(self, button: 'SolenoidButton'):
-        index = self._solenoidButtons.index(button)
-        self.device.solenoidPolarities[index] = not self.device.solenoidPolarities[index]
-        AppGlobals.Rig().FlushStates()
-        self.Update()
-        AppGlobals.Instance().onValveChanged.emit()
-
-    def Update(self):
-        if not self.device.IsDeviceAvailable():
-            self.deleteLater()
-            return
-
-        if self.device.isEnabled:
-            if self.device.isConnected:
-                self._statusLabel.setText("Connected.")
-                self._enableToggle.setIcon(self._enableIcon)
-            else:
-                self._statusLabel.setText(self.device.errorMessage)
-                self._enableToggle.setIcon(self._errorIcon)
-        else:
-            self._enableToggle.setIcon(self._disableIcon)
-            self._statusLabel.setText("Disabled.")
-        self.startNumberDial.setEnabled(self.device.isEnabled and self.device.isConnected)
-        self.openAllButton.setEnabled(self.device.isEnabled and self.device.isConnected)
-        self.closeAllButton.setEnabled(self.device.isEnabled and self.device.isConnected)
-        for i in range(24):
-            self._solenoidButtons[i].setEnabled(self.device.isConnected and self.device.isEnabled)
-            self._solenoidButtons[i].Update(self.device.startNumber + i)
 
 
 class SolenoidButton(QToolButton):
     solenoidClicked = Signal()
-    polarityClicked = Signal()
 
     def __init__(self, number):
         super().__init__()

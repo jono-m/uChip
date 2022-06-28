@@ -13,6 +13,9 @@ ActionButtonFrame {
 ActionButtonFrame QToolButton {
     padding: 10px;
 }
+ActionButtonFrame QToolButton::menu-indicator {
+    image: none;
+}
 WidgetChipItemContainer {
     background: transparent;
 }

@@ -72,7 +72,6 @@ class Chip:
             raise Exception("Could not find program with name '" + programName + "'.")
 
     def FindPresetWithName(self, presetName: str):
-        print("Looking for item")
         matches = [preset for preset in self.programPresets if preset.name == presetName]
         if matches:
             return matches[0]
