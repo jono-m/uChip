@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QMessageBox
 from PySide6.QtCore import QThread, QTimer
 from UI.AppGlobals import AppGlobals
 import sys
-from Model.Rig.Rig import Rig
+from Data.Rig.Rig import Rig
 
 
 class RigWatchdogWorker(QThread):

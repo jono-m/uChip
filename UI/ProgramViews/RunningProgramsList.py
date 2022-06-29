@@ -3,7 +3,7 @@ from typing import List
 from PySide6.QtWidgets import QFrame, QLabel, QVBoxLayout, QPushButton, QHBoxLayout
 from PySide6.QtCore import Signal, Qt
 from UI.AppGlobals import AppGlobals
-from Model.Program.ProgramInstance import ProgramInstance
+from Data.Program.ProgramInstance import ProgramInstance
 
 
 class RunningProgramsList(QFrame):

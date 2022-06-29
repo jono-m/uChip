@@ -3,9 +3,9 @@ import types
 from typing import Optional, Dict, List, Union
 from PySide6.QtCore import QObject, Signal
 
-from Model.Program.ProgramInstance import ProgramInstance, DataType
-from Model.Chip import Chip, ProgramPreset
-from Model.Rig import Rig
+from Data.Program.ProgramInstance import ProgramInstance, DataType
+from Data.Chip import Chip, ProgramPreset
+from Data.Rig import Rig
 
 
 class ProgramRunner(QObject):

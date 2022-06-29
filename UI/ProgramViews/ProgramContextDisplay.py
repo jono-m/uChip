@@ -1,4 +1,4 @@
-from Model.Program.ProgramInstance import ProgramInstance, Program
+from Data.Program.ProgramInstance import ProgramInstance, Program
 
 from PySide6.QtWidgets import QFrame, QVBoxLayout, QApplication, QPushButton
 from PySide6.QtCore import Qt, QEvent, Signal

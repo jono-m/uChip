@@ -3,7 +3,7 @@ from typing import List
 from PySide6.QtWidgets import QFrame, QVBoxLayout, QHBoxLayout, QLabel, QToolButton, QPushButton, QSizePolicy
 from PySide6.QtCore import Signal, Qt
 from UI.AppGlobals import AppGlobals
-from Model.Rig.RigDevice import RigDevice
+from Data.Rig.RigDevice import RigDevice
 from UI.RigViewer.RigSettingsWidget import RigSettingsWidget
 
 

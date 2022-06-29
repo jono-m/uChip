@@ -5,7 +5,7 @@ from PySide6.QtCore import QPointF, QSizeF, Signal, QRectF
 from PySide6.QtWidgets import QLabel, QVBoxLayout, QFrame
 
 from UI.ChipEditor.WidgetChipItem import WidgetChipItem, ChipItem
-from Model.Image import Image
+from Data.Image import Image
 from UI.AppGlobals import AppGlobals
 
 from pathlib import Path

@@ -1,11 +1,11 @@
 from typing import Optional, List
 
-from Model.Valve import Valve
-from Model.Program.Data import DataType
-from Model.Program.Program import Program
-from Model.Program.ProgramPreset import ProgramPreset
-from Model.Image import Image
-from Model.Annotation import Annotation
+from Data.Valve import Valve
+from Data.Program.Data import DataType
+from Data.Program.Program import Program
+from Data.Program.ProgramPreset import ProgramPreset
+from Data.Image import Image
+from Data.Annotation import Annotation
 from pathlib import Path
 import dill
 

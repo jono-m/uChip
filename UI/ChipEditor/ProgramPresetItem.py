@@ -3,7 +3,7 @@ from PySide6.QtWidgets import QLineEdit, QVBoxLayout, QLabel, QHBoxLayout, QChec
 
 from UI.ChipEditor.WidgetChipItem import WidgetChipItem, ChipItem
 from UI.ProgramViews.ProgramInstanceWidget import ProgramInstanceWidget
-from Model.Program.ProgramPreset import ProgramPreset
+from Data.Program.ProgramPreset import ProgramPreset
 from UI.AppGlobals import AppGlobals
 
 

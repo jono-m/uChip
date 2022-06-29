@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QFrame, QLabel, QVBoxLayout, QPushButton, QHBoxLayout, QScrollArea
 from PySide6.QtCore import Qt
 from UI.AppGlobals import AppGlobals
-from Model.Program.ProgramRunner import ProgramRunnerMessage
+from Data.Program.ProgramRunner import ProgramRunnerMessage
 
 
 class ConsoleViewer(QFrame):

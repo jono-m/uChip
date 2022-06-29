@@ -4,8 +4,8 @@ from PySide6.QtWidgets import QFrame, QHBoxLayout, QVBoxLayout, QLabel, QPushBut
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import Qt
 from UI.ProgramViews.DataValueWidget import DataValueWidget
-from Model.Program.ProgramInstance import ProgramInstance, Parameter
-from Model.Program.Data import DataType
+from Data.Program.ProgramInstance import ProgramInstance, Parameter
+from Data.Program.Data import DataType
 from UI.AppGlobals import AppGlobals
 
 

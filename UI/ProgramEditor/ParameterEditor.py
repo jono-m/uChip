@@ -1,8 +1,8 @@
 from typing import List
 
-from Model.Program.Program import Program
-from Model.Program.Parameter import Parameter
-from Model.Program.Data import DataType
+from Data.Program.Program import Program
+from Data.Program.Parameter import Parameter
+from Data.Program.Data import DataType
 
 from PySide6.QtWidgets import QFrame, QVBoxLayout, QHBoxLayout, QScrollArea, QLabel, QPushButton, QLineEdit, \
     QComboBox, QSpinBox, QDoubleSpinBox, QToolButton, QGridLayout

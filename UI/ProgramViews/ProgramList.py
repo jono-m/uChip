@@ -3,8 +3,8 @@ from PySide6.QtWidgets import QFrame, QLabel, QListWidget, QPushButton, QMessage
     QFileDialog, QToolButton, QHBoxLayout
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import Signal, Qt, QSize
-from Model.Program.Program import Program
-from Model.Program.ProgramInstance import ProgramInstance
+from Data.Program.Program import Program
+from Data.Program.ProgramInstance import ProgramInstance
 from UI.AppGlobals import AppGlobals
 from UI.ProgramViews.ProgramContextDisplay import ProgramContextDisplay
 

@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QDialog, QVBoxLayout, QListWidget, QPushButton, QF
     QMessageBox, QLabel, QCheckBox, QSpinBox, QWidget
 from PySide6.QtGui import QValidator
 from UI.AppGlobals import AppGlobals
-from Model.Rig.RigDevice import RigDevice
+from Data.Rig.RigDevice import RigDevice
 
 
 class RigSettingsWidget(QDialog):

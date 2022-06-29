@@ -1,7 +1,7 @@
 from typing import List
 
 from PySide6.QtWidgets import QComboBox
-from Model.Program.Data import DataType
+from Data.Program.Data import DataType
 from UI.AppGlobals import AppGlobals
 
 

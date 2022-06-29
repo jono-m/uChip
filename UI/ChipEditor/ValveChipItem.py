@@ -2,7 +2,7 @@ from PySide6.QtCore import QPointF
 from PySide6.QtWidgets import QPushButton, QSpinBox, QLabel, QGridLayout, QLineEdit, QHBoxLayout
 
 from UI.ChipEditor.WidgetChipItem import WidgetChipItem, ChipItem
-from Model.Valve import Valve
+from Data.Valve import Valve
 from UI.AppGlobals import AppGlobals
 
 

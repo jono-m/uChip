@@ -1,6 +1,6 @@
-from Model.Rig.Rig import Rig
-from Model.Chip import Chip
-from Model.Program.ProgramRunner import ProgramRunner
+from Data.Rig.Rig import Rig
+from Data.Chip import Chip
+from Data.Program.ProgramRunner import ProgramRunner
 from PySide6.QtCore import QObject, Signal
 
 

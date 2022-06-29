@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QFrame, QSplitter, QHBoxLayout, QLineEdit, QVBoxLayout, QLabel, QPlainTextEdit
 from PySide6.QtCore import Signal, Qt
-from Model.Program.Program import Program
+from Data.Program.Program import Program
 from UI.AppGlobals import AppGlobals
 from UI.ProgramEditor.CodeTextEditor import CodeTextEditor
 from UI.ProgramEditor.ParameterEditor import ParameterEditor

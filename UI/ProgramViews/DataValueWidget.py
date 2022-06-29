@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QFrame, QSpinBox, QDoubleSpinBox, QComboBox, QLineEdit, QVBoxLayout, QLabel, QHBoxLayout, \
     QSizePolicy
 from PySide6.QtCore import Signal
-from Model.Program.Data import DataType, DataValueType
+from Data.Program.Data import DataType, DataValueType
 from UI.ProgramViews.ChipDataSelection import ChipDataSelection
 from typing import List
 

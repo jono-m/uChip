@@ -1,7 +1,7 @@
 from typing import Set, Dict, Optional
 import dill
 from pathlib import Path
-from Model.Rig.RigDevice import RigDevice
+from Data.Rig.RigDevice import RigDevice
 from serial.tools.list_ports import comports
 
 
