@@ -10,8 +10,16 @@ class Rig:
         super().__init__()
         self.solenoidStates: Dict[int, bool] = {}
 
+    def SetSolenoidState(self, number: int, state: bool):
+        self.solenoidStates[number] = state
 
-class DeviceSpecification:
+    def GetSolenoidState(self, number: int):
+        if number not in self.solenoidStates:
+            self.solenoidStates[number] = False
+        return self.solenoidStates[number]
+
+
+class Device:
     def __init__(self):
         self.portInfo: Optional[ListPortInfo] = None
         self.startNumber = 0
@@ -19,9 +27,33 @@ class DeviceSpecification:
         self.enabled = False
         self.serialPort: Optional[Serial] = None
 
+    def IsConnected(self):
+        return self.serialPort is not None and self.serialPort.is_open
 
-def IsDeviceConnected(device: DeviceSpecification):
-    return device.serialPort is not None and device.serialPort.is_open
+    def SetPinStates(self, solenoidStates: List[bool]):
+        if not self.IsConnected():
+            return
+        polarizedStates = [state != self.polarities[int(i / 8)] for (i, state) in
+                           enumerate(solenoidStates)]
+        aState = ConvertPinStatesToBytes(polarizedStates[0:8])
+        bState = ConvertPinStatesToBytes(polarizedStates[8:16])
+        cState = ConvertPinStatesToBytes(polarizedStates[16:24])
+        self.serialPort.write(b'A' + aState)
+        self.serialPort.write(b'B' + bState)
+        self.serialPort.write(b'C' + cState)
+
+    def Connect(self):
+        if self.IsConnected():
+            return
+        self.serialPort = Serial(self.portInfo.device, timeout=0, writeTimeout=0)
+        self.serialPort.write(b'!A' + bytes([0]))
+        self.serialPort.write(b'!B' + bytes([0]))
+        self.serialPort.write(b'!C' + bytes([0]))
+
+    def Disconnect(self):
+        if self.IsConnected():
+            self.serialPort.close()
+            self.serialPort = None
 
 
 def ConvertPinStatesToBytes(state: List[bool]):
@@ -32,51 +64,13 @@ def ConvertPinStatesToBytes(state: List[bool]):
     return bytes([number])
 
 
-def SetPinStates(device: DeviceSpecification, solenoidStates: List[bool]):
-    if not IsDeviceConnected(device):
-        return
-    polarizedStates = [state != device.polarities[int(i / 8)] for (i, state) in
-                       enumerate(solenoidStates)]
-    aState = ConvertPinStatesToBytes(polarizedStates[0:8])
-    bState = ConvertPinStatesToBytes(polarizedStates[8:16])
-    cState = ConvertPinStatesToBytes(polarizedStates[16:24])
-    device.serialPort.write(b'A' + aState)
-    device.serialPort.write(b'B' + bState)
-    device.serialPort.write(b'C' + cState)
-
-
-def ConnectDevice(device: DeviceSpecification):
-    if IsDeviceConnected(device):
-        return
-    device.serialPort = Serial(device.portInfo.device, timeout=0, writeTimeout=0)
-    device.serialPort.write(b'!A' + bytes([0]))
-    device.serialPort.write(b'!B' + bytes([0]))
-    device.serialPort.write(b'!C' + bytes([0]))
-
-
-def DisconnectDevice(device: DeviceSpecification):
-    if IsDeviceConnected(device):
-        device.serialPort.close()
-        device.serialPort = None
-
-
 def RescanPorts():
     foundDevices = comports()
     return foundDevices
 
 
-def SetSolenoidState(rig: Rig, number: int, state: bool):
-    rig.solenoidStates[number] = state
-
-
-def GetSolenoidState(rig: Rig, number: int):
-    if number not in rig.solenoidStates:
-        rig.solenoidStates[number] = False
-    return rig.solenoidStates[number]
-
-
-def UpdateDevicesFromSolenoidStates(rig: Rig, devices: List[DeviceSpecification]):
+def UpdateDevicesFromRig(rig: Rig, devices: List[Device]):
     for device in devices:
-        if device.enabled and IsDeviceConnected(device):
-            SetPinStates(device, [GetSolenoidState(rig, i) for i in
-                                  range(device.startNumber, device.startNumber + 24)])
+        if device.enabled and device.IsConnected():
+            device.SetPinStates([rig.GetSolenoidState(i) for i in
+                                 range(device.startNumber, device.startNumber + 24)])
