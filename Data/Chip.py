@@ -1,94 +1,47 @@
-from typing import Optional, List
+from typing import Optional, List, Dict
+from Data.Program import ProgramInstance, ProgramSpecification, Parameter, FindObjectWithName, \
+    ExceptionIfNone
 
-from Data.Valve import Valve
-from Data.Program.Data import DataType
-from Data.Program.Program import Program
-from Data.Program.ProgramPreset import ProgramPreset
-from Data.Image import Image
-from Data.Annotation import Annotation
-from pathlib import Path
-import dill
 
-import os
+class Valve:
+    def __init__(self):
+        self.name = ""
+        self.position_x = 0
+        self.position_y = 0
+        self.solenoidNumber = 0
+
+
+class ProgramPreset:
+    def __init__(self):
+        self.name = ""
+        self.position_x = 0
+        self.position_y = 0
+        self.instance: Optional[ProgramInstance] = None
+        self.parameterVisibility: Dict[Parameter, bool] = {}
+        self.showDescription = False
+
+
+class Annotation:
+    def __init__(self):
+        self.position_x = 0
+        self.position_y = 0
+        self.text = ""
+        self.size = 1
+
+
+class Image:
+    def __init__(self):
+        self.position_x = 0
+        self.position_y = 0
+        self.localPath = ""
+        self.width = 0
+        self.height = 0
 
 
 class Chip:
     def __init__(self):
         self.valves: List[Valve] = []
-        self.programs: List[Program] = []
+        self.specifications: List[ProgramSpecification] = []
         self.programPresets: List[ProgramPreset] = []
         self.images: List[Image] = []
         self.annotations: List[Annotation] = []
-        self.editingMode = True
-        self.path: Optional[Path] = None
-        self.modified = False
-
-    def RecordModification(self):
-        self.modified = True
-
-    def HasBeenSaved(self):
-        return bool(self.path)
-
-    def SaveToFile(self, path: Path):
-        self.path = path
-        self.modified = False
-        for image in self.images:
-            image.path = Path(os.path.relpath(image.path, self.path.parent))
-        file = open(self.path, "wb+")
-        dill.dump(self, file)
-        file.close()
-        for image in self.images:
-            image.path = path.parent / image.path
-
-    @staticmethod
-    def LoadFromFile(path: Path) -> 'Chip':
-        file = open(path, "rb")
-        chip = dill.load(file)
-        file.close()
-        chip.path = path
-        for image in chip.images:
-            image.path = path.parent / image.path
-        return chip
-
-    def NextSolenoidNumber(self):
-        number = 0
-        while True:
-            if number not in [valve.solenoidNumber for valve in self.valves]:
-                return number
-            number += 1
-
-    def FindValveWithName(self, valveName: str):
-        matches = [valve for valve in self.valves if valve.name == valveName]
-        if matches:
-            return matches[0]
-        else:
-            raise Exception("Could not find valve with name '" + valveName + "'.")
-
-    def FindProgramWithName(self, programName: str):
-        matches = [program for program in self.programs if program.name == programName]
-        if matches:
-            return matches[0]
-        else:
-            raise Exception("Could not find program with name '" + programName + "'.")
-
-    def FindPresetWithName(self, presetName: str):
-        matches = [preset for preset in self.programPresets if preset.name == presetName]
-        if matches:
-            return matches[0]
-        else:
-            raise Exception("Could not find preset with name '" + presetName + "'.")
-
-    def Validate(self):
-        for preset in self.programPresets.copy():
-            if preset.instance.program not in self.programs:
-                self.programPresets.remove(preset)
-            else:
-                preset.instance.SyncParameters()
-
-                for parameter in preset.instance.parameterValues:
-                    if parameter.dataType is DataType.VALVE:
-                        if preset.instance.parameterValues[parameter] not in self.valves:
-                            preset.instance.parameterValues[parameter] = None
-                    elif parameter.dataType is DataType.PROGRAM_PRESET:
-                        if preset.instance.parameterValues[parameter] not in self.programPresets:
-                            preset.instance.parameterValues[parameter] = None
