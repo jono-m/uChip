@@ -18,8 +18,16 @@ class ChipView(QWidget):
         demoWidget.layout().addWidget(QPushButton("A button."))
 
         item = CustomGraphicsViewItem(demoWidget)
-
         self.graphicsView.AddItem(item)
-        item.SetRect(QRectF(0, 0, 1000, 1000))
+        item.SetRect(QRectF(0, 0, 120, 120))
+
+        demoWidget = QWidget()
+        demoWidget.setLayout(QVBoxLayout())
+        demoWidget.layout().addWidget(QLabel("Test!"))
+        demoWidget.layout().addWidget(QPushButton("A button."))
+
+        item = CustomGraphicsViewItem(demoWidget)
+        self.graphicsView.AddItem(item)
+        item.SetRect(QRectF(-200, 100, 120, 120))
 
         self.graphicsView.UpdateItemVisuals()
