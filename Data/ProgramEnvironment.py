@@ -3,7 +3,7 @@ from Data.Program import ProgramInstance, WaitForProgram, WaitForSeconds, WaitFo
     WaitForHours, StartInstance, ProgramState, PauseInstance, StopInstance, \
     Parameter, InstantiateProgram
 from Data.Chip import Chip, Valve
-from Data.Rig import Rig, SetSolenoidState, GetSolenoidState
+from Data.Rig import Rig
 
 
 def FindObjectWithName(objects, name: str):
@@ -35,10 +35,10 @@ class ValveIntermediate:
         self._rig = rig
 
     def Set(self, state: bool):
-        SetSolenoidState(self._rig, self._valve.solenoidNumber, state)
+        self._rig.SetSolenoidState(self._valve.solenoidNumber, state)
 
     def Get(self):
-        GetSolenoidState(self._rig, self._valve.solenoidNumber)
+        self._rig.GetSolenoidState(self._valve.solenoidNumber)
 
 
 class ProgramIntermediate:
@@ -102,7 +102,8 @@ def BuildRuntimeEnvironment(instance: ProgramInstance, chip: Chip, rig: Rig,
             FindObjectWithName(chip.programPresets, name),
             "Could not find existing program with name '" +
             name + "'."), chip, rig, programParentDictionary),
-        "CreateProgram": lambda name: CreateProgram(name, instance, chip, rig, programParentDictionary),
+        "CreateProgram": lambda name: CreateProgram(name, instance, chip, rig,
+                                                    programParentDictionary),
         "OPEN": True,
         "CLOSED": False
     }

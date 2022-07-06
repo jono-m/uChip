@@ -1,337 +1,300 @@
-from typing import List
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QGridLayout, QLabel, QPushButton, \
+    QListWidget, QListWidgetItem, QSpinBox, QComboBox, QHBoxLayout, QSizePolicy
+from PySide6.QtCore import QTimer, QSize, Qt
+from typing import Optional, List
+from Data.Rig import Device
+from UI.UIMaster import UIMaster
+import time
+import math
 
-from PySide6.QtWidgets import QFrame, QVBoxLayout, QHBoxLayout, QLabel, QToolButton, QPushButton, QSizePolicy
-from PySide6.QtCore import Signal, Qt
-from UI.AppGlobals import AppGlobals
-from Data.Rig.RigDevice import RigDevice
-from UI.RigViewer.RigSettingsWidget import RigSettingsWidget
 
-
-class RigView(QFrame):
+class RigView(QWidget):
     def __init__(self):
         super().__init__()
 
-        self._headerWidget = QFrame()
-        headerLayout = QHBoxLayout()
-        self._headerWidget.setLayout(headerLayout)
-        headerLayout.setContentsMargins(0, 0, 0, 0)
-        headerLayout.setSpacing(0)
-        self._rigStatusLabel = QLabel()
-        headerLayout.addWidget(self._rigStatusLabel, stretch=1)
-        settingsButton = QPushButton("Configure devices...")
-        settingsButton.clicked.connect(self.OpenSettings)
-        headerLayout.addWidget(settingsButton, stretch=0)
-
-        self._devicesListWidget = QFrame()
-        self._deviceLayout = QVBoxLayout()
-        self._deviceLayout.setAlignment(Qt.AlignTop)
-        self._deviceLayout.setContentsMargins(0, 0, 0, 0)
-        self._deviceLayout.setSpacing(0)
-        self._devicesListWidget.setLayout(self._deviceLayout)
+        self.setObjectName("Rig")
 
         mainLayout = QVBoxLayout()
-        mainLayout.setContentsMargins(0, 0, 0, 0)
-        mainLayout.setSpacing(0)
-        mainLayout.setAlignment(Qt.AlignTop)
-        mainLayout.addWidget(self._headerWidget, stretch=0)
-        mainLayout.addWidget(self._devicesListWidget, stretch=0)
+        self.setLayout(mainLayout)
+
+        self.solenoidsLayout = QGridLayout()
+        self._lastNumbers = []
+
+        mainLayout.addWidget(QLabel("<b>Solenoid Control</b>"))
+        mainLayout.addWidget(BorderSpacer(False))
+        mainLayout.addLayout(self.solenoidsLayout)
+        self.noneConnectedLabel = QLabel("No solenoids available.")
+        mainLayout.addWidget(self.noneConnectedLabel)
+
         mainLayout.addStretch(1)
-        self.setLayout(mainLayout)
 
-        self._deviceItems: List[DeviceItem] = []
+        deviceListAndInfoLayout = QVBoxLayout()
+        mainLayout.addLayout(deviceListAndInfoLayout, 0)
 
-        AppGlobals.Instance().onDevicesChanged.connect(self.UpdateList)
+        self.devicesList = QListWidget()
+        self.devicesList.currentRowChanged.connect(self.NewDeviceSelected)
+        self.portInfoLabel = QLabel()
+        self.portInfoLabel.setAlignment(Qt.AlignTop)
+        self.portInfoLabel.setSizePolicy(QSizePolicy.Ignored,
+                                         QSizePolicy.Ignored)
+        deviceListAndInfoLayout.addWidget(QLabel("<b>Available Devices</b>"))
+        deviceListAndInfoLayout.addWidget(BorderSpacer(False))
+        dl = QHBoxLayout()
+        dl.addWidget(self.devicesList, 1)
+        dl.addWidget(self.portInfoLabel, 1)
+        deviceListAndInfoLayout.addLayout(dl)
 
-        self.UpdateList()
+        self.startNumberBox = QSpinBox()
+        self.startNumberBox.valueChanged.connect(self.PushUIToDevice)
+        self.startNumberBox.setMaximum(1000)
+        self.startNumberBox.setMinimum(0)
+        self.invertA = ChoiceBox()
+        self.invertB = ChoiceBox()
+        self.invertC = ChoiceBox()
+        self.enabledBox = ChoiceBox()
 
-    def UpdateList(self):
-        for item in self._deviceItems:
-            item.deleteLater()
-        self._deviceItems = []
-        devices = AppGlobals.Rig().GetActiveDevices()
-        devices.sort(key=lambda x: x.startNumber)
-        for device in devices:
-            if device.enabled and device not in [deviceItem.device for deviceItem in self._deviceItems]:
-                newItem = DeviceItem(device)
-                self._deviceItems.append(newItem)
-                self._deviceLayout.addWidget(newItem)
+        [x.currentTextChanged.connect(self.PushUIToDevice) for x in
+         [self.invertA, self.invertB, self.invertC, self.enabledBox]]
 
-        if len(self._deviceItems) == 0:
-            self._rigStatusLabel.setText("<i>No configured devices found.</i>")
-        else:
-            self._rigStatusLabel.setText("<i>Connected to %d devices.</i>" % len(self._deviceItems))
+        deviceInfoLayout = QGridLayout()
+        deviceListAndInfoLayout.addLayout(deviceInfoLayout)
+        deviceInfoLayout.addWidget(QLabel("Enabled"), 0, 0)
+        deviceInfoLayout.addWidget(self.enabledBox, 0, 1)
+        deviceInfoLayout.addWidget(QLabel("Start Number"), 1, 0)
+        deviceInfoLayout.addWidget(self.startNumberBox, 1, 1)
+        deviceInfoLayout.addWidget(QLabel("Invert 0-7"), 2, 0)
+        deviceInfoLayout.addWidget(self.invertA, 2, 1)
+        deviceInfoLayout.addWidget(QLabel("Invert 8-15"), 3, 0)
+        deviceInfoLayout.addWidget(self.invertB, 3, 1)
+        deviceInfoLayout.addWidget(QLabel("Invert 16-23"), 4, 0)
+        deviceInfoLayout.addWidget(self.invertC, 4, 1)
 
-    def OpenSettings(self):
-        settingsWindow = RigSettingsWidget(self)
-        settingsWindow.exec()
+        self.blinkButton = QPushButton("Blink Solenoids")
+        self.blinkButton.clicked.connect(self.Blink)
 
+        deviceListAndInfoLayout.addWidget(self.blinkButton)
+        deviceListAndInfoLayout.addWidget(BorderSpacer(False))
+        self.selectedDevice: Optional[Device] = None
+        self.lastDevicesList: List[Device] = []
 
-class DeviceItem(QFrame):
-    def __init__(self, device: RigDevice):
-        super().__init__()
+        self.updateTimer = QTimer(self)
+        self.updateTimer.timeout.connect(self.Update)
+        self.updateTimer.start(30)
 
-        self.device = device
+        self.Update()
 
-        self.openAllButton = QPushButton("All On")
-        self.openAllButton.clicked.connect(lambda: self.SetAll(True))
-        self.openAllButton.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
-        self.closeAllButton = QPushButton("All Off")
-        self.closeAllButton.clicked.connect(lambda: self.SetAll(False))
-        self.closeAllButton.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+        self.PushDeviceToUI()
 
-        self.solenoidsLayout = QHBoxLayout()
-        openCloseLayout = QHBoxLayout()
-        openCloseLayout.addWidget(self.openAllButton)
-        openCloseLayout.addWidget(self.closeAllButton)
-        self.solenoidsLayout.addLayout(openCloseLayout)
-        self._solenoidButtons: List[SolenoidButton] = []
-        for solenoidNumber in range(24):
-            newButton = SolenoidButton(solenoidNumber + self.device.startNumber)
-            newButton.solenoidClicked.connect(lambda s=newButton: self.ToggleSolenoid(s))
-            self._solenoidButtons.append(newButton)
-            self.solenoidsLayout.addWidget(newButton, stretch=0)
+    def Update(self):
+        self.UpdateDeviceList()
+        self.UpdateSolenoids()
 
-        self.setLayout(self.solenoidsLayout)
+    def PushUIToDevice(self):
+        self.selectedDevice.enabled = self.enabledBox.IsTrue()
+        self.selectedDevice.polarities = [self.invertA.IsTrue(), self.invertB.IsTrue(),
+                                          self.invertC.IsTrue()]
+        self.selectedDevice.startNumber = self.startNumberBox.value()
+        if self.selectedDevice.enabled and not self.selectedDevice.IsConnected():
+            self.selectedDevice.Connect()
+        elif not self.selectedDevice.enabled and self.selectedDevice.IsConnected():
+            self.selectedDevice.Disconnect()
+        UIMaster.Instance().rig.FlushStates()
+        self.PushDeviceToUI()
 
-    def SetAll(self, isOpen: bool):
-        for i in range(24):
-            AppGlobals.Rig().SetSolenoidState(self.device.startNumber + i, isOpen)
-        AppGlobals.Rig().FlushStates()
-        AppGlobals.Instance().onValveChanged.emit()
+    def Blink(self):
+        for i in range(5):
+            state = (i % 2) == 0
+            self.selectedDevice.SetSolenoids({i: state for i in
+                                              range(self.selectedDevice.startNumber,
+                                                    self.selectedDevice.startNumber + 24)})
+            time.sleep(0.25)
+        UIMaster.Instance().rig.FlushStates()
 
-    def ToggleSolenoid(self, button: 'SolenoidButton'):
-        index = self._solenoidButtons.index(button)
-        AppGlobals.Rig().SetSolenoidState(self.device.startNumber + index,
-                                          not AppGlobals.Rig().GetSolenoidState(self.device.startNumber + index), True)
-        AppGlobals.Instance().onValveChanged.emit()
+    def PushDeviceToUI(self):
+        [x.setEnabled(self.selectedDevice is not None) for x in
+         [self.enabledBox, self.invertA, self.invertB, self.invertC, self.startNumberBox]]
+        [x.blockSignals(True) for x in
+         [self.enabledBox, self.invertA, self.invertB, self.invertC, self.startNumberBox]]
+        self.blinkButton.setEnabled(
+            self.selectedDevice is not None and self.selectedDevice.IsConnected())
+        if self.selectedDevice is None:
+            self.portInfoLabel.setText("No device selected")
+            return
+        self.enabledBox.SetTrue(self.selectedDevice.enabled)
+        [x.SetTrue(y) for x, y in
+         zip([self.invertA, self.invertB, self.invertC], self.selectedDevice.polarities)]
+        self.startNumberBox.setValue(self.selectedDevice.startNumber)
+        [x.blockSignals(False) for x in
+         [self.enabledBox, self.invertA, self.invertB, self.invertC, self.startNumberBox]]
 
+        self.portInfoLabel.setText(self.selectedDevice.Summary())
 
-class SolenoidButton(QToolButton):
-    solenoidClicked = Signal()
+    def UpdateDeviceList(self):
+        devices = [d for d in UIMaster.Instance().rig.allDevices if d.available]
+        if devices == self.lastDevicesList:
+            return
+        self.lastDevicesList = devices
+        self.devicesList.clear()
+        for d in UIMaster.Instance().rig.allDevices:
+            if d.available:
+                i = QListWidgetItem(d.portInfo.name + " (" + d.portInfo.device + ")")
+                self.devicesList.addItem(i)
+                if self.selectedDevice == d:
+                    self.devicesList.setCurrentItem(i)
 
-    def __init__(self, number):
-        super().__init__()
+    def NewDeviceSelected(self):
+        self.selectedDevice = self.lastDevicesList[self.devicesList.currentRow()]
+        self.PushDeviceToUI()
 
-        self.clicked.connect(self.solenoidClicked.emit)
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+    def UpdateSolenoids(self):
+        numbers = UIMaster.Instance().rig.GetConnectedSolenoidNumbers()
+        if numbers == self._lastNumbers:
+            return
+        self._lastNumbers = numbers
 
-        AppGlobals.Instance().onValveChanged.connect(self.UpdateValveState)
+        for i in reversed(range(self.solenoidsLayout.count())):
+            w = self.solenoidsLayout.itemAt(i).widget()
+            if w is not None:
+                w.deleteLater()
 
-        self.Update(number)
+        for i, n in enumerate(numbers):
+            row = int(i / 8)
+            column = i % 8
+            self.solenoidsLayout.addWidget(SolenoidButton(n), row, column)
 
-        self._number = number
-        self._showOpen = None
-        self.UpdateValveState()
+        nRows = math.ceil(len(numbers) / 8)
+        for rowNumber in range(nRows):
+            numbersInRow = numbers[rowNumber * 8:(rowNumber + 1) * 8]
+            self.solenoidsLayout.addWidget(BorderSpacer(True), rowNumber, 8)
+            self.solenoidsLayout.addWidget(SetAllButton("ON", numbersInRow, True), rowNumber, 9)
+            self.solenoidsLayout.addWidget(SetAllButton("OFF", numbersInRow, False), rowNumber, 10)
 
-    def Update(self, number: int):
-        self._number = number
-        self.setText(str(number))
-
-    def UpdateValveState(self):
-        showOpen = AppGlobals.Rig().GetSolenoidState(self._number)
-        if showOpen != self._showOpen:
-            self.setProperty("On", showOpen)
-            self._showOpen = showOpen
-            self.setStyle(self.style())
-
-from typing import List, Tuple, Optional
-
-from PySide6.QtWidgets import QDialog, QVBoxLayout, QListWidget, QPushButton, QFrame, QHBoxLayout, QListWidgetItem, \
-    QMessageBox, QLabel, QCheckBox, QSpinBox, QWidget
-from PySide6.QtGui import QValidator
-from UI.AppGlobals import AppGlobals
-from Data.Rig.RigDevice import RigDevice
-
-
-class RigSettingsWidget(QDialog):
-    def __init__(self, parent):
-        super().__init__(parent)
-
-        self.setModal(True)
-
-        self.setWindowTitle("Device Configuration")
-
-        self.availableDevicesList = QListWidget()
-        self.availableDevicesList.currentItemChanged.connect(self.OnListItemChanged)
-
-        self.deviceInfoWidget = DeviceInfoWidget()
-
-        mainLayout = QVBoxLayout()
-        midLayout = QHBoxLayout()
-        midLayout.addWidget(self.availableDevicesList)
-        midLayout.addWidget(self.deviceInfoWidget)
-        mainLayout.addLayout(midLayout)
-        self.setLayout(mainLayout)
-
-        AppGlobals.Instance().onDevicesChanged.connect(self.RepopulateList)
-
-        self._itemDeviceMapping: List[Tuple[QListWidgetItem, RigDevice]] = []
-
-        self.RepopulateList()
-
-    def DeviceForItem(self, item: QListWidgetItem):
-        if item is None:
-            return None
-        device = [device for (i, device) in self._itemDeviceMapping if i == item]
-        if len(device) > 0:
-            return device[0]
-        return None
-
-    def OnListItemChanged(self, currentItem, previousItem):
-        device = self.DeviceForItem(currentItem)
-        if self.PromptSwitchDevice(device):
-            self.deviceInfoWidget.DisplayInfoForDevice(device)
-        else:
-            lastIndex = self.availableDevicesList.indexFromItem(previousItem)
-            self.availableDevicesList.blockSignals(True)
-            self.availableDevicesList.setCurrentIndex(lastIndex)
-            self.availableDevicesList.blockSignals(False)
-
-    def closeEvent(self, arg__1) -> None:
-        if not self.PromptSwitchDevice(None):
-            arg__1.ignore()
-        else:
-            super().closeEvent(arg__1)
-
-    def RepopulateList(self):
-        self.availableDevicesList.blockSignals(True)
-
-        currentDevice = self.deviceInfoWidget.Device()
-        self.availableDevicesList.clear()
-        self._itemDeviceMapping.clear()
-        currentItem = None
-        for device in AppGlobals.Rig().GetAvailableDevices():
-            newItem = QListWidgetItem(device.Name())
-            self._itemDeviceMapping.append((newItem, device))
-            if device == currentDevice:
-                currentItem = newItem
-            self.availableDevicesList.addItem(newItem)
-
-        self.availableDevicesList.blockSignals(False)
-
-        if currentItem:
-            self.availableDevicesList.setCurrentItem(currentItem)
-        elif self.availableDevicesList.count() > 0:
-            self.availableDevicesList.setCurrentRow(0)
-
-    # Return true if the switch was accepted
-    def PromptSwitchDevice(self, device: Optional[RigDevice]) -> bool:
-        if self.deviceInfoWidget.Device() != device and self.deviceInfoWidget.IsModified():
-            ret = QMessageBox.question(self, "Confirm Change",
-                                       "You have unsaved changes to this device. Do you want to discard them?",
-                                       QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel,
-                                       QMessageBox.Save)
-
-            if ret == QMessageBox.Save:
-                self.deviceInfoWidget.Save()
-            elif ret == QMessageBox.Cancel:
-                return False
-        return True
+        if len(numbers) > 0:
+            self.solenoidsLayout.addWidget(SetAllButton("ALL ON", numbers, True, False),
+                                           nRows + 1, 0, 1, 5)
+            self.solenoidsLayout.addWidget(SetAllButton("ALL OFF", numbers, False, False),
+                                           nRows + 1, 5, 1, 6)
+        self.noneConnectedLabel.setVisible(len(numbers) == 0)
 
 
-class DeviceInfoWidget(QFrame):
+class ChoiceBox(QComboBox):
     def __init__(self):
         super().__init__()
-        self.saveButton = QPushButton("Save")
-        self.saveButton.clicked.connect(self.Save)
+        self.addItem("YES")
+        self.addItem("NO")
 
-        self.nameLabel = QLabel("")
-        self.descriptionLabel = QLabel("")
+    def IsTrue(self):
+        return self.currentText() == "YES"
 
-        self.enabledCheckbox = QCheckBox("Enabled")
-        self.enabledCheckbox.stateChanged.connect(self._Modified)
+    def SetTrue(self, isTrue: bool):
+        self.setCurrentText("YES" if isTrue else "NO")
 
-        self.invertedACheckbox = QCheckBox("Invert Solenoids 0-7")
-        self.invertedACheckbox.stateChanged.connect(self._Modified)
 
-        self.invertedBCheckbox = QCheckBox("Invert Solenoids 8-15")
-        self.invertedBCheckbox.stateChanged.connect(self._Modified)
-
-        self.invertedCCheckbox = QCheckBox("Invert Solenoids 16-23")
-        self.invertedCCheckbox.stateChanged.connect(self._Modified)
-
-        self.startNumber = QSpinBox()
-        self.startNumber.setCorrectionMode(QSpinBox.CorrectToNearestValue)
-        self.startNumber.validate = self.ValidateNumber
-        self.startNumber.setMinimum(0)
-        self.startNumber.setMaximum(9999)
-        self.startNumber.setSingleStep(24)
-        self.startNumber.valueChanged.connect(self._Modified)
-
-        startNumberLayout = QHBoxLayout()
-        startNumberLayout.addWidget(QLabel("Start Number: "))
-        startNumberLayout.addWidget(self.startNumber)
-
-        layout = QVBoxLayout()
-        layout.addWidget(self.nameLabel)
-        layout.addWidget(self.descriptionLabel)
-        layout.addWidget(self.enabledCheckbox)
-        layout.addWidget(self.invertedACheckbox)
-        layout.addWidget(self.invertedBCheckbox)
-        layout.addWidget(self.invertedCCheckbox)
-        layout.addLayout(startNumberLayout)
-        layout.addWidget(self.saveButton)
-        layout.addStretch(1)
-        self.setLayout(layout)
-
-        self._currentDevice = None
-        self._modified = False
-
-    def ValidateNumber(self, number: str, pos):
-        if not number.isnumeric():
-            return QValidator.Invalid
-        number = int(float(number))
-        if number % 24 == 0:
-            return QValidator.Acceptable
+class BorderSpacer(QLabel):
+    def __init__(self, vertical):
+        super().__init__()
+        self.setStyleSheet("""background-color: #999999""")
+        if vertical:
+            self.setFixedWidth(1)
         else:
-            return QValidator.Intermediate
+            self.setFixedHeight(1)
 
-    def IsModified(self):
-        return self._modified
 
-    def Device(self):
-        return self._currentDevice
+solenoidOnStyle = """
+QPushButton {
+background-color: #ebb734; 
+border: 1px solid black;
+}
+QPushButton::hover {
+background-color: #bd932a;
+}
+QPushButton::pressed {
+background-color: #a17d23;
+}
+"""
 
-    def DisplayInfoForDevice(self, device: RigDevice):
-        self._currentDevice = device
+solenoidOffStyle = """
+QPushButton {
+background-color: white; 
+border: 1px solid black;
+}
+QPushButton::hover {
+background-color: #EEEEEE;
+}
+QPushButton::pressed {
+background-color: #DDDDDD;
+}
+"""
 
-        if self._currentDevice is None:
-            [t.setVisible(False) for t in self.children() if isinstance(t, QWidget)]
-            self.nameLabel.setVisible(True)
-            self.nameLabel.setText("No device selected.")
+
+class SolenoidButton(QPushButton):
+    def __init__(self, n):
+        super().__init__()
+        self.number = n
+        self.setText(str(n))
+        self.clicked.connect(self.ToggleState)
+        self.checkTimer = QTimer(self)
+        self.checkTimer.timeout.connect(self.UpdateDisplay)
+        self.checkTimer.start(30)
+
+        self._displayState = None
+
+        self.UpdateDisplay()
+
+    def sizeHint(self) -> QSize:
+        return QSize(30, 30)
+
+    def minimumSizeHint(self) -> QSize:
+        return QSize(30, 30)
+
+    def resizeEvent(self, event) -> None:
+        self.setMinimumHeight(self.width())
+        super().resizeEvent(event)
+
+    def ToggleState(self):
+        r = UIMaster.Instance().rig
+        r.SetSolenoidState(self.number, not r.GetSolenoidState(self.number))
+        r.FlushStates()
+        self.UpdateDisplay()
+
+    def UpdateDisplay(self):
+        s = UIMaster.Instance().rig.GetSolenoidState(self.number)
+        if s == self._displayState:
+            return
+        self._displayState = s
+        if UIMaster.Instance().rig.GetSolenoidState(self.number):
+            self.setStyleSheet(solenoidOnStyle)
         else:
-            [t.setVisible(True) for t in self.children() if isinstance(t, QWidget)]
-            self.nameLabel.setText("Name: %s" % self._currentDevice.livePortInfo.name)
-            self.descriptionLabel.setText(("Port: %s\n"
-                                           "Serial Number: %s\n"
-                                           "Description: %s\n") % (self._currentDevice.livePortInfo.device,
-                                                                   self._currentDevice.livePortInfo.serial_number,
-                                                                   self._currentDevice.livePortInfo.description))
+            self.setStyleSheet(solenoidOffStyle)
 
-            self.invertedACheckbox.setChecked(self._currentDevice.polarities[0])
-            self.invertedBCheckbox.setChecked(self._currentDevice.polarities[1])
-            self.invertedCCheckbox.setChecked(self._currentDevice.polarities[2])
 
-            self.enabledCheckbox.setChecked(self._currentDevice.enabled)
+class SetAllButton(QPushButton):
+    def __init__(self, text, n, stateToSet, scale=True):
+        super().__init__()
+        self.scale = scale
+        self.numbers = n
+        self.stateToSet = stateToSet
+        if stateToSet:
+            self.setText(text)
+            self.setStyleSheet(solenoidOnStyle)
+        else:
+            self.setText(text)
+            self.setStyleSheet(solenoidOffStyle)
+        self.pressed.connect(self.Perform)
 
-            self.startNumber.setValue(self._currentDevice.startNumber)
+    def sizeHint(self) -> QSize:
+        return QSize(30, 30)
 
-        self.saveButton.setEnabled(False)
-        self._modified = False
+    def minimumSizeHint(self) -> QSize:
+        return QSize(30, 30)
 
-    def Save(self):
-        self._currentDevice.enabled = self.enabledCheckbox.isChecked()
-        self._currentDevice.polarities[0] = self.invertedACheckbox.isChecked()
-        self._currentDevice.polarities[1] = self.invertedBCheckbox.isChecked()
-        self._currentDevice.polarities[2] = self.invertedCCheckbox.isChecked()
-        self._currentDevice.startNumber = self.startNumber.value()
-        self._modified = False
-        self.saveButton.setEnabled(False)
-        try:
-            AppGlobals.UpdateRig(True)
-        except Exception as e:
-            QMessageBox.critical(self, "Rig Device Error!", str(e))
+    def resizeEvent(self, event) -> None:
+        if self.scale:
+            self.setMinimumHeight(self.width())
+        super().resizeEvent(event)
 
-    def _Modified(self):
-        self._modified = True
-        self.saveButton.setEnabled(True)
+    def Perform(self):
+        r = UIMaster.Instance().rig
+        for i in self.numbers:
+            r.SetSolenoidState(i, self.stateToSet)
+        r.FlushStates()

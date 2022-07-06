@@ -1,15 +1,13 @@
-from PySide6.QtWidgets import QMainWindow, QDockWidget, QTabWidget, QWidget, QMenuBar
+from PySide6.QtWidgets import QMainWindow, QDockWidget, QTabWidget, QWidget, QMenuBar, QSizePolicy
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon, QKeySequence
 from UI.ChipView import ChipView
-from UI.StylesheetLoader import StylesheetLoader
+from UI.RigView import RigView
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-
-        StylesheetLoader.RegisterWidget(self)
 
         self.chipEditor = ChipView()
 
@@ -18,9 +16,14 @@ class MainWindow(QMainWindow):
 
         self.setTabPosition(Qt.AllDockWidgetAreas, QTabWidget.TabPosition.North)
 
-        self.resize(500, 500)
+        self.resize(1600, 900)
+
+        self.rigView = RigView()
+        self.dockPositions = {self.rigView: Qt.RightDockWidgetArea}
 
         self.BuildMenu()
+
+        self.ShowWidget(self.rigView)
 
     def BuildMenu(self):
         menuBar = QMenuBar()
@@ -39,6 +42,10 @@ class MainWindow(QMainWindow):
 
         exitAction = fileMenu.addAction("Exit")
 
+        viewMenu = menuBar.addMenu("View")
+        viewRigAction = viewMenu.addAction("Rig")
+        viewRigAction.triggered.connect(lambda: self.ShowWidget(self.rigView))
+
         self.setMenuBar(menuBar)
 
     def ShowWidget(self, widget: QWidget):
@@ -47,7 +54,7 @@ class MainWindow(QMainWindow):
 
         dock = QDockWidget()
         dock.setWindowTitle(widget.objectName())
-        dock.setAllowedAreas(Qt.AllDockWidgetAreas)
+        dock.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
         dock.setWidget(widget)
         dock.setFeatures(QDockWidget.DockWidgetClosable | QDockWidget.DockWidgetMovable)
         self.addDockWidget(self.dockPositions[widget], dock)

@@ -7,8 +7,27 @@ from serial.tools.list_ports_common import ListPortInfo
 
 class Rig:
     def __init__(self):
-        super().__init__()
         self.solenoidStates: Dict[int, bool] = {}
+        self.allDevices: List[Device] = [DummyDevice(), DummyDevice()]
+
+    def RescanForDevices(self):
+        portInfos = RescanPorts()
+
+        for device in self.allDevices:
+            match = next([p for p in portInfos if p.serial_number == device.portInfo.serial_number],
+                         None)
+            if match is not None:
+                device.portInfo = match
+                device.available = True
+            else:
+                device.available = False
+                device.Disconnect()
+
+        for portInfo in portInfos:
+            if portInfo.serial_number not in [d.portInfo.serial_number for d in self.allDevices]:
+                newDevice = Device()
+                newDevice.portInfo = portInfo
+                newDevice.available = True
 
     def SetSolenoidState(self, number: int, state: bool):
         self.solenoidStates[number] = state
@@ -18,6 +37,19 @@ class Rig:
             self.solenoidStates[number] = False
         return self.solenoidStates[number]
 
+    def FlushStates(self):
+        for device in self.allDevices:
+            device.SetSolenoids(self.solenoidStates)
+
+    def GetConnectedSolenoidNumbers(self):
+        numbers = []
+        for d in self.allDevices:
+            if d.enabled and d.IsConnected():
+                for n in range(d.startNumber, d.startNumber + 24):
+                    if n not in numbers:
+                        numbers.append(n)
+        return sorted(numbers)
+
 
 class Device:
     def __init__(self):
@@ -25,22 +57,46 @@ class Device:
         self.startNumber = 0
         self.polarities = [False, False, False]
         self.enabled = False
+        self.available = False
         self.serialPort: Optional[Serial] = None
+        self.solenoidStates = [False for _ in range(24)]
 
     def IsConnected(self):
         return self.serialPort is not None and self.serialPort.is_open
 
-    def SetPinStates(self, solenoidStates: List[bool]):
-        if not self.IsConnected():
+    def __getstate__(self):
+        d = self.__dict__.copy()
+        d['serialPort'] = None
+        d['available'] = False
+        return d
+
+    def __setstate__(self, state):
+        self.__dict__ = state
+
+    def SetSolenoids(self, solenoidStates: Dict[int, bool]):
+        if not self.enabled or not self.IsConnected():
             return
+
+        for i in range(self.startNumber, self.startNumber + 24):
+            if i in solenoidStates and \
+                    solenoidStates[i] != self.solenoidStates[i - self.startNumber]:
+                self.solenoidStates[i - self.startNumber] = solenoidStates[i]
+
         polarizedStates = [state != self.polarities[int(i / 8)] for (i, state) in
-                           enumerate(solenoidStates)]
+                           enumerate(self.solenoidStates)]
         aState = ConvertPinStatesToBytes(polarizedStates[0:8])
         bState = ConvertPinStatesToBytes(polarizedStates[8:16])
         cState = ConvertPinStatesToBytes(polarizedStates[16:24])
-        self.serialPort.write(b'A' + aState)
-        self.serialPort.write(b'B' + bState)
-        self.serialPort.write(b'C' + cState)
+        self.Write(b'A' + aState)
+        self.Write(b'B' + bState)
+        self.Write(b'C' + cState)
+        self.Flush()
+
+    def Write(self, data):
+        self.serialPort.write(data)
+
+    def Flush(self):
+        self.serialPort.flush()
 
     def Connect(self):
         if self.IsConnected():
@@ -49,11 +105,32 @@ class Device:
         self.serialPort.write(b'!A' + bytes([0]))
         self.serialPort.write(b'!B' + bytes([0]))
         self.serialPort.write(b'!C' + bytes([0]))
+        self.serialPort.flush()
 
     def Disconnect(self):
         if self.IsConnected():
             self.serialPort.close()
-            self.serialPort = None
+        self.serialPort = None
+
+    def Summary(self):
+        return """Name: {}
+        Device: {}
+        Serial Number: {}
+        Location: {}
+        Manufacturer: {}
+        Product: {}
+        Interface: {}
+        Description: {}
+        HWID: {}
+        """.format(self.portInfo.name,
+                   self.portInfo.device,
+                   self.portInfo.serial_number,
+                   self.portInfo.location,
+                   self.portInfo.manufacturer,
+                   self.portInfo.product,
+                   self.portInfo.interface,
+                   self.portInfo.description,
+                   self.portInfo.hwid).replace("    ", "\t").replace("\t", "")
 
 
 def ConvertPinStatesToBytes(state: List[bool]):
@@ -65,12 +142,45 @@ def ConvertPinStatesToBytes(state: List[bool]):
 
 
 def RescanPorts():
-    foundDevices = comports()
-    return foundDevices
+    return comports()
 
 
-def UpdateDevicesFromRig(rig: Rig, devices: List[Device]):
-    for device in devices:
-        if device.enabled and device.IsConnected():
-            device.SetPinStates([rig.GetSolenoidState(i) for i in
-                                 range(device.startNumber, device.startNumber + 24)])
+class DummyDevice(Device):
+    class DummyPortInfo:
+        def __init__(self):
+            self.name = "Dummy"
+            self.device = "DEVICE"
+            self.serial_number = "XXXXXX"
+            self.location = "USB0"
+            self.manufacturer = "A dummy."
+            self.description = "Some info."
+            self.product = "Dummy product."
+            self.interface = "USB"
+            self.hwid = "What goes here?"
+
+    def __init__(self):
+        super().__init__()
+        self.portInfo = DummyDevice.DummyPortInfo()
+        self.available = True
+        self.connected = False
+
+    def IsConnected(self):
+        return self.connected
+
+    def Connect(self):
+        print("Connecting")
+        self.connected = True
+
+    def Flush(self):
+        if not self.connected:
+            print("ERROR: Not connected!")
+        print("Flushing")
+
+    def Disconnect(self):
+        print("Disconnecting")
+        self.connected = False
+
+    def Write(self, data):
+        if not self.connected:
+            print("ERROR: Not connected!")
+        print(data)
