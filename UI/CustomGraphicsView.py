@@ -1,8 +1,8 @@
 from typing import List, Tuple, Optional
 from PySide6.QtWidgets import QGraphicsView, QGraphicsScene, QWidget, QGraphicsProxyWidget, \
-    QGraphicsRectItem
+    QGraphicsRectItem, QVBoxLayout, QLabel, QFrame
 from PySide6.QtGui import QPen, QColor, QPainter, QBrush, QWheelEvent, QTransform, QGuiApplication, \
-    QPalette
+    QPalette, QKeyEvent
 from PySide6.QtCore import Qt, QPointF, QSizeF, QRectF, QLineF, QRect, QMarginsF, QPoint
 from enum import Enum, auto
 
@@ -16,20 +16,33 @@ class CustomGraphicsViewState(Enum):
 
 
 class CustomGraphicsViewItem:
-    def __init__(self, widget: QWidget):
-        self.widget = widget
+    def __init__(self, name: str = ""):
         self.graphicsProxy = QGraphicsProxyWidget()
-        self.graphicsProxy.setWidget(widget)
         self.borderRectItem = QGraphicsRectItem()
         self.borderWidth = 5
         self.borderVisible = True
         self.borderColor = QColor(255, 255, 255)
+        self.inspectorWidget = QWidget()
+        self.inspectorWidget.setLayout(QVBoxLayout())
+        self.nameLabel = QLabel("<b><u>" + name + "</u></b>")
+        self.inspectorWidget.layout().addWidget(self.nameLabel)
+        self._oldWidget = None
 
     def UpdateGeometry(self):
         self.borderRectItem.setPen(QPen(self.borderColor, self.borderWidth, j=Qt.MiterJoin))
         self.borderRectItem.setRect(
             QRectF(self.graphicsProxy.scenePos(), self.graphicsProxy.size()))
         self.borderRectItem.setVisible(self.borderVisible)
+
+    def SetWidget(self, w: QWidget):
+        self.graphicsProxy.setWidget(w)
+        self.UpdateGeometry()
+
+    def SetInspector(self, w: QWidget):
+        if self._oldWidget is not None:
+            self.inspectorWidget.layout().removeWidget(self._oldWidget)
+        self.inspectorWidget.layout().addWidget(w)
+        self._oldWidget = w
 
     def SetRect(self, rect: QRectF):
         self.graphicsProxy.setPos(rect.topLeft())
@@ -39,34 +52,47 @@ class CustomGraphicsViewItem:
     def SetPosition(self, point: QPointF):
         self.graphicsProxy.setPos(point)
 
+    def Remove(self) -> bool:
+        return True
+
+    def Duplicate(self):
+        return CustomGraphicsViewItem()
+
 
 class CustomGraphicsView(QGraphicsView):
     def __init__(self):
         super().__init__()
 
-        scene = QGraphicsScene()
-        self.setScene(scene)
-
+        # Set up view
+        self.setScene(QGraphicsScene())
         self.setMouseTracking(True)
+        self.setRenderHints(
+            QPainter.Antialiasing | QPainter.SmoothPixmapTransform | QPainter.TextAntialiasing |
+            QPainter.VerticalSubpixelPositioning)
 
+        # State
         self.viewOffset = QPointF(0, 0)
         self.zoom = 1
+        self.state = CustomGraphicsViewState.IDLE
+        self.allItems: List[CustomGraphicsViewItem] = []
+        self.selectedItems: List[CustomGraphicsViewItem] = []
+        self.isInteractive = True
 
+        # Grid settings
         self.gridSpacing = QSizeF(50, 50)
         self.gridThickness = 1
         self.gridZoomThreshold = 0.25
         self.showGrid = True
 
+        # Mouse control and state
         self.scrollSensitivity = 1 / 1000
-
-        self.state = CustomGraphicsViewState.IDLE
-
         self.mouseDeltaScenePosition = QPointF()
         self.mouseScenePosition = QPointF()
         self._lastMouseViewPosition = QPoint()
         self.itemUnderMouse: Optional[CustomGraphicsViewItem] = None
         self.resizeHandleIndexUnderMouse = -1
 
+        # Selection box and transformation handles
         self.selectionBoxRectItem = QGraphicsRectItem()
         self.selectionBoxRectItem.setBrush(Qt.NoBrush)
         self.selectionBoxRectScreenSize = 2
@@ -86,11 +112,34 @@ class CustomGraphicsView(QGraphicsView):
         self.resizeHandles = [QGraphicsRectItem() for _ in range(8)]
         [self.scene().addItem(h) for h in self.resizeHandles]
 
-        self.allItems: List[CustomGraphicsViewItem] = []
-        self.selectedItems: List[CustomGraphicsViewItem] = []
-        self.isInteractive = True
+        # Inspector
+        self.inspectorPanel = QFrame(self)
+        self.inspectorPanel.setFixedWidth(200)
+        self.inspectorPanel.setMinimumHeight(300)
+        self.inspectorPanel.setFrameShape(QFrame.Box)
+        self.inspectorPanel.setAutoFillBackground(True)
+        inspectorLayout = QVBoxLayout()
+        inspectorLayout.setAlignment(Qt.AlignTop)
+        self.inspectorPanel.setLayout(inspectorLayout)
+        label = QLabel("<b>Inspector</b>")
+        label.setAlignment(Qt.AlignCenter)
+        inspectorLayout.addWidget(label)
+        inspectorLayout.addWidget(BorderSpacer(False))
+        self.noneSelectedLabel = QLabel("No objects selected.")
+        inspectorLayout.addWidget(self.noneSelectedLabel)
+        self.inspectorLayout = QVBoxLayout()
+        inspectorLayout.addLayout(self.inspectorLayout)
 
+        # Initialization
         self.UpdateViewMatrix()
+        self.UpdateItemVisuals()
+
+    def Clear(self):
+        for i in self.allItems:
+            self.scene().removeItem(i.borderRectItem)
+            self.scene().removeItem(i.graphicsProxy)
+        self.selectedItems = []
+        self.UpdateInspector()
         self.UpdateItemVisuals()
 
     def UpdateViewMatrix(self):
@@ -98,11 +147,6 @@ class CustomGraphicsView(QGraphicsView):
         transform.scale(self.zoom, self.zoom)
         self.setTransform(transform)
         self.setSceneRect(QRectF(self.viewOffset, QSizeF()))
-
-    def wheelEvent(self, event: QWheelEvent):
-        self.UpdateMouseInfo(event.position().toPoint())
-        self.UpdateZoom(self.mouseScenePosition,
-                        self.zoom + float(event.angleDelta().y()) * self.scrollSensitivity)
 
     def UpdateZoom(self, scenePositionAnchor: QPointF, newZoom: float):
         anchorScreenSpace = self.mapFromScene(scenePositionAnchor)
@@ -113,136 +157,21 @@ class CustomGraphicsView(QGraphicsView):
         self.UpdateViewMatrix()
         self.UpdateItemVisuals()
 
-    def mousePressEvent(self, event):
-        self.UpdateMouseInfo(event.pos())
-        if self.state != CustomGraphicsViewState.IDLE:
-            return
-        if event.button() == Qt.LeftButton:
-            if QGuiApplication.queryKeyboardModifiers() == Qt.ShiftModifier:
-                if self.itemUnderMouse is not None:
-                    if self.itemUnderMouse in self.selectedItems:
-                        self.selectedItems.remove(self.itemUnderMouse)
-                    else:
-                        self.selectedItems.append(self.itemUnderMouse)
-            else:
-                if self.resizeHandleIndexUnderMouse >= 0:
-                    self._transformResizeHandleIndex = self.resizeHandleIndexUnderMouse
-                    self._transformStartRects = [x.graphicsProxy.sceneBoundingRect() for x in
-                                                 self.selectedItems]
-                    self._transformStartMousePos = self.mouseScenePosition
-                    self.state = CustomGraphicsViewState.RESIZING
-                elif self.itemUnderMouse is not None:
-                    if self.itemUnderMouse not in self.selectedItems:
-                        self.selectedItems = [self.itemUnderMouse]
-                    self.state = CustomGraphicsViewState.MOVING
-                    self._transformStartRects = [x.graphicsProxy.sceneBoundingRect() for x in
-                                                 self.selectedItems]
-                    self._transformStartMousePos = self.mouseScenePosition
-                else:
-                    self.selectedItems = []
-            self.UpdateItemVisuals()
-        if event.button() == Qt.RightButton:
-            self.state = CustomGraphicsViewState.PANNING
-
-        self.UpdateCursor()
-        super().mousePressEvent(event)
-
-    def mouseReleaseEvent(self, event):
-        self.UpdateMouseInfo(event.pos())
-
-        if self.state == CustomGraphicsViewState.PANNING and event.button() == Qt.RightButton:
-            self.state = CustomGraphicsViewState.IDLE
-        elif self.state == CustomGraphicsViewState.MOVING and event.button() == Qt.LeftButton:
-            self.state = CustomGraphicsViewState.IDLE
-        elif self.state == CustomGraphicsViewState.RESIZING and event.button() == Qt.LeftButton:
-            self.state = CustomGraphicsViewState.IDLE
-        self.UpdateCursor()
-        super().mouseReleaseEvent(event)
-
-    def mouseMoveEvent(self, event):
-        self.UpdateMouseInfo(event.pos())
-        if self.state == CustomGraphicsViewState.PANNING:
-            self.viewOffset -= self.mouseDeltaScenePosition
-            self.UpdateViewMatrix()
-        elif self.state == CustomGraphicsViewState.MOVING:
-            self.DoMove()
-        elif self.state == CustomGraphicsViewState.RESIZING:
-            self.DoResize()
-        else:
-            self.UpdateItemVisuals()
-        self.UpdateCursor()
-        super().mouseMoveEvent(event)
-
-    def DoMove(self):
-        def Snap(x, div):
-            return round(float(x) / div) * div
-
-        def SnapPoint(p: QPointF):
-            return QPointF(Snap(p.x(), self.gridSpacing.width()),
-                           Snap(p.y(), self.gridSpacing.height()))
-
-        moveDelta = self.mouseScenePosition - self._transformStartMousePos
-        for startRect, item in zip(self._transformStartRects, self.selectedItems):
-            newRect = startRect.translated(moveDelta)
-            snapOffsets = (SnapPoint(newRect.topLeft()) - newRect.topLeft(),
-                           SnapPoint(newRect.topRight()) - newRect.topRight(),
-                           SnapPoint(newRect.bottomLeft()) - newRect.bottomLeft(),
-                           SnapPoint(newRect.bottomRight()) - newRect.bottomRight())
-            magnitudes = [d.x() ** 2 + d.y() ** 2 for d in snapOffsets]
-            minOffset = min(zip(magnitudes, snapOffsets), key=lambda x: x[0])[1]
-            item.graphicsProxy.setPos(newRect.topLeft() + minOffset)
-        self.UpdateItemVisuals()
-
-    def DoResize(self):
-        def Snap(x, div):
-            return round(float(x) / div) * div
-
-        def SnapPoint(p: QPointF):
-            return QPointF(Snap(p.x(), self.gridSpacing.width()),
-                           Snap(p.y(), self.gridSpacing.height()))
-
-        resizeDelta = self.mouseScenePosition - self._transformStartMousePos
-        initialRect = self._transformStartRects[0]
-        for r in self._transformStartRects:
-            initialRect = initialRect.united(r)
-        newRect = QRectF(initialRect)
-        if self._transformResizeHandleIndex == 0:
-            newRect.setTopLeft(SnapPoint(newRect.topLeft() + resizeDelta))
-        elif self._transformResizeHandleIndex == 2:
-            newRect.setTopRight(SnapPoint(newRect.topRight() + resizeDelta))
-        elif self._transformResizeHandleIndex == 5:
-            newRect.setBottomLeft(SnapPoint(newRect.bottomLeft() + resizeDelta))
-        elif self._transformResizeHandleIndex == 7:
-            newRect.setBottomRight(SnapPoint(newRect.bottomRight() + resizeDelta))
-        elif self._transformResizeHandleIndex == 1:
-            newRect.setTop(Snap(newRect.top() + resizeDelta.y(), self.gridSpacing.height()))
-        elif self._transformResizeHandleIndex == 6:
-            newRect.setBottom(Snap(newRect.bottom() + resizeDelta.y(), self.gridSpacing.height()))
-        elif self._transformResizeHandleIndex == 3:
-            newRect.setLeft(Snap(newRect.left() + resizeDelta.x(), self.gridSpacing.width()))
-        elif self._transformResizeHandleIndex == 4:
-            newRect.setRight(Snap(newRect.right() + resizeDelta.x(), self.gridSpacing.width()))
-        newRect = newRect.normalized()
-
-        def Transform(p: QPointF):
-            return QPointF(
-                ((p.x() - initialRect.x()) / initialRect.width()) * newRect.width() + newRect.x(),
-                ((p.y() - initialRect.y()) / initialRect.height()) * newRect.height() + newRect.y())
-
-        for (r, i) in zip(self._transformStartRects, self.selectedItems):
-            i.SetRect(QRectF(Transform(r.topLeft()), Transform(r.bottomRight())))
-        self.UpdateItemVisuals()
-
-    def DrawDebugRect(self, rect, id: int, color: QColor):
-        try:
-            self._drawnRects
-        except:
-            self._drawnRects = {}
-        if id not in self._drawnRects:
-            self._drawnRects[id] = QGraphicsRectItem()
-            self._drawnRects[id].setPen(QPen(color, 1))
-            self.scene().addItem(self._drawnRects[id])
-        self._drawnRects[id].setRect(rect)
+    def UpdateInspector(self):
+        self.inspectorPanel.setVisible(self.isInteractive)
+        self.noneSelectedLabel.setVisible(len(self.selectedItems) == 0)
+        for i in range(self.inspectorLayout.count()):
+            w = self.inspectorLayout.takeAt(0)
+            if w.widget():
+                w.widget().setVisible(False)
+        for i in self.selectedItems:
+            if i.inspectorWidget is not None:
+                self.inspectorLayout.addWidget(i.inspectorWidget)
+                i.inspectorWidget.setVisible(True)
+        self.inspectorPanel.adjustSize()
+        size = QPoint(self.inspectorPanel.rect().width(), self.inspectorPanel.rect().height())
+        padding = 20
+        self.inspectorPanel.move(self.rect().bottomRight() - size - QPoint(padding, padding))
 
     def UpdateMouseInfo(self, mousePosition: QPoint):
         self.mouseScenePosition = self.mapToScene(mousePosition)
@@ -251,7 +180,7 @@ class CustomGraphicsView(QGraphicsView):
         self._lastMouseViewPosition = mousePosition
 
         self.itemUnderMouse = None
-        for item in sorted(self.allItems, key=lambda x: x.graphicsProxy.zValue()):
+        for item in sorted(self.allItems, key=lambda x: x.graphicsProxy.zValue(), reverse=True):
             if item.borderRectItem.contains(self.mouseScenePosition):
                 self.itemUnderMouse = item
                 break
@@ -302,40 +231,88 @@ class CustomGraphicsView(QGraphicsView):
             if cursorShape is not None:
                 QGuiApplication.setOverrideCursor(cursorShape)
 
-    def drawBackground(self, painter: QPainter, rect: QRectF):
-        if self.backgroundBrush().color() != self.palette().color(QPalette.Midlight):
-            self.setBackgroundBrush(self.palette().color(QPalette.Midlight))
-        super().drawBackground(painter, rect)
+    def DoMove(self):
+        def Snap(x, div):
+            return round(float(x) / div) * div
 
-        if self.zoom <= self.gridZoomThreshold or not self.showGrid:
-            return
+        def SnapPoint(p: QPointF):
+            return QPointF(Snap(p.x(), self.gridSpacing.width()),
+                           Snap(p.y(), self.gridSpacing.height()))
 
-        painter.setPen(QPen(self.palette().color(QPalette.Dark), self.gridThickness))
+        moveDelta = self.mouseScenePosition - self._transformStartMousePos
+        for startRect, item in zip(self._transformStartRects, self.selectedItems):
+            newRect = startRect.translated(moveDelta)
+            snapOffsets = (SnapPoint(newRect.topLeft()) - newRect.topLeft(),
+                           SnapPoint(newRect.topRight()) - newRect.topRight(),
+                           SnapPoint(newRect.bottomLeft()) - newRect.bottomLeft(),
+                           SnapPoint(newRect.bottomRight()) - newRect.bottomRight())
+            magnitudes = [d.x() ** 2 + d.y() ** 2 for d in snapOffsets]
+            minOffset = min(zip(magnitudes, snapOffsets), key=lambda x: x[0])[1]
+            item.SetRect(newRect.translated(minOffset))
+        self.UpdateItemVisuals()
 
-        lines = []
-        if self.gridSpacing.width() > 0:
-            xStart = rect.left() - rect.left() % self.gridSpacing.width()
-            while xStart <= rect.right():
-                line = QLineF(xStart, rect.bottom(), xStart, rect.top())
-                lines.append(line)
-                xStart = xStart + self.gridSpacing.width()
+    def DoResize(self):
+        def Snap(x, div):
+            return round(float(x) / div) * div
 
-        if self.gridSpacing.height() > 0:
-            yStart = rect.top() - rect.top() % self.gridSpacing.height()
-            while yStart <= rect.bottom():
-                line = QLineF(rect.left(), yStart, rect.right(), yStart)
-                lines.append(line)
-                yStart = yStart + self.gridSpacing.height()
+        def SnapPoint(p: QPointF):
+            return QPointF(Snap(p.x(), self.gridSpacing.width()),
+                           Snap(p.y(), self.gridSpacing.height()))
 
-        painter.drawLines(lines)
+        resizeDelta = self.mouseScenePosition - self._transformStartMousePos
+        initialRect = self._transformStartRects[0]
+        for r in self._transformStartRects:
+            initialRect = initialRect.united(r)
+        newRect = QRectF(initialRect)
+        if self._transformResizeHandleIndex == 0:
+            newRect.setTopLeft(SnapPoint(newRect.topLeft() + resizeDelta))
+        elif self._transformResizeHandleIndex == 2:
+            newRect.setTopRight(SnapPoint(newRect.topRight() + resizeDelta))
+        elif self._transformResizeHandleIndex == 5:
+            newRect.setBottomLeft(SnapPoint(newRect.bottomLeft() + resizeDelta))
+        elif self._transformResizeHandleIndex == 7:
+            newRect.setBottomRight(SnapPoint(newRect.bottomRight() + resizeDelta))
+        elif self._transformResizeHandleIndex == 1:
+            newRect.setTop(Snap(newRect.top() + resizeDelta.y(), self.gridSpacing.height()))
+        elif self._transformResizeHandleIndex == 6:
+            newRect.setBottom(Snap(newRect.bottom() + resizeDelta.y(), self.gridSpacing.height()))
+        elif self._transformResizeHandleIndex == 3:
+            newRect.setLeft(Snap(newRect.left() + resizeDelta.x(), self.gridSpacing.width()))
+        elif self._transformResizeHandleIndex == 4:
+            newRect.setRight(Snap(newRect.right() + resizeDelta.x(), self.gridSpacing.width()))
+        newRect = newRect.normalized()
 
-    def AddItem(self, item: CustomGraphicsViewItem):
+        def Transform(p: QPointF):
+            return QPointF(
+                ((p.x() - initialRect.x()) / initialRect.width()) * newRect.width() + newRect.x(),
+                ((p.y() - initialRect.y()) / initialRect.height()) * newRect.height() + newRect.y())
+
+        for (r, i) in zip(self._transformStartRects, self.selectedItems):
+            i.SetRect(QRectF(Transform(r.topLeft()), Transform(r.bottomRight())))
+        self.UpdateItemVisuals()
+
+    def AddItem(self, item: CustomGraphicsViewItem, center=False, select=False):
         self.allItems.append(item)
         self.scene().addItem(item.borderRectItem)
         self.scene().addItem(item.graphicsProxy)
         z = self.GetMaxItemZValue()
         item.borderRectItem.setZValue(z + 1)
         item.graphicsProxy.setZValue(z + 1)
+        if center:
+            r = item.graphicsProxy.sceneBoundingRect()
+            r.moveCenter(self.viewOffset)
+            item.SetRect(r)
+        if select:
+            self.SelectItems([item])
+        self.UpdateItemVisuals()
+
+    def RemoveItem(self, item: CustomGraphicsViewItem):
+        self.allItems.remove(item)
+        self.scene().removeItem(item.borderRectItem)
+        self.scene().removeItem(item.graphicsProxy)
+        self.SelectItems([i for i in self.selectedItems if i != item])
+        self.UpdateInspector()
+        self.UpdateItemVisuals()
 
     def GetMaxItemZValue(self):
         return max([x.graphicsProxy.zValue() for x in self.allItems]) if len(
@@ -343,9 +320,20 @@ class CustomGraphicsView(QGraphicsView):
 
     def SetInteractive(self, interactive: bool):
         self.isInteractive = interactive
+        self.showGrid = interactive
         if not interactive:
-            self.selectedItems = []
-            self.UpdateItemVisuals()
+            self.SelectItems([])
+        self.UpdateInspector()
+        self.setFocus()
+        self.scene().update()
+
+    def SelectItems(self, items: List[CustomGraphicsViewItem]):
+        self.selectedItems = items
+        self.UpdateInspector()
+        self.UpdateItemVisuals()
+
+    def IsInteractive(self):
+        return self.isInteractive
 
     def UpdateItemVisuals(self):
         borderWidthSelected = self.mapToScene(
@@ -403,3 +391,126 @@ class CustomGraphicsView(QGraphicsView):
         else:
             self.selectionBoxRectItem.setVisible(False)
             [h.setVisible(False) for h in self.resizeHandles]
+
+    # Events
+    def wheelEvent(self, event: QWheelEvent):
+        self.UpdateMouseInfo(event.position().toPoint())
+        self.UpdateZoom(self.mouseScenePosition,
+                        self.zoom + float(event.angleDelta().y()) * self.scrollSensitivity)
+
+    def resizeEvent(self, event) -> None:
+        super().resizeEvent(event)
+        self.UpdateInspector()
+
+    def keyPressEvent(self, event: QKeyEvent):
+        if self.isInteractive:
+            if event.key() == Qt.Key_Delete:
+                for item in self.selectedItems.copy():
+                    if item.Remove():
+                        self.RemoveItem(item)
+        else:
+            super().keyPressEvent(event)
+
+    def mousePressEvent(self, event):
+        self.UpdateMouseInfo(event.pos())
+        if self.state != CustomGraphicsViewState.IDLE:
+            return
+        if event.button() == Qt.LeftButton and self.isInteractive:
+            if QGuiApplication.queryKeyboardModifiers() == Qt.ShiftModifier:
+                if self.itemUnderMouse is not None:
+                    if self.itemUnderMouse in self.selectedItems:
+                        self.SelectItems(
+                            [i for i in self.selectedItems if i != self.itemUnderMouse])
+                    else:
+                        self.SelectItems(self.selectedItems + [self.itemUnderMouse])
+            else:
+                if self.resizeHandleIndexUnderMouse >= 0:
+                    self._transformResizeHandleIndex = self.resizeHandleIndexUnderMouse
+                    self._transformStartRects = [x.graphicsProxy.sceneBoundingRect() for x in
+                                                 self.selectedItems]
+                    self._transformStartMousePos = self.mouseScenePosition
+                    self.state = CustomGraphicsViewState.RESIZING
+                elif self.itemUnderMouse is not None:
+                    if self.itemUnderMouse not in self.selectedItems:
+                        self.SelectItems([self.itemUnderMouse])
+                    self.state = CustomGraphicsViewState.MOVING
+                    self._transformStartRects = [x.graphicsProxy.sceneBoundingRect() for x in
+                                                 self.selectedItems]
+                    self._transformStartMousePos = self.mouseScenePosition
+                else:
+                    self.SelectItems([])
+        elif event.button() == Qt.RightButton:
+            self.state = CustomGraphicsViewState.PANNING
+
+        self.UpdateCursor()
+        if not self.isInteractive:
+            super().mousePressEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        self.UpdateMouseInfo(event.pos())
+
+        if self.state == CustomGraphicsViewState.PANNING and event.button() == Qt.RightButton:
+            self.state = CustomGraphicsViewState.IDLE
+        elif self.state == CustomGraphicsViewState.MOVING and event.button() == Qt.LeftButton:
+            self.state = CustomGraphicsViewState.IDLE
+        elif self.state == CustomGraphicsViewState.RESIZING and event.button() == Qt.LeftButton:
+            self.state = CustomGraphicsViewState.IDLE
+        self.UpdateCursor()
+        if not self.isInteractive:
+            super().mouseReleaseEvent(event)
+
+    def mouseMoveEvent(self, event):
+        self.UpdateMouseInfo(event.pos())
+        if self.state == CustomGraphicsViewState.PANNING:
+            self.viewOffset -= self.mouseDeltaScenePosition
+            self.UpdateViewMatrix()
+        elif self.state == CustomGraphicsViewState.MOVING:
+            self.DoMove()
+        elif self.state == CustomGraphicsViewState.RESIZING:
+            self.DoResize()
+        elif self.state == CustomGraphicsViewState.BAND_SELECTING:
+            pass
+        self.UpdateCursor()
+        if not self.isInteractive:
+            super().mouseMoveEvent(event)
+
+    def mouseDoubleClickEvent(self, event) -> None:
+        if not self.isInteractive:
+            super().mouseDoubleClickEvent(event)
+
+    def drawBackground(self, painter: QPainter, rect: QRectF):
+        if self.backgroundBrush().color() != self.palette().color(QPalette.Light):
+            self.setBackgroundBrush(self.palette().color(QPalette.Light))
+        super().drawBackground(painter, rect)
+
+        if self.zoom <= self.gridZoomThreshold or not self.showGrid:
+            return
+
+        painter.setPen(QPen(self.palette().color(QPalette.Midlight), self.gridThickness))
+
+        lines = []
+        if self.gridSpacing.width() > 0:
+            xStart = rect.left() - rect.left() % self.gridSpacing.width()
+            while xStart <= rect.right():
+                line = QLineF(xStart, rect.bottom(), xStart, rect.top())
+                lines.append(line)
+                xStart = xStart + self.gridSpacing.width()
+
+        if self.gridSpacing.height() > 0:
+            yStart = rect.top() - rect.top() % self.gridSpacing.height()
+            while yStart <= rect.bottom():
+                line = QLineF(rect.left(), yStart, rect.right(), yStart)
+                lines.append(line)
+                yStart = yStart + self.gridSpacing.height()
+
+        painter.drawLines(lines)
+
+
+class BorderSpacer(QLabel):
+    def __init__(self, vertical):
+        super().__init__()
+        self.setStyleSheet("""background-color: #999999""")
+        if vertical:
+            self.setFixedWidth(1)
+        else:
+            self.setFixedHeight(1)

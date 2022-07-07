@@ -1,5 +1,7 @@
 from Data.Rig import Rig
 from Data.Chip import Chip
+from typing import Optional
+from pathlib import Path
 
 
 class UIMaster:
@@ -9,6 +11,8 @@ class UIMaster:
         super().__init__()
         self.rig = Rig()
         self.currentChip = Chip()
+        self.modified = False
+        self.currentChipPath: Optional[Path] = None
 
     @staticmethod
     def Instance():

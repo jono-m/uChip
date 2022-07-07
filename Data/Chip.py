@@ -5,36 +5,32 @@ from Data.Program import ProgramInstance, ProgramSpecification, Parameter
 class Valve:
     def __init__(self):
         self.name = ""
-        self.position_x = 0
-        self.position_y = 0
+        self.rect = [0, 0, 0, 0]
         self.solenoidNumber = 0
+        self.textSize = 12
 
 
 class ProgramPreset:
     def __init__(self):
         self.name = ""
-        self.position_x = 0
-        self.position_y = 0
+        self.rect = [0, 0, 0, 0]
         self.instance: Optional[ProgramInstance] = None
         self.parameterVisibility: Dict[Parameter, bool] = {}
         self.showDescription = False
+        self.textSize = 12
 
 
-class Annotation:
+class Text:
     def __init__(self):
-        self.position_x = 0
-        self.position_y = 0
-        self.text = ""
-        self.size = 1
+        self.rect = [0, 0, 0, 0]
+        self.text = "New annotation"
+        self.textSize = 12
 
 
 class Image:
     def __init__(self):
-        self.position_x = 0
-        self.position_y = 0
+        self.rect = [0, 0, 0, 0]
         self.localPath = ""
-        self.width = 0
-        self.height = 0
 
 
 class Chip:
@@ -43,4 +39,4 @@ class Chip:
         self.specifications: List[ProgramSpecification] = []
         self.programPresets: List[ProgramPreset] = []
         self.images: List[Image] = []
-        self.annotations: List[Annotation] = []
+        self.text: List[Text] = []
