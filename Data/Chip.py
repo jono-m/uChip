@@ -1,5 +1,6 @@
 from typing import Optional, List, Dict
 from Data.Program import ProgramInstance, ProgramSpecification, Parameter
+from PySide6.QtGui import QImage
 
 
 class Valve:
@@ -30,7 +31,19 @@ class Text:
 class Image:
     def __init__(self):
         self.rect = [0, 0, 0, 0]
-        self.localPath = ""
+        self.original_image: Optional[QImage] = None
+
+    def __setstate__(self, state):
+        self.original_image = QImage(state['data'], *state['size'], QImage.Format(state['format']))
+        self.rect = state['rect']
+
+    def __getstate__(self):
+        data = self.__dict__.copy()
+        del data['original_image']
+        data['data'] = self.original_image.bits().tobytes()
+        data['format'] = int(self.original_image.format())
+        data['size'] = (self.original_image.width(), self.original_image.height())
+        return data
 
 
 class Chip:

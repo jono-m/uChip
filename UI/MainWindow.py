@@ -1,22 +1,23 @@
 import pathlib
 
 from PySide6.QtWidgets import QMainWindow, QDockWidget, QTabWidget, QWidget, QMenuBar, QFileDialog, \
-    QMessageBox
+    QMessageBox, QApplication
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QIcon, QKeySequence
-from UI.ChipView import ChipView
-from UI.RigView import RigView
-from UI.UIMaster import UIMaster
-from Data.FileIO import SaveObject, LoadObject
-from Data.Chip import Chip
+from PySide6.QtGui import QIcon, QKeySequence, QCursor, QGuiApplication
+# from UI.ChipView import ChipView
+# from UI.RigView import RigView
+# from UI.UIMaster import UIMaster
+# from Data.FileIO import SaveObject, LoadObject
+# from Data.Chip import Chip
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        QGuiApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
 
+        return
         self.chipEditor = ChipView()
-
         self.setCentralWidget(self.chipEditor)
         self.setWindowIcon(QIcon("Assets/Images/icon.png"))
 
@@ -37,6 +38,7 @@ class MainWindow(QMainWindow):
         if not self.PromptCloseChip():
             return
         UIMaster.Instance().currentChip = Chip()
+        self.chipEditor.CloseChip()
         self.chipEditor.OpenChip()
         UIMaster.Instance().modified = False
 
@@ -56,6 +58,7 @@ class MainWindow(QMainWindow):
             return
         d = QFileDialog.getOpenFileName(self, "Open Chip", filter="uChip Project (*.ucp)")
         if d[0]:
+            self.chipEditor.CloseChip()
             UIMaster.Instance().currentChipPath = pathlib.Path(d[0])
             UIMaster.Instance().currentChip = LoadObject(UIMaster.Instance().currentChipPath)
             self.chipEditor.OpenChip()
