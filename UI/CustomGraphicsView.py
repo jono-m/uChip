@@ -298,7 +298,7 @@ class CustomGraphicsView(QGraphicsView):
         self.SelectItems([i for i in self.selectedItems if i not in items])
 
     def GetMaxItemZValue(self):
-        return max([x.inspectorProxy.zValue() for x in self.allItems]) if len(
+        return max([x.borderRectItem.zValue() for x in self.allItems]) if len(
             self.allItems) > 0 else 0
 
     def SetInteractive(self, interactive: bool):
@@ -335,11 +335,12 @@ class CustomGraphicsView(QGraphicsView):
         maxZValue = self.GetMaxItemZValue()
         for i in self.allItems:
             if i not in self.selectedItems or not self.isInteractive or \
-                    self.state != CustomGraphicsViewState.IDLE or i.customInspector is None:
+                    self.state not in [CustomGraphicsViewState.IDLE,
+                                       CustomGraphicsViewState.PANNING] or i.customInspector is None:
                 i.inspectorProxy.setVisible(False)
             else:
                 i.inspectorProxy.setVisible(True)
-                i.inspectorProxy.setZValue(maxZValue + 1)
+                i.inspectorProxy.setZValue(maxZValue + 3)
 
     def UpdateSelectionBox(self):
         selectionRect = None if len(self.selectedItems) == 0 else \
@@ -460,6 +461,7 @@ class CustomGraphicsView(QGraphicsView):
             self.state = CustomGraphicsViewState.PANNING
 
         self.UpdateCursor()
+        self.UpdateInspectors()
         if not self.isInteractive or self.inspectorItemUnderMouse is not None:
             super().mousePressEvent(event)
 
@@ -478,6 +480,7 @@ class CustomGraphicsView(QGraphicsView):
             self.rubberBandRectItem.setVisible(False)
             self.DoMultiSelection()
         self.UpdateCursor()
+        self.UpdateInspectors()
         if not self.isInteractive or self.inspectorItemUnderMouse is not None:
             super().mouseReleaseEvent(event)
 

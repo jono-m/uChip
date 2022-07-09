@@ -2,9 +2,7 @@ from Data.Rig import Rig
 from Data.Chip import Chip
 from typing import Optional
 from pathlib import Path
-from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QCursor, QGuiApplication
-from PySide6.QtCore import Qt
 
 
 class UIMaster:
@@ -26,11 +24,12 @@ class UIMaster:
 
     @staticmethod
     def SetCursor(cursorShape: Optional[QCursor]):
-        QGuiApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
-        return
         if UIMaster.Instance().currentCursorShape != cursorShape:
-            UIMaster.Instance().currentCursorShape = cursorShape
             if cursorShape is not None:
-                w.setCursor(cursorShape)
+                if UIMaster.Instance().currentCursorShape is None:
+                    QGuiApplication.setOverrideCursor(QCursor(cursorShape))
+                else:
+                    QGuiApplication.changeOverrideCursor(QCursor(cursorShape))
             else:
-                w.unsetCursor()
+                QGuiApplication.restoreOverrideCursor()
+            UIMaster.Instance().currentCursorShape = cursorShape
