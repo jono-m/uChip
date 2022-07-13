@@ -18,14 +18,13 @@ class ProgramPreset:
         self.instance: Optional[ProgramInstance] = None
         self.parameterVisibility: Dict[Parameter, bool] = {}
         self.showDescription = False
-        self.textSize = 12
 
 
 class Text:
     def __init__(self):
         self.rect = [0, 0, 0, 0]
         self.text = "New annotation"
-        self.textSize = 12
+        self.color = (0, 0, 0)
 
 
 class Image:

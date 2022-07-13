@@ -1,10 +1,11 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QFormLayout, \
-    QLineEdit, QSpinBox, QFileDialog
+    QLineEdit, QSpinBox, QFileDialog, QColorDialog, QPlainTextEdit
 from PySide6.QtGui import QIcon, QImage, QPixmap, QColor
 from PySide6.QtCore import QPoint, Qt, QSize, QTimer, QRectF
 from UI.CustomGraphicsView import CustomGraphicsView, CustomGraphicsViewItem
 from UI.UIMaster import UIMaster
-from Data.Chip import Valve, Image
+from UI import Utilities
+from Data.Chip import Valve, Image, Text
 import re
 
 
@@ -125,7 +126,13 @@ class ChipView(QWidget):
             self.graphicsView.SelectItems([newImageItem])
 
     def AddNewText(self):
-        pass
+        newText = Text()
+        newText.text = "New text"
+        UIMaster.Instance().currentChip.text.append(newText)
+        newTextItem = TextItem(newText)
+        self.graphicsView.AddItems([newTextItem])
+        self.graphicsView.CenterItem(newTextItem)
+        self.graphicsView.SelectItems([newTextItem])
 
     def CloseChip(self):
         self.graphicsView.Clear()
@@ -139,6 +146,11 @@ class ChipView(QWidget):
         imageItems = [ImageItem(image) for image in UIMaster.Instance().currentChip.images]
         [i.SetRect(QRectF(*image.rect)) for i, image in
          zip(imageItems, UIMaster.Instance().currentChip.images)]
+        self.graphicsView.AddItems(imageItems)
+
+        textItems = [TextItem(text) for text in UIMaster.Instance().currentChip.text]
+        [i.SetRect(QRectF(*text.rect)) for i, text in
+         zip(textItems, UIMaster.Instance().currentChip.text)]
         self.graphicsView.AddItems(imageItems)
 
 
@@ -186,17 +198,15 @@ class ValveItem(CustomGraphicsViewItem):
         self.numberField.valueChanged.connect(self.PushToValve)
         self.numberField.setMinimum(0)
         self.numberField.setMaximum(1000)
-        self.fontSizeField = QSpinBox()
-        self.fontSizeField.valueChanged.connect(self.PushToValve)
         self.SetWidget(self.valveWidget)
         inspectorWidget = QWidget()
         form = QFormLayout()
         form.addRow("Name", self.nameField)
         form.addRow("Solenoid", self.numberField)
-        form.addRow("Text Size", self.fontSizeField)
         inspectorWidget.setLayout(form)
         self._updating = False
         self.SetInspector(inspectorWidget)
+
         self.Update()
 
     def SetRect(self, rect):
@@ -236,7 +246,6 @@ class ValveItem(CustomGraphicsViewItem):
         self.valve.solenoidNumber = self.numberField.value()
         self.valve.rect = [self.GetRect().x(), self.GetRect().y(),
                            self.GetRect().width(), self.GetRect().height()]
-        self.valve.textSize = self.fontSizeField.value()
         UIMaster.Instance().modified = True
 
     def Update(self):
@@ -245,19 +254,20 @@ class ValveItem(CustomGraphicsViewItem):
             self.numberField.setValue(self.valve.solenoidNumber)
         if self.nameField.text() != self.valve.name:
             self.nameField.setText(self.valve.name)
-        if self.fontSizeField.value() != self.valve.textSize:
-            self.fontSizeField.setValue(self.valve.textSize)
-        self.valveWidget.setText(self.valve.name + "\n(" + str(self.valve.solenoidNumber) + ")")
-        newState = UIMaster.Instance().rig.GetSolenoidState(self.valve.solenoidNumber)
-        if self.valveWidget.font().pointSize() != self.valve.textSize:
-            f = self.valveWidget.font()
-            f.setPointSize(self.valve.textSize)
-            self.valveWidget.setFont(f)
+
+        text = self.valve.name + "\n(" + str(self.valve.solenoidNumber) + ")"
+        if self.valveWidget.text() != text:
+            self.valveWidget.setText(text)
+
+        font = Utilities.ComputeAutofit(self.valveWidget)
+        if self.valveWidget.font().pixelSize() != font.pixelSize():
+            self.valveWidget.setFont(font)
+        currentState = UIMaster.Instance().rig.GetSolenoidState(self.valve.solenoidNumber)
+        if currentState != self._displayState:
+            self._displayState = currentState
+            self.valveWidget.setStyleSheet(
+                self.valveOpenStyle if currentState else self.valveClosedStyle)
         self._updating = False
-        if newState == self._displayState:
-            return
-        self._displayState = newState
-        self.valveWidget.setStyleSheet(self.valveOpenStyle if newState else self.valveClosedStyle)
 
 
 class ImageItem(CustomGraphicsViewItem):
@@ -285,6 +295,82 @@ class ImageItem(CustomGraphicsViewItem):
 
     def OnRemoved(self):
         UIMaster.Instance().currentChip.images.remove(self.image)
+        UIMaster.Instance().modified = True
+
+
+class TextItem(CustomGraphicsViewItem):
+    def __init__(self, text: Text):
+        super().__init__()
+        self.text = text
+        self.textWidget = QLabel()
+        self.textField = QPlainTextEdit()
+        self.textField.textChanged.connect(self.PushToText)
+        self.textColorButton = QPushButton()
+        self.textColorButton.clicked.connect(self.PickColor)
+        inspectorWidget = QWidget()
+        formLayout = QFormLayout()
+        inspectorWidget.setLayout(formLayout)
+        formLayout.addRow("Text", self.textField)
+        formLayout.addRow("Font Color", self.textColorButton)
+        self.timer = QTimer(self.textWidget)
+        self.timer.timeout.connect(self.Update)
+        self.timer.start(30)
+        self.SetWidget(self.textWidget)
+        self.SetInspector(inspectorWidget)
+        self._updating = False
+        self.Update()
+        self.SetRect(QRectF(0, 0, 200, 100))
+
+    def PushToText(self):
+        if self._updating:
+            return
+        self.text.text = self.textField.toPlainText()
+
+    def PickColor(self):
+        colorPicker = QColorDialog(QColor(*self.text.color),
+                                   parent=UIMaster.Instance().topLevel)
+        colorPicker.setModal(True)
+        colorPicker.currentColorChanged.connect(self.SetColor)
+        colorPicker.exec()
+
+    def SetColor(self, c: QColor):
+        self.text.color = (c.red(), c.green(), c.blue())
+        UIMaster.Instance().modified = True
+
+    def Update(self):
+        self._updating = True
+        c = QColor(*self.text.color)
+        if self.textColorButton.text() != c.name():
+            self.textColorButton.setStyleSheet("background-color: " + c.name())
+            self.textColorButton.setText(c.name())
+            self.textWidget.setStyleSheet("background-color: transparent; color: " + c.name())
+        if self.textField.toPlainText() != self.text.text:
+            self.textField.setPlainText(self.text.text)
+        if self.textWidget.text() != self.text.text:
+            self.textWidget.setText(self.text.text)
+
+        font = Utilities.ComputeAutofit(self.textWidget.font(),
+                                        self.GetRect().size(),
+                                        self.textWidget.text())
+        if font.pixelSize() != self.textWidget.font().pixelSize():
+            print(font.pixelSize())
+            self.textWidget.setFont(font)
+        self._updating = False
+
+    def Duplicate(self):
+        newText = Text()
+        newText.text = self.text
+        UIMaster.Instance().currentChip.text.append(newText)
+        UIMaster.Instance().modified = True
+        return TextItem(newText)
+
+    def SetRect(self, rect: QRectF):
+        super().SetRect(QRectF(rect))
+        self.text.rect = [rect.x(), rect.y(), rect.width(), rect.height()]
+        UIMaster.Instance().modified = True
+
+    def OnRemoved(self):
+        UIMaster.Instance().currentChip.text.remove(self.text)
         UIMaster.Instance().modified = True
 
 

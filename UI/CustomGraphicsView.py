@@ -36,7 +36,6 @@ class CustomGraphicsViewItem:
     def UpdateGeometry(self):
         self.itemProxy.setPos(self._rect.topLeft())
         self.itemProxy.resize(self._rect.size())
-        self._rect = self.itemProxy.sceneBoundingRect()
         self.borderRectItem.setPen(QPen(self.borderColor, self.borderWidth, j=Qt.MiterJoin))
         self.borderRectItem.setRect(self._rect)
         self.borderRectItem.setVisible(self.borderVisible)
@@ -48,6 +47,7 @@ class CustomGraphicsViewItem:
         return self._rect
 
     def SetWidget(self, w: QWidget):
+        w.setMinimumSize(50, 50)
         self.itemProxy.setWidget(w)
         self.UpdateGeometry()
 
@@ -150,7 +150,7 @@ class CustomGraphicsView(QGraphicsView):
 
     def UpdateZoom(self, scenePositionAnchor: QPointF, newZoom: float):
         anchorScreenSpace = self.mapFromScene(scenePositionAnchor)
-        self.zoom = min(max(newZoom, 0.05), 1)
+        self.zoom = min(max(newZoom, 0.05), 2)
         self.UpdateViewMatrix()
         newAnchorPosition = self.mapToScene(anchorScreenSpace)
         self.viewOffset -= newAnchorPosition - scenePositionAnchor

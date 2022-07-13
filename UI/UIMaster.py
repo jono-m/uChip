@@ -3,6 +3,7 @@ from Data.Chip import Chip
 from typing import Optional
 from pathlib import Path
 from PySide6.QtGui import QCursor, QGuiApplication
+from PySide6.QtWidgets import QApplication
 
 
 class UIMaster:
@@ -10,6 +11,7 @@ class UIMaster:
 
     def __init__(self):
         super().__init__()
+        self.topLevel = QApplication.topLevelWidgets()[0]
         self.rig = Rig()
         self.currentChip = Chip()
         self.modified = False
