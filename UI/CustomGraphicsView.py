@@ -18,14 +18,15 @@ class CustomGraphicsViewState(Enum):
 
 
 class CustomGraphicsViewItem:
-    def __init__(self, name: str = ""):
+    def __init__(self, name):
         self.itemProxy = QGraphicsProxyWidget()
         self.borderRectItem = QGraphicsRectItem()
         self.borderWidth = 5
         self.borderVisible = False
         self.borderColor = QColor(255, 255, 255)
         self.inspectorProxy = QGraphicsProxyWidget()
-        inspectorWidget = QWidget()
+        inspectorWidget = QFrame()
+        inspectorWidget.setFrameShape(QFrame.Shape.Box)
         inspectorWidget.setLayout(QVBoxLayout())
         self.nameLabel = QLabel("<b><u>" + name + "</u></b>")
         inspectorWidget.layout().addWidget(self.nameLabel)
@@ -66,7 +67,7 @@ class CustomGraphicsViewItem:
         pass
 
     def Duplicate(self):
-        return CustomGraphicsViewItem()
+        return CustomGraphicsViewItem("")
 
 
 class CustomGraphicsView(QGraphicsView):
@@ -211,55 +212,49 @@ class CustomGraphicsView(QGraphicsView):
         else:
             UIMaster.SetCursor(None)
 
+    @staticmethod
+    def Snap(x, div):
+        return round(float(x) / div) * div
+
+    def SnapPoint(self, p: QPointF):
+        return QPointF(self.Snap(p.x(), self.gridSpacing.width()),
+                       self.Snap(p.y(), self.gridSpacing.height()))
+
     def DoMove(self):
-        def Snap(x, div):
-            return round(float(x) / div) * div
-
-        def SnapPoint(p: QPointF):
-            return QPointF(Snap(p.x(), self.gridSpacing.width()),
-                           Snap(p.y(), self.gridSpacing.height()))
-
         moveDelta = self.mouseScenePosition - self._transformStartMousePos
         for startRect, item in zip(self._transformStartRects, self.selectedItems):
             newRect = startRect.translated(moveDelta)
-            snapOffsets = (SnapPoint(newRect.topLeft()) - newRect.topLeft(),
-                           SnapPoint(newRect.topRight()) - newRect.topRight(),
-                           SnapPoint(newRect.bottomLeft()) - newRect.bottomLeft(),
-                           SnapPoint(newRect.bottomRight()) - newRect.bottomRight())
+            snapOffsets = (self.SnapPoint(newRect.topLeft()) - newRect.topLeft(),
+                           self.SnapPoint(newRect.topRight()) - newRect.topRight(),
+                           self.SnapPoint(newRect.bottomLeft()) - newRect.bottomLeft(),
+                           self.SnapPoint(newRect.bottomRight()) - newRect.bottomRight())
             magnitudes = [d.x() ** 2 + d.y() ** 2 for d in snapOffsets]
             minOffset = min(zip(magnitudes, snapOffsets), key=lambda x: x[0])[1]
             item.SetRect(newRect.translated(minOffset))
         self.UpdateSelectionBox()
 
     def DoResize(self):
-        def Snap(x, div):
-            return round(float(x) / div) * div
-
-        def SnapPoint(p: QPointF):
-            return QPointF(Snap(p.x(), self.gridSpacing.width()),
-                           Snap(p.y(), self.gridSpacing.height()))
-
         resizeDelta = self.mouseScenePosition - self._transformStartMousePos
         initialRect = self._transformStartRects[0]
         for r in self._transformStartRects:
             initialRect = initialRect.united(r)
         newRect = QRectF(initialRect)
         if self._transformResizeHandleIndex == 0:
-            newRect.setTopLeft(SnapPoint(newRect.topLeft() + resizeDelta))
+            newRect.setTopLeft(self.SnapPoint(newRect.topLeft() + resizeDelta))
         elif self._transformResizeHandleIndex == 2:
-            newRect.setTopRight(SnapPoint(newRect.topRight() + resizeDelta))
+            newRect.setTopRight(self.SnapPoint(newRect.topRight() + resizeDelta))
         elif self._transformResizeHandleIndex == 5:
-            newRect.setBottomLeft(SnapPoint(newRect.bottomLeft() + resizeDelta))
+            newRect.setBottomLeft(self.SnapPoint(newRect.bottomLeft() + resizeDelta))
         elif self._transformResizeHandleIndex == 7:
-            newRect.setBottomRight(SnapPoint(newRect.bottomRight() + resizeDelta))
+            newRect.setBottomRight(self.SnapPoint(newRect.bottomRight() + resizeDelta))
         elif self._transformResizeHandleIndex == 1:
-            newRect.setTop(Snap(newRect.top() + resizeDelta.y(), self.gridSpacing.height()))
+            newRect.setTop(self.Snap(newRect.top() + resizeDelta.y(), self.gridSpacing.height()))
         elif self._transformResizeHandleIndex == 6:
-            newRect.setBottom(Snap(newRect.bottom() + resizeDelta.y(), self.gridSpacing.height()))
+            newRect.setBottom(self.Snap(newRect.bottom() + resizeDelta.y(), self.gridSpacing.height()))
         elif self._transformResizeHandleIndex == 3:
-            newRect.setLeft(Snap(newRect.left() + resizeDelta.x(), self.gridSpacing.width()))
+            newRect.setLeft(self.Snap(newRect.left() + resizeDelta.x(), self.gridSpacing.width()))
         elif self._transformResizeHandleIndex == 4:
-            newRect.setRight(Snap(newRect.right() + resizeDelta.x(), self.gridSpacing.width()))
+            newRect.setRight(self.Snap(newRect.right() + resizeDelta.x(), self.gridSpacing.width()))
         newRect = newRect.normalized()
 
         def Transform(p: QPointF):
@@ -286,6 +281,7 @@ class CustomGraphicsView(QGraphicsView):
     def CenterItem(self, item: CustomGraphicsViewItem):
         r = item.itemProxy.sceneBoundingRect()
         r.moveCenter(self.viewOffset)
+        r.moveTopLeft(self.SnapPoint(r.topLeft()))
         item.SetRect(r)
 
     def DeleteItems(self, items: List[CustomGraphicsViewItem]):

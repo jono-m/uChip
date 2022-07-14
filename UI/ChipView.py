@@ -1,3 +1,5 @@
+import pathlib
+
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QFormLayout, \
     QLineEdit, QSpinBox, QFileDialog, QColorDialog, QPlainTextEdit
 from PySide6.QtGui import QIcon, QImage, QPixmap, QColor
@@ -5,7 +7,8 @@ from PySide6.QtCore import QPoint, Qt, QSize, QTimer, QRectF
 from UI.CustomGraphicsView import CustomGraphicsView, CustomGraphicsViewItem
 from UI.UIMaster import UIMaster
 from UI import Utilities
-from Data.Chip import Valve, Image, Text
+from Data.Chip import Valve, Image, Text, Program
+from Data.ProgramCompilation import CompiledProgram
 import re
 
 
@@ -259,7 +262,9 @@ class ValveItem(CustomGraphicsViewItem):
         if self.valveWidget.text() != text:
             self.valveWidget.setText(text)
 
-        font = Utilities.ComputeAutofit(self.valveWidget)
+        r = self.valveWidget.rect().size()
+        r.setHeight(r.height() / 2)
+        font = Utilities.ComputeAutofit(self.valveWidget.font(), r, self.valveWidget.text())
         if self.valveWidget.font().pixelSize() != font.pixelSize():
             self.valveWidget.setFont(font)
         currentState = UIMaster.Instance().rig.GetSolenoidState(self.valve.solenoidNumber)
@@ -272,24 +277,39 @@ class ValveItem(CustomGraphicsViewItem):
 
 class ImageItem(CustomGraphicsViewItem):
     def __init__(self, image: Image):
-        super().__init__()
+        super().__init__("Image")
         self.image = image
+        self.lastModifiedTime = None
+        self.lastPath = None
+        self.imageData = None
         self.imageWidget = QLabel()
+        self.timer = QTimer(self.imageWidget)
+        self.timer.timeout.connect(self.Update)
+        self.timer.start(30)
         self.SetWidget(self.imageWidget)
+        self.Update()
+
+    def Update(self):
+        if self.image.path != self.lastPath or self.image.path.stat().st_mtime != self.lastModifiedTime:
+            # TODO: Throw an error if image is not found now.
+            self.imageData = QImage(str(self.image.path))
+            self.lastPath = self.image.path
+            self.lastModifiedTime = self.image.path.stat().st_mtime
+
+    def RefreshImage(self):
+        pixmap = QPixmap(self.imageData).scaled(self.GetRect().size())
+        self.imageWidget.setPixmap(pixmap)
 
     def Duplicate(self):
         newImage = Image()
-        newImage.original_image = self.image.original_image.copy()
+        newImage.path = self.image.path
         UIMaster.Instance().currentChip.images.append(newImage)
         UIMaster.Instance().modified = True
         return ImageItem(newImage)
 
     def SetRect(self, rect: QRectF):
-        rect = rect.toRect()
-        pixmap = QPixmap(self.image.original_image).scaled(rect.size())
-        self.imageWidget.setPixmap(pixmap)
-        self.imageWidget.setFixedSize(rect.size())
-        super().SetRect(QRectF(rect))
+        self.imageWidget.setFixedSize(rect.size().toSize())
+        super().SetRect(rect)
         self.image.rect = [rect.x(), rect.y(), rect.width(), rect.height()]
         UIMaster.Instance().modified = True
 
@@ -300,18 +320,24 @@ class ImageItem(CustomGraphicsViewItem):
 
 class TextItem(CustomGraphicsViewItem):
     def __init__(self, text: Text):
-        super().__init__()
+        super().__init__("Text")
         self.text = text
         self.textWidget = QLabel()
+        self.textWidget.setWordWrap(True)
         self.textField = QPlainTextEdit()
         self.textField.textChanged.connect(self.PushToText)
-        self.textColorButton = QPushButton()
-        self.textColorButton.clicked.connect(self.PickColor)
+        self.fontColorButton = QPushButton()
+        self.fontColorButton.clicked.connect(self.PickColor)
+        self.fontSizeField = QSpinBox()
+        self.fontSizeField.valueChanged.connect(self.PushToText)
         inspectorWidget = QWidget()
+        mainLayout = QVBoxLayout()
+        mainLayout.addWidget(self.textField)
         formLayout = QFormLayout()
-        inspectorWidget.setLayout(formLayout)
-        formLayout.addRow("Text", self.textField)
-        formLayout.addRow("Font Color", self.textColorButton)
+        mainLayout.addLayout(formLayout)
+        inspectorWidget.setLayout(mainLayout)
+        formLayout.addRow("Font Color", self.fontColorButton)
+        formLayout.addRow("Font Size", self.fontSizeField)
         self.timer = QTimer(self.textWidget)
         self.timer.timeout.connect(self.Update)
         self.timer.start(30)
@@ -325,6 +351,7 @@ class TextItem(CustomGraphicsViewItem):
         if self._updating:
             return
         self.text.text = self.textField.toPlainText()
+        self.text.fontSize = self.fontSizeField.value()
 
     def PickColor(self):
         colorPicker = QColorDialog(QColor(*self.text.color),
@@ -340,26 +367,28 @@ class TextItem(CustomGraphicsViewItem):
     def Update(self):
         self._updating = True
         c = QColor(*self.text.color)
-        if self.textColorButton.text() != c.name():
-            self.textColorButton.setStyleSheet("background-color: " + c.name())
-            self.textColorButton.setText(c.name())
+        if self.fontColorButton.text() != c.name():
+            self.fontColorButton.setStyleSheet("background-color: " + c.name())
+            self.fontColorButton.setText(c.name())
             self.textWidget.setStyleSheet("background-color: transparent; color: " + c.name())
         if self.textField.toPlainText() != self.text.text:
             self.textField.setPlainText(self.text.text)
         if self.textWidget.text() != self.text.text:
             self.textWidget.setText(self.text.text)
+        if self.fontSizeField.value() != self.text.fontSize:
+            self.fontSizeField.setValue(self.text.fontSize)
+        if self.textWidget.font().pixelSize() != self.text.fontSize:
+            f = self.textWidget.font()
+            f.setPixelSize(self.text.fontSize)
+            self.textWidget.setFont(f)
 
-        font = Utilities.ComputeAutofit(self.textWidget.font(),
-                                        self.GetRect().size(),
-                                        self.textWidget.text())
-        if font.pixelSize() != self.textWidget.font().pixelSize():
-            print(font.pixelSize())
-            self.textWidget.setFont(font)
         self._updating = False
 
     def Duplicate(self):
         newText = Text()
-        newText.text = self.text
+        newText.text = self.text.text
+        newText.fontSize = self.text.fontSize
+        newText.color = self.text.color
         UIMaster.Instance().currentChip.text.append(newText)
         UIMaster.Instance().modified = True
         return TextItem(newText)
@@ -371,6 +400,47 @@ class TextItem(CustomGraphicsViewItem):
 
     def OnRemoved(self):
         UIMaster.Instance().currentChip.text.remove(self.text)
+        UIMaster.Instance().modified = True
+
+
+class ProgramItem(CustomGraphicsViewItem):
+    def __init__(self, program: Program):
+        super().__init__("Program")
+        self.program = program
+        self.itemWidget = QWidget()
+        inspectorWidget = QWidget()
+        self.timer = QTimer(self.itemWidget)
+        self.timer.timeout.connect(self.Update)
+        self.timer.start(30)
+        self.SetWidget(self.itemWidget)
+        self.SetInspector(inspectorWidget)
+        self._updating = False
+        self.Update()
+
+    def PushToProgram(self):
+        if self._updating:
+            return
+
+    def Update(self):
+        self._updating = True
+        self._updating = False
+
+    def Duplicate(self):
+        newText = Text()
+        newText.text = self.text.text
+        newText.fontSize = self.text.fontSize
+        newText.color = self.text.color
+        UIMaster.Instance().currentChip.text.append(newText)
+        UIMaster.Instance().modified = True
+        return TextItem(newText)
+
+    def SetRect(self, rect: QRectF):
+        super().SetRect(QRectF(rect))
+        self.text.rect = [rect.x(), rect.y(), rect.width(), rect.height()]
+        UIMaster.Instance().modified = True
+
+    def OnRemoved(self):
+        UIMaster.Instance().currentChip.programs.remove(self.)
         UIMaster.Instance().modified = True
 
 
