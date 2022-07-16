@@ -1,14 +1,18 @@
 import pathlib
+import typing
 
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QFormLayout, \
-    QLineEdit, QSpinBox, QFileDialog, QColorDialog, QPlainTextEdit
+    QLineEdit, QSpinBox, QFileDialog, QColorDialog, QPlainTextEdit, QDoubleSpinBox, QComboBox
 from PySide6.QtGui import QIcon, QImage, QPixmap, QColor
-from PySide6.QtCore import QPoint, Qt, QSize, QTimer, QRectF
+from PySide6.QtCore import QPoint, Qt, QSize, QTimer, QRectF, Signal, QObject
+
+import types
 from UI.CustomGraphicsView import CustomGraphicsView, CustomGraphicsViewItem
 from UI.UIMaster import UIMaster
 from UI import Utilities
+from ucscript import Trigger
 from Data.Chip import Valve, Image, Text, Program
-from Data.ProgramCompilation import CompiledProgram
+from Data.ProgramCompilation import CompiledProgram, CompiledValve, CompiledProgramReference
 import re
 
 
@@ -58,6 +62,15 @@ class ChipView(QWidget):
         self.addImageButton.setIconSize(QSize(20, 20))
         self.addImageButton.clicked.connect(self.AddNewImage)
 
+        self.addProgramButton = QPushButton()
+        self.addProgramButton.setFocusPolicy(Qt.NoFocus)
+        self.addProgramButton.setToolTip("Add program")
+        self.addProgramButton.setIcon(
+            ColoredIcon("Assets/Images/plusIcon.png", QColor(100, 100, 100)))
+        self.addProgramButton.setFixedSize(30, 30)
+        self.addProgramButton.setIconSize(QSize(20, 20))
+        self.addProgramButton.clicked.connect(self.AddNewProgram)
+
         self.addTextButton = QPushButton()
         self.addTextButton.setFocusPolicy(Qt.NoFocus)
         self.addTextButton.setToolTip("Add text")
@@ -80,6 +93,7 @@ class ChipView(QWidget):
         toolOptionsLayout.addWidget(self.addValveButton, alignment=Qt.AlignHCenter)
         toolOptionsLayout.addWidget(self.addImageButton, alignment=Qt.AlignHCenter)
         toolOptionsLayout.addWidget(self.addTextButton, alignment=Qt.AlignHCenter)
+        toolOptionsLayout.addWidget(self.addProgramButton, alignment=Qt.AlignHCenter)
         self.toolOptions.setLayout(toolOptionsLayout)
         toolPanelLayout.addWidget(self.toolOptions)
 
@@ -101,6 +115,11 @@ class ChipView(QWidget):
         self.editButton.setVisible(not isEditing)
         self.finishEditsButton.setVisible(isEditing)
         self.toolOptions.setVisible(isEditing)
+
+        for item in self.graphicsView.allItems:
+            if isinstance(item, ValveItem):
+                item.valveWidget.setEnabled(not isEditing)
+
         self.UpdateToolPanelPosition()
 
     def AddNewValve(self):
@@ -111,6 +130,7 @@ class ChipView(QWidget):
         newValve.solenoidNumber = highestValveNumber + 1
         UIMaster.Instance().currentChip.valves.append(newValve)
         newValveItem = ValveItem(newValve)
+        newValveItem.valveWidget.setEnabled(not self.graphicsView.isInteractive)
         self.graphicsView.AddItems([newValveItem])
         self.graphicsView.CenterItem(newValveItem)
         self.graphicsView.SelectItems([newValveItem])
@@ -120,10 +140,12 @@ class ChipView(QWidget):
                                                  filter="Images (*.png *.bmp *.gif *.jpg *.jpeg)")
         if imageToAdd[0]:
             newImage = Image()
-            newImage.original_image = QImage(imageToAdd[0])
+            newImage.path = pathlib.Path(imageToAdd[0])
             UIMaster.Instance().currentChip.images.append(newImage)
             newImageItem = ImageItem(newImage)
-            newImageItem.imageWidget.setFixedSize(newImage.original_image.size() * 0.1)
+            newImageItem.SetRect(
+                QRectF(newImageItem.GetRect().topLeft(),
+                       QSize(newImageItem.imageData.size())))
             self.graphicsView.AddItems([newImageItem])
             self.graphicsView.CenterItem(newImageItem)
             self.graphicsView.SelectItems([newImageItem])
@@ -137,6 +159,19 @@ class ChipView(QWidget):
         self.graphicsView.CenterItem(newTextItem)
         self.graphicsView.SelectItems([newTextItem])
 
+    def AddNewProgram(self):
+        programToAdd = QFileDialog.getOpenFileName(self, "Browse for program",
+                                                   filter="uChip program (*.py)")
+        if programToAdd[0]:
+            newProgram = Program()
+            newProgram.path = pathlib.Path(programToAdd[0])
+            newProgram.name = newProgram.path.stem
+            UIMaster.Instance().currentChip.programs.append(newProgram)
+            newProgramItem = ProgramItem(newProgram)
+            self.graphicsView.AddItems([newProgramItem])
+            self.graphicsView.CenterItem(newProgramItem)
+            self.graphicsView.SelectItems([newProgramItem])
+
     def CloseChip(self):
         self.graphicsView.Clear()
 
@@ -144,6 +179,7 @@ class ChipView(QWidget):
         valveItems = [ValveItem(valve) for valve in UIMaster.Instance().currentChip.valves]
         [v.SetRect(QRectF(*valve.rect)) for v, valve in
          zip(valveItems, UIMaster.Instance().currentChip.valves)]
+        [v.valveWidget.setEnabled(not self.graphicsView.isInteractive) for v in valveItems]
         self.graphicsView.AddItems(valveItems)
 
         imageItems = [ImageItem(image) for image in UIMaster.Instance().currentChip.images]
@@ -154,7 +190,13 @@ class ChipView(QWidget):
         textItems = [TextItem(text) for text in UIMaster.Instance().currentChip.text]
         [i.SetRect(QRectF(*text.rect)) for i, text in
          zip(textItems, UIMaster.Instance().currentChip.text)]
-        self.graphicsView.AddItems(imageItems)
+        self.graphicsView.AddItems(textItems)
+
+        programItems = [ProgramItem(program) for program in
+                        UIMaster.Instance().currentChip.programs]
+        [i.SetRect(QRectF(*program.rect)) for i, program in
+         zip(programItems, UIMaster.Instance().currentChip.programs)]
+        self.graphicsView.AddItems(programItems)
 
 
 class ValveItem(CustomGraphicsViewItem):
@@ -281,8 +323,9 @@ class ImageItem(CustomGraphicsViewItem):
         self.image = image
         self.lastModifiedTime = None
         self.lastPath = None
-        self.imageData = None
+        self.imageData: typing.Optional[QImage] = None
         self.imageWidget = QLabel()
+        # TODO: Image browse field
         self.timer = QTimer(self.imageWidget)
         self.timer.timeout.connect(self.Update)
         self.timer.start(30)
@@ -295,9 +338,10 @@ class ImageItem(CustomGraphicsViewItem):
             self.imageData = QImage(str(self.image.path))
             self.lastPath = self.image.path
             self.lastModifiedTime = self.image.path.stat().st_mtime
+            self.RefreshImage()
 
     def RefreshImage(self):
-        pixmap = QPixmap(self.imageData).scaled(self.GetRect().size())
+        pixmap = QPixmap(self.imageData).scaled(self.GetRect().size().toSize())
         self.imageWidget.setPixmap(pixmap)
 
     def Duplicate(self):
@@ -310,6 +354,7 @@ class ImageItem(CustomGraphicsViewItem):
     def SetRect(self, rect: QRectF):
         self.imageWidget.setFixedSize(rect.size().toSize())
         super().SetRect(rect)
+        self.RefreshImage()
         self.image.rect = [rect.x(), rect.y(), rect.width(), rect.height()]
         UIMaster.Instance().modified = True
 
@@ -407,15 +452,41 @@ class ProgramItem(CustomGraphicsViewItem):
     def __init__(self, program: Program):
         super().__init__("Program")
         self.program = program
-        self.itemWidget = QWidget()
+
+        self.compiledProgram: typing.Optional[CompiledProgram] = None
+
+        # Set up inspector widget
+        self.nameField = QLineEdit()
+        self.nameField.textChanged.connect(self.PushToProgram)
+        self.parameterWidgets: typing.List[ParameterWidget] = []
+
+        # TODO: browse source field
+
         inspectorWidget = QWidget()
+        self.SetInspector(inspectorWidget)
+        self.inspectorLayout = QFormLayout()
+        inspectorWidget.setLayout(self.inspectorLayout)
+        self.inspectorLayout.addRow("Name", self.nameField)
+
+        # Set up item widget
+        self.itemWidget = QWidget()
         self.timer = QTimer(self.itemWidget)
         self.timer.timeout.connect(self.Update)
         self.timer.start(30)
         self.SetWidget(self.itemWidget)
-        self.SetInspector(inspectorWidget)
         self._updating = False
         self.Update()
+
+    def RebuildInspectorLayout(self):
+        for i in reversed(range(1, self.inspectorLayout.rowCount())):
+            self.inspectorLayout.removeRow(i)
+        self.parameterWidgets = []
+        for parameter in self.compiledProgram.compiledParameters:
+            widget = ParameterWidget(parameter.GetName(), parameter.type)
+            widget.OnValueChanged.connect(self.PushToProgram)
+            if widget.parameterWidget is not None:
+                self.inspectorLayout.addRow(parameter.GetName(), widget.parameterWidget)
+            self.parameterWidgets.append(widget)
 
     def PushToProgram(self):
         if self._updating:
@@ -423,25 +494,150 @@ class ProgramItem(CustomGraphicsViewItem):
 
     def Update(self):
         self._updating = True
-        self._updating = False
+        if UIMaster.ShouldRecompile(self.program):
+            UIMaster.Recompile(self.program)
+            self.compiledProgram = UIMaster.GetCompiledProgram(self.program)
+            self.RebuildInspectorLayout()
+        if self.program.name != self.nameField.text():
+            self.nameField.setText(self.program.name)
+        for parameterWidget, parameter in zip(self.parameterWidgets,
+                                              self.compiledProgram.compiledParameters):
+            value = self.program.parameterValues[parameter.GetName()]
+            try:
+                parameterWidget.UpdateValue(value)
+            except ParameterLostException:
+                self.program.parameterValues[parameter.GetName()] = None
+            self._updating = False
 
     def Duplicate(self):
-        newText = Text()
-        newText.text = self.text.text
-        newText.fontSize = self.text.fontSize
-        newText.color = self.text.color
-        UIMaster.Instance().currentChip.text.append(newText)
+        newProgram = Program()
+        newProgram.name = self.program.name
+        newProgram.path = self.program.path
+        newProgram.parameterValues = self.program.parameterValues.copy()
+        UIMaster.Instance().currentChip.programs.append(newProgram)
         UIMaster.Instance().modified = True
-        return TextItem(newText)
+        return ProgramItem(newProgram)
 
     def SetRect(self, rect: QRectF):
         super().SetRect(QRectF(rect))
-        self.text.rect = [rect.x(), rect.y(), rect.width(), rect.height()]
+        self.program.rect = [rect.x(), rect.y(), rect.width(), rect.height()]
         UIMaster.Instance().modified = True
 
     def OnRemoved(self):
-        UIMaster.Instance().currentChip.programs.remove(self.)
+        UIMaster.Instance().currentChip.programs.remove(self.program)
+        [UIMaster.Instance().compiledPrograms.remove(x) for x in
+         UIMaster.Instance().compiledPrograms if x.program == self.program]
         UIMaster.Instance().modified = True
+
+
+class ParameterLostException(Exception):
+    pass
+
+
+class ParameterWidget(QObject):
+    OnValueChanged = Signal()
+
+    def __init__(self, name: str, t):
+        super().__init__()
+        self.name = name
+        self.type = t
+        self.dataForComboBox = []
+        self.parameterWidget: typing.Union[
+            QComboBox, QSpinBox, QDoubleSpinBox, QLineEdit, None] = None
+        if self.type == int or self.type == float:
+            self.parameterWidget = QSpinBox() if self.type == int else QDoubleSpinBox()
+            self.parameterWidget.setMinimum(-100000)
+            self.parameterWidget.setMaximum(100000)
+            self.parameterWidget.valueChanged.connect(self.OnChanged)
+        elif self.type == str:
+            self.parameterWidget = QLineEdit()
+            self.parameterWidget.textChanged.connect(self.OnChanged)
+        elif self.type == bool or self.type == CompiledValve or \
+                self.type == CompiledProgramReference or \
+                (isinstance(self.type, list) and isinstance(self.type[0], str)):
+            self.parameterWidget = QComboBox()
+            self.parameterWidget.currentIndexChanged.connect(self.OnChanged)
+        elif isinstance(self.type, list) and isinstance(self.type[0], type):
+            self.parameterWidget = QWidget()
+            self.parameterWidget.setLayout(QVBoxLayout())
+            # TODO: Include add button
+        elif isinstance(self.type, Trigger):
+            self.parameterWidget = QPushButton(self.type.label)
+            self.parameterWidget.clicked.connect(self.type.onTriggered)
+        self._updating = False
+
+    def OnChanged(self):
+        if self._updating:
+            return
+        else:
+            self.OnValueChanged.emit()
+
+    def GetValue(self):
+        if isinstance(self.parameterWidget, QComboBox):
+            if self.type == bool:
+                return self.parameterWidget.currentText() == "Yes"
+            elif self.type == CompiledValve or self.type == CompiledProgramReference:
+                return self.dataForComboBox[self.parameterWidget.currentIndex()]
+            elif isinstance(self.type, list) and isinstance(self.type[0], str):
+                return self.parameterWidget.currentText()
+        elif isinstance(self.parameterWidget, QSpinBox) or \
+                isinstance(self.parameterWidget, QDoubleSpinBox):
+            return self.parameterWidget.value()
+        elif isinstance(self.parameterWidget, QLineEdit):
+            return self.parameterWidget.text()
+        elif isinstance(self.parameterWidget, QWidget):
+            return [x.GetValue() for x in self.parameterWidget.children() if
+                    isinstance(x, ParameterWidget)]
+
+    def UpdateValue(self, value):
+        self._updating = True
+        if isinstance(self.parameterWidget, QComboBox):
+            if self.type == bool:
+                newVal = "Yes" if value else "No"
+                if newVal != self.parameterWidget.currentText():
+                    self.parameterWidget.setCurrentText(newVal)
+            elif self.type == CompiledValve:
+                if UIMaster.Instance().currentChip.valves != self.dataForComboBox:
+                    self.dataForComboBox = UIMaster.Instance().currentChip.valves.copy()
+                if any([valve.name != self.parameterWidget.itemText(i) for i, valve in
+                        enumerate(self.dataForComboBox)]):
+                    self.parameterWidget.clear()
+                    [self.parameterWidget.addItem(x.name) for x in self.dataForComboBox]
+                try:
+                    i = self.dataForComboBox.index(value)
+                except ValueError:
+                    raise ParameterLostException()
+                if self.parameterWidget.currentIndex() != i:
+                    self.parameterWidget.setCurrentIndex(i)
+            elif self.type == CompiledProgramReference:
+                if UIMaster.Instance().currentChip.programs != self.dataForComboBox:
+                    self.dataForComboBox = UIMaster.Instance().currentChip.programs.copy()
+                if any([program.name != self.parameterWidget.itemText(i) for i, program in
+                        enumerate(self.dataForComboBox)]):
+                    self.parameterWidget.clear()
+                    [self.parameterWidget.addItem(x.name) for x in self.dataForComboBox]
+                try:
+                    i = self.dataForComboBox.index(value)
+                except ValueError:
+                    raise ParameterLostException()
+                if self.parameterWidget.currentIndex() != i:
+                    self.parameterWidget.setCurrentIndex(i)
+            elif isinstance(self.type, list) and isinstance(self.type[0], str):
+                if value != self.parameterWidget.currentText():
+                    self.parameterWidget.setCurrentText(value)
+        elif isinstance(self.parameterWidget, QSpinBox) or \
+                isinstance(self.parameterWidget, QDoubleSpinBox):
+            if value != self.parameterWidget.value():
+                self.parameterWidget.setValue(value)
+        elif isinstance(self.parameterWidget, QLineEdit):
+            if value != self.parameterWidget.text():
+                self.parameterWidget.setText(value)
+        elif isinstance(self.parameterWidget, QWidget):
+            if value != [x.GetValue() for x in self.parameterWidget.children() if
+                         isinstance(x, ParameterWidget)]:
+                # TODO: Now need to clear the children, add more...
+                pass
+        self._updating = False
 
 
 class ColoredIcon(QIcon):

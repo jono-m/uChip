@@ -1,6 +1,6 @@
 from typing import List, Tuple, Optional
 from PySide6.QtWidgets import QGraphicsView, QGraphicsScene, QWidget, QGraphicsProxyWidget, \
-    QGraphicsRectItem, QVBoxLayout, QLabel, QFrame, QScrollArea
+    QGraphicsRectItem, QVBoxLayout, QLabel, QFrame, QScrollArea, QComboBox
 from PySide6.QtGui import QPen, QColor, QPainter, QBrush, QWheelEvent, QTransform, QGuiApplication, \
     QPalette, QKeyEvent
 from PySide6.QtCore import Qt, QPointF, QSizeF, QRectF, QLineF, QRect, QMarginsF, QPoint
@@ -102,7 +102,7 @@ class CustomGraphicsView(QGraphicsView):
         self._lastMouseViewPosition = QPoint()
         self.itemUnderMouse: Optional[CustomGraphicsViewItem] = None
         self.resizeHandleIndexUnderMouse = -1
-        self.inspectorItemUnderMouse = None
+        self.isInspectorUnderMouse = False
 
         # Selection box and transformation handles
         self.selectionBoxRectItem = QGraphicsRectItem()
@@ -140,6 +140,12 @@ class CustomGraphicsView(QGraphicsView):
         self.UpdateInspectors()
         self.UpdateCursor()
 
+        testItem = QComboBox()
+        [testItem.addItem(str(x)) for x in range(7)]
+        self.testWidget = QGraphicsProxyWidget()
+        self.testWidget.setWidget(testItem)
+        self.scene().addItem(self.testWidget)
+
     def Clear(self):
         self.DeleteItems(self.allItems.copy())
 
@@ -159,27 +165,33 @@ class CustomGraphicsView(QGraphicsView):
         self.UpdateSelectionDisplay()
 
     def UpdateMouseInfo(self, mousePosition: QPoint):
+        print(self.testWidget.isUnderMouse())
+
         self.mouseScenePosition = self.mapToScene(mousePosition)
         self.mouseDeltaScenePosition = self.mouseScenePosition - self.mapToScene(
             self._lastMouseViewPosition)
         self._lastMouseViewPosition = mousePosition
 
+        self.isInspectorUnderMouse = False
         self.itemUnderMouse = None
-        self.inspectorItemUnderMouse = None
-        for item in sorted(self.allItems, key=lambda x: x.itemProxy.zValue(), reverse=True):
-            if item.inspectorProxy.isVisible() and item.inspectorProxy.sceneBoundingRect().contains(
-                    self.mouseScenePosition):
-                self.inspectorItemUnderMouse = item
-                break
-            if item.borderRectItem.contains(self.mouseScenePosition):
-                self.itemUnderMouse = item
-                break
-
         self.resizeHandleIndexUnderMouse = -1
+        for item in self.allItems:
+            if item.inspectorProxy.isVisible():
+                itemUnder = item.inspectorProxy.widget().childAt(item.inspectorProxy.mapFromScene(
+                    self.mouseScenePosition).toPoint())
+                if itemUnder is not None:
+                    self.isInspectorUnderMouse = True
+                    return
+
         for i, handle in enumerate(self.resizeHandles):
             if handle.contains(self.mouseScenePosition):
                 self.resizeHandleIndexUnderMouse = i
-                break
+                return
+
+        for item in sorted(self.allItems, key=lambda x: x.itemProxy.zValue(), reverse=True):
+            if item.itemProxy.isUnderMouse():
+                self.itemUnderMouse = item
+                return
 
     def UpdateCursor(self):
         if self.state == CustomGraphicsViewState.PANNING:
@@ -250,7 +262,8 @@ class CustomGraphicsView(QGraphicsView):
         elif self._transformResizeHandleIndex == 1:
             newRect.setTop(self.Snap(newRect.top() + resizeDelta.y(), self.gridSpacing.height()))
         elif self._transformResizeHandleIndex == 6:
-            newRect.setBottom(self.Snap(newRect.bottom() + resizeDelta.y(), self.gridSpacing.height()))
+            newRect.setBottom(
+                self.Snap(newRect.bottom() + resizeDelta.y(), self.gridSpacing.height()))
         elif self._transformResizeHandleIndex == 3:
             newRect.setLeft(self.Snap(newRect.left() + resizeDelta.x(), self.gridSpacing.width()))
         elif self._transformResizeHandleIndex == 4:
@@ -416,22 +429,19 @@ class CustomGraphicsView(QGraphicsView):
                         self.zoom + float(event.angleDelta().y()) * self.scrollSensitivity)
 
     def keyPressEvent(self, event: QKeyEvent):
-        if self.isInteractive and self.inspectorItemUnderMouse is None:
-            if event.key() == Qt.Key_Delete:
-                self.DeleteItems(self.selectedItems)
-            elif event.modifiers() == Qt.ControlModifier and event.key() == Qt.Key_D:
-                self.Duplicate()
-            elif event.modifiers() == Qt.ControlModifier and event.key() == Qt.Key_A:
-                self.SelectItems(self.allItems)
-        else:
-            super().keyPressEvent(event)
+        if event.key() == Qt.Key_Delete:
+            self.DeleteItems(self.selectedItems)
+        elif event.modifiers() == Qt.ControlModifier and event.key() == Qt.Key_D:
+            self.Duplicate()
+        elif event.modifiers() == Qt.ControlModifier and event.key() == Qt.Key_A:
+            self.SelectItems(self.allItems)
+        super().keyPressEvent(event)
 
     def mousePressEvent(self, event):
         self.UpdateMouseInfo(event.pos())
         if self.state != CustomGraphicsViewState.IDLE:
             return
-        if event.button() == Qt.LeftButton and self.isInteractive and \
-                self.inspectorItemUnderMouse is None:
+        if event.button() == Qt.LeftButton and self.isInteractive and not self.isInspectorUnderMouse:
             self.rubberBandAnchor = self.mouseScenePosition
             self.rubberBandRectItem.setRect(QRectF(self.mouseScenePosition, QSizeF()))
             if self.resizeHandleIndexUnderMouse >= 0:
@@ -458,8 +468,8 @@ class CustomGraphicsView(QGraphicsView):
 
         self.UpdateCursor()
         self.UpdateInspectors()
-        if not self.isInteractive or self.inspectorItemUnderMouse is not None:
-            super().mousePressEvent(event)
+
+        super().mousePressEvent(event)
 
     def mouseReleaseEvent(self, event):
         self.UpdateMouseInfo(event.pos())
@@ -477,8 +487,8 @@ class CustomGraphicsView(QGraphicsView):
             self.DoMultiSelection()
         self.UpdateCursor()
         self.UpdateInspectors()
-        if not self.isInteractive or self.inspectorItemUnderMouse is not None:
-            super().mouseReleaseEvent(event)
+
+        super().mouseReleaseEvent(event)
 
     def mouseMoveEvent(self, event):
         self.UpdateMouseInfo(event.pos())
@@ -496,14 +506,7 @@ class CustomGraphicsView(QGraphicsView):
                 QRectF(self.rubberBandAnchor, self.mouseScenePosition).normalized())
             self.scene().update()
         self.UpdateCursor()
-        if not self.isInteractive or \
-                (self.inspectorItemUnderMouse is not None and
-                 self.state == CustomGraphicsViewState.IDLE):
-            super().mouseMoveEvent(event)
-
-    def mouseDoubleClickEvent(self, event) -> None:
-        if not self.isInteractive or self.inspectorItemUnderMouse is not None:
-            super().mouseDoubleClickEvent(event)
+        super().mouseMoveEvent(event)
 
     def drawBackground(self, painter: QPainter, rect: QRectF):
         if self.backgroundBrush().color() != self.palette().color(QPalette.Light):

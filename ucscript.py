@@ -1,23 +1,23 @@
 import typing as _typing
-import time as _time
 
 
 class Parameter:
-    def __init__(self, parameterType: _typing.Union[_typing.Type, _typing.List[_typing.Type], _typing.List[str]],
-                 defaultValue=None, minimum=None, maximum=None, displayName=None,
-                 validateFunc: _typing.Callable[[_typing.Any], bool] = None):
+    def __init__(self, parameterType, defaultValue=None):
         self.type = parameterType
         self.defaultValue = defaultValue
-        self.minimum = minimum
-        self.maximum = maximum
-        self.displayName = displayName
-        self.validateFunc = validateFunc
 
     def Set(self, value):
         pass
 
     def Get(self) -> _typing.Any:
         pass
+
+
+class Trigger(Parameter):
+    def __init__(self, label, onTriggered: _typing.Callable[[], _typing.Any]):
+        super().__init__(self, None)
+        self.onTriggered = onTriggered
+        self.label = label
 
 
 class Valve:

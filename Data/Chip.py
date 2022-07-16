@@ -1,4 +1,4 @@
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union, Callable, Type
 from pathlib import Path
 
 
@@ -35,6 +35,5 @@ class Program:
     def __init__(self):
         self.path: Optional[Path] = None
         self.rect = [0, 0, 0, 0]
-        self.fontSize = 12
         self.parameterValues: Dict[str, Any] = {}
         self.name = ""

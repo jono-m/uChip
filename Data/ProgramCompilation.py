@@ -3,6 +3,7 @@ import ucscript
 from typing import Optional, List, Dict, Any
 import Data.Chip as Chip
 from Data.Rig import Rig
+import inspect
 from enum import Enum, auto
 
 
@@ -21,16 +22,97 @@ class CompiledProgram:
         self.iterator: Optional[types.GeneratorType] = None
         self.yieldedValue = None
         self.lastCallTime = None
-        self.parameterNames: Dict[ucscript.Parameter, str] = {}
+        self.lastScriptModifiedTime = None
+        self.lastScriptPath = None
+        self.compiledParameters: List[CompiledParameter] = []
         self.globals: Dict[str, Any] = {}
         self.messages: List[str] = []
 
 
-def Compile(program: Chip.Program, chip: Chip, rig: Rig, compiledPrograms: List[CompiledProgram]) -> CompiledProgram:
+def Compile(program: Chip.Program, chip: Chip, rig: Rig,
+            compiledPrograms: List[CompiledProgram]) -> CompiledProgram:
     compiledProgram = CompiledProgram()
     compiledProgram.program = program
     Recompile(compiledProgram, chip, rig, compiledPrograms)
     return compiledProgram
+
+
+class CompiledParameter(ucscript.Parameter):
+    def SetName(self, parameterName: str):
+        self._parameterName = parameterName
+
+    def SetChip(self, chip: Chip):
+        self._chip = chip
+
+    def SetRig(self, rig: Rig):
+        self._rig = rig
+
+    def SetProgram(self, program: Chip.Program):
+        self._program = program
+
+    def GetName(self):
+        return self._parameterName
+
+    def Get(self) -> Any:
+        val = self._program.parameterValues[self._parameterName]
+        if isinstance(val, Chip.Valve):
+            newValve = CompiledValve()
+            newValve.SetValve(val)
+            newValve.SetRig(self._rig)
+            return newValve
+        if isinstance(val, CompiledProgram):
+            newProgram = CompiledProgramReference()
+            newProgram.SetProgram(val)
+            return newProgram
+        return self._program.parameterValues[self._parameterName]
+
+    def Set(self, value):
+        # TODO check for type match
+        self._program.parameterValues[self._parameterName] = value
+
+
+class CompiledValve(ucscript.Valve):
+    def SetValve(self, valve: Chip.Valve):
+        self._valve = valve
+
+    def SetRig(self, rig: Rig):
+        self._rig = rig
+
+    def SetOpen(self, state: bool):
+        self._rig.SetSolenoidState(self._valve.solenoidNumber, state)
+
+    def IsOpen(self) -> bool:
+        self._rig.GetSolenoidState(self._valve.solenoidNumber)
+
+
+class CompiledProgramReference(ucscript.Program):
+    def SetProgram(self, program: CompiledProgram):
+        self._program = program
+
+    def Start(self):
+        StartProgram(self._program)
+
+    def IsRunning(self):
+        return self._program.state == CompiledProgram.ProgramState.RUNNING
+
+    def Pause(self):
+        if self._program.state == CompiledProgram.ProgramState.RUNNING:
+            self._program.state = CompiledProgram.ProgramState.PAUSED
+
+    def Resume(self):
+        if self._program.state == CompiledProgram.ProgramState.PAUSED:
+            self._program.state = CompiledProgram.ProgramState.RUNNING
+
+    def Stop(self):
+        if self._program.state == CompiledProgram.ProgramState.PAUSED or \
+                self._program.state == CompiledProgram.ProgramState.RUNNING:
+            self._program.state = CompiledProgram.ProgramState.IDLE
+
+    def FindParameter(self, name: str):
+        return ExceptionIfNone(
+            next([k for k in self._program.compiledParameters if
+                  k.parameterName == name],
+                 None), "Could not find parameter with name '" + name + "'.")
 
 
 def Recompile(compiledProgram: CompiledProgram, chip: Chip, rig: Rig,
@@ -41,63 +123,28 @@ def Recompile(compiledProgram: CompiledProgram, chip: Chip, rig: Rig,
         WaitForHours = ucscript.WaitForMinutes
         Stop = ucscript.Stop
 
-        class Parameter(ucscript.Parameter):
-            def Get(self) -> Any:
-                return compiledProgram.program.parameterValues[compiledProgram.parameterNames[self]]
-
-            def Set(self, value):
-                # TODO check for type match
-                compiledProgram.program.parameterValues[compiledProgram.parameterNames[self]] = value
-
-        class Valve(ucscript.Valve):
-            def __init__(self, valve: Chip.Valve):
-                super().__init__()
-                self._valve = valve
-
-            def SetOpen(self, state: bool):
-                rig.SetSolenoidState(self._valve.solenoidNumber, state)
-
-            def IsOpen(self) -> bool:
-                return rig.GetSolenoidState(self._valve.solenoidNumber)
-
-        class Program(ucscript.Program):
-            def __init__(self, program: CompiledProgram):
-                super().__init__()
-                self._program = program
-
-            def Start(self):
-                StartProgram(self._program)
-
-            def IsRunning(self):
-                return self._program.state == CompiledProgram.ProgramState.RUNNING
-
-            def Pause(self):
-                if self._program.state == CompiledProgram.ProgramState.RUNNING:
-                    self._program.state = CompiledProgram.ProgramState.PAUSED
-
-            def Resume(self):
-                if self._program.state == CompiledProgram.ProgramState.PAUSED:
-                    self._program.state = CompiledProgram.ProgramState.RUNNING
-
-            def Stop(self):
-                if self._program.state == CompiledProgram.ProgramState.PAUSED or \
-                        self._program.state == CompiledProgram.ProgramState.RUNNING:
-                    self._program.state = CompiledProgram.ProgramState.IDLE
-
-            def FindParameter(self, name: str):
-                return ExceptionIfNone(
-                    next([k for k in self._program.parameterNames if self._program.parameterNames[k] == name],
-                         None), "Could not find parameter with name '" + name + "'.")
+        Parameter = CompiledParameter
+        Trigger = ucscript.Trigger
+        Program = CompiledProgram
+        Valve = CompiledValve
 
         @staticmethod
         def FindValve(name: str):
-            return Namespace.Valve(ExceptionIfNone(next([k for k in chip.valves if k.name == name]),
-                                                   "Could not find program with name '" + name + "'."))
+            valveMatch = ExceptionIfNone(next([k for k in chip.valves if k.name == name]),
+                                         "Could not find program with name '" + name + "'.")
+            newValve = CompiledValve()
+            newValve.SetValve(valveMatch)
+            newValve.SetRig(rig)
+            return newValve
 
         @staticmethod
         def FindProgram(name: str):
-            return Namespace.Program(ExceptionIfNone(next([k for k in compiledPrograms if k.program.name == name]),
-                                                     "Could not find program with name '" + name + "'."))
+            programMatch = ExceptionIfNone(
+                next([k for k in compiledPrograms if k.program.name == name]),
+                "Could not find program with name '" + name + "'.")
+            newProgram = CompiledProgramReference()
+            newProgram.SetProgram(programMatch)
+            return newProgram
 
         @staticmethod
         def SetDescription(description: str):
@@ -121,33 +168,40 @@ def Recompile(compiledProgram: CompiledProgram, chip: Chip, rig: Rig,
             return standardImporter(name, *args, **kwargs)
 
     globalsDict['__builtins__']['__import__'] = ImportInterceptor
-
+    compiledProgram.globals = globalsDict
     # Compile the script
-    exec(compiledProgram.script, globalsDict)
+    exec(compiledProgram.script, compiledProgram.globals)
 
-    existingParameters = compiledProgram.program.parameterValues.copy()
-    newParameters: Dict[str, Any] = {}
-    compiledProgram.parameterNames = {}
+    existingParameterValues = compiledProgram.program.parameterValues.copy()
+    newParameterValues: Dict[str, Any] = {}
+    compiledProgram.compiledParameters = []
     # Extract and match parameters
     for symbol in compiledProgram.globals:
         parameter = compiledProgram.globals[symbol]
-        if isinstance(parameter, ucscript.Parameter):
-            if symbol in newParameters.keys():
+        if isinstance(parameter, CompiledParameter):
+            if not IsParameterTypeValid(parameter.type):
+                raise Exception("Parameter named '" + symbol + "' has an invalid type.")
+            parameter.SetName(symbol)
+            parameter.SetProgram(compiledProgram.program)
+            if parameter.defaultValue is None:
+                parameter.defaultValue = NoneValueForType(parameter.type)
+            if symbol in newParameterValues.keys():
                 raise Exception("Parameter named '" + symbol + "' is already defined.")
-            if symbol in existingParameters.keys():
+            if symbol in existingParameterValues.keys():
                 # Found a name match!
-                value = existingParameters[symbol]
-                del existingParameters[symbol]
-                if IsTypeMatch(parameter.type, value):
+                value = existingParameterValues[symbol]
+                del existingParameterValues[symbol]
+                if IsTypeMatch(value, parameter.type):
                     # Type matches too!
-                    newParameters[symbol] = value
+                    newParameterValues[symbol] = value
                 else:
                     # Type does not match
-                    newParameters[symbol] = parameter.defaultValue
+                    newParameterValues[symbol] = parameter.defaultValue
             else:
                 # Name not found
-                newParameters[symbol] = parameter.defaultValue
-    compiledProgram.program.parameterValues = newParameters
+                newParameterValues[symbol] = parameter.defaultValue
+            compiledProgram.compiledParameters.append(parameter)
+    compiledProgram.program.parameterValues = newParameterValues
 
     return compiledProgram
 
@@ -184,7 +238,34 @@ def TickProgram(compiledProgram: CompiledProgram, currentTime: float):
             compiledProgram.state = CompiledProgram.ProgramState.IDLE
 
 
-def IsTypeMatch(t, value):
+def NoneValueForType(t):
+    if t == int:
+        return 0
+    if t == float:
+        return 0.0
+    if t == str:
+        return ""
+    if isinstance(t, list):
+        if isinstance(t[0], type):
+            return []
+        else:
+            return t[0]
+    return None
+
+
+def IsParameterTypeValid(t):
+    if isinstance(t, type) or isinstance(t, ucscript.Trigger):
+        return True
+    if not isinstance(t, list):
+        return False
+    if len(t) == 1 and isinstance(t[0], type):
+        return IsParameterTypeValid(t[0])
+    if len(t) >= 1 and all([isinstance(ts, str) for ts in t]):
+        return True
+    return False
+
+
+def IsTypeMatch(value, t):
     if isinstance(t, type) and isinstance(value, t):
         return True
     if not isinstance(t, list):
@@ -194,7 +275,7 @@ def IsTypeMatch(t, value):
             return True
         else:
             return False
-    if len(t) >= 1 and all([isinstance(v, str) for v in value]):
+    if len(t) >= 1 and all([isinstance(ts, str) for ts in t]) and value in t:
         return True
     return False
 
