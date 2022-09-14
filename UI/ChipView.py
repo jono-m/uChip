@@ -1,5 +1,5 @@
 import pathlib
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QFileDialog
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton
 from PySide6.QtGui import QIcon, QPixmap, QColor
 from PySide6.QtCore import QPoint, Qt, QSize, QRectF
 
@@ -118,21 +118,21 @@ class ChipView(QWidget):
         newValve.name = "Valve " + str(highestValveNumber + 1)
         newValve.solenoidNumber = highestValveNumber + 1
         UIMaster.Instance().currentChip.valves.append(newValve)
-        newValveItem = ValveItem(newValve)
+        newValveItem = ValveItem.ValveItem(newValve)
         self.graphicsView.AddItems([newValveItem])
         self.graphicsView.CenterItem(newValveItem)
         self.graphicsView.SelectItems([newValveItem])
 
     def AddNewImage(self):
-        path = ImageItem.Browse(self)
+        path = ImageItem.ImageItem.Browse(self)
         if path:
             newImage = Image()
             newImage.path = path
             UIMaster.Instance().currentChip.images.append(newImage)
-            newImageItem = ImageItem(newImage)
+            newImageItem = ImageItem.ImageItem(newImage)
             newImageItem.SetRect(
                 QRectF(newImageItem.GetRect().topLeft(),
-                       QSize(newImageItem.imageData.size())))
+                       QSize(newImageItem.qtImage.size())))
             self.graphicsView.AddItems([newImageItem])
             self.graphicsView.CenterItem(newImageItem)
             self.graphicsView.SelectItems([newImageItem])
@@ -141,20 +141,19 @@ class ChipView(QWidget):
         newText = Text()
         newText.text = "New text"
         UIMaster.Instance().currentChip.text.append(newText)
-        newTextItem = TextItem(newText)
+        newTextItem = TextItem.TextItem(newText)
         self.graphicsView.AddItems([newTextItem])
         self.graphicsView.CenterItem(newTextItem)
         self.graphicsView.SelectItems([newTextItem])
 
     def AddNewProgram(self):
-        programToAdd = QFileDialog.getOpenFileName(self, "Browse for program",
-                                                   filter="uChip program (*.py)")
-        if programToAdd[0]:
+        path = ProgramItem.ProgramItem.Browse(self)
+        if path:
             newProgram = Program()
-            newProgram.path = pathlib.Path(programToAdd[0])
+            newProgram.path = pathlib.Path(path)
             newProgram.name = newProgram.path.stem
             UIMaster.Instance().currentChip.programs.append(newProgram)
-            newProgramItem = ProgramItem(newProgram)
+            newProgramItem = ProgramItem.ProgramItem(newProgram)
             self.graphicsView.AddItems([newProgramItem])
             self.graphicsView.CenterItem(newProgramItem)
             self.graphicsView.SelectItems([newProgramItem])
@@ -163,26 +162,22 @@ class ChipView(QWidget):
         self.graphicsView.Clear()
 
     def OpenChip(self):
-        valveItems = [ValveItem(valve) for valve in UIMaster.Instance().currentChip.valves]
+        valveItems = [ValveItem.ValveItem(valve) for valve in
+                      UIMaster.Instance().currentChip.valves]
         [v.SetRect(QRectF(*valve.rect)) for v, valve in
          zip(valveItems, UIMaster.Instance().currentChip.valves)]
         [v.valveWidget.setEnabled(not self.graphicsView.isInteractive) for v in valveItems]
         self.graphicsView.AddItems(valveItems)
 
-        imageItems = [ImageItem(image) for image in UIMaster.Instance().currentChip.images]
-        [i.SetRect(QRectF(*image.rect)) for i, image in
-         zip(imageItems, UIMaster.Instance().currentChip.images)]
+        imageItems = [ImageItem.ImageItem(image) for image in
+                      UIMaster.Instance().currentChip.images]
         self.graphicsView.AddItems(imageItems)
 
-        textItems = [TextItem(text) for text in UIMaster.Instance().currentChip.text]
-        [i.SetRect(QRectF(*text.rect)) for i, text in
-         zip(textItems, UIMaster.Instance().currentChip.text)]
+        textItems = [TextItem.TextItem(text) for text in UIMaster.Instance().currentChip.text]
         self.graphicsView.AddItems(textItems)
 
-        programItems = [ProgramItem(program) for program in
+        programItems = [ProgramItem.ProgramItem(program) for program in
                         UIMaster.Instance().currentChip.programs]
-        [i.SetRect(QRectF(*program.rect)) for i, program in
-         zip(programItems, UIMaster.Instance().currentChip.programs)]
         self.graphicsView.AddItems(programItems)
 
 

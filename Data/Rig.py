@@ -146,6 +146,8 @@ def RescanPorts():
 
 
 class DummyDevice(Device):
+    n = 0
+
     class DummyPortInfo:
         def __init__(self):
             self.name = "Dummy"
@@ -162,7 +164,10 @@ class DummyDevice(Device):
         super().__init__()
         self.portInfo = DummyDevice.DummyPortInfo()
         self.available = True
-        self.connected = False
+        self.enabled = True
+        self.connected = True
+        self.startNumber = DummyDevice.n
+        DummyDevice.n += 24
 
     def IsConnected(self):
         return self.connected

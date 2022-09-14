@@ -1,9 +1,7 @@
-import time
-
 from Data.Rig import Rig
 from Data.Chip import Chip, Program
-from Data.ProgramCompilation import CompiledProgram, Recompile, Compile
-from typing import Optional, List
+import Data.ProgramCompilation as ProgramCompilation
+from typing import Optional, List, Dict
 from pathlib import Path
 from PySide6.QtGui import QCursor, QGuiApplication
 from PySide6.QtWidgets import QApplication
@@ -15,7 +13,8 @@ class UIMaster:
     def __init__(self):
         super().__init__()
         self.topLevel = QApplication.topLevelWidgets()[0]
-        self.compiledPrograms: List[CompiledProgram] = []
+        self._compiledPrograms: List[ProgramCompilation.CompiledProgram] = []
+        self._programLookup: Dict[Program, ProgramCompilation.CompiledProgram] = {}
         self.rig = Rig()
         self.currentChip = Chip()
         self.modified = False
@@ -23,31 +22,34 @@ class UIMaster:
         self.currentCursorShape: Optional[QCursor] = None
 
     @staticmethod
-    def Recompile(p: Program):
-        match = UIMaster.GetCompiledProgram(p)
-        if match is None:
-            match = Compile(p, UIMaster.Instance().currentChip, UIMaster.Instance().rig,
-                            UIMaster.Instance().compiledPrograms)
-            match.lastScriptModifiedTime = p.path.stat().st_mtime
-            UIMaster.Instance().compiledPrograms.append(match)
-        else:
-            Recompile(match, UIMaster.Instance().currentChip, UIMaster.Instance().rig,
-                      UIMaster.Instance().compiledPrograms)
-        match.lastScriptModifiedTime = p.path.stat().st_mtime
-        match.lastScriptPath = p.path
+    def CompileProgram(program: Program):
+        self = UIMaster.Instance()
+        if program not in self._programLookup:
+            self._programLookup[program] = ProgramCompilation.CompiledProgram(program)
+            self._compiledPrograms.append(self._programLookup[program])
+        ProgramCompilation.Recompile(self._programLookup[program], self.currentChip, self.rig,
+                                     self._compiledPrograms)
 
     @staticmethod
-    def GetCompiledProgram(p: Program):
-        return next((x for x in UIMaster.Instance().compiledPrograms if x.program == p), None)
+    def RemoveProgram(program: Program):
+        self = UIMaster.Instance()
+        if program not in self._programLookup:
+            return
+        self._compiledPrograms.remove(self._programLookup[program])
+        del self._programLookup[program]
 
     @staticmethod
-    def ShouldRecompile(p: Program):
-        match = UIMaster.GetCompiledProgram(p)
-        if match is None:
-            return True
-        if match.lastScriptPath != p.path or match.lastScriptModifiedTime < p.path.stat().st_mtime:
-            return True
-        return False
+    def GetCompiledPrograms():
+        self = UIMaster.Instance()
+        return self._compiledPrograms
+
+    @staticmethod
+    def GetCompiledProgram(program: Program):
+        self = UIMaster.Instance()
+        if program not in self._programLookup or \
+                ProgramCompilation.IsOutOfDate(self._programLookup[program]):
+            self.CompileProgram(program)
+        return self._programLookup[program]
 
     @staticmethod
     def Instance():

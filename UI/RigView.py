@@ -35,8 +35,6 @@ class RigView(QWidget):
         self.devicesList.currentRowChanged.connect(self.NewDeviceSelected)
         self.portInfoLabel = QLabel()
         self.portInfoLabel.setAlignment(Qt.AlignTop)
-        self.portInfoLabel.setSizePolicy(QSizePolicy.Ignored,
-                                         QSizePolicy.Ignored)
         deviceListAndInfoLayout.addWidget(QLabel("<b>Available Devices</b>"))
         deviceListAndInfoLayout.addWidget(BorderSpacer(False))
         dl = QHBoxLayout()
@@ -73,7 +71,6 @@ class RigView(QWidget):
         self.blinkButton.clicked.connect(self.Blink)
 
         deviceListAndInfoLayout.addWidget(self.blinkButton)
-        deviceListAndInfoLayout.addWidget(BorderSpacer(False))
         self.selectedDevice: Optional[Device] = None
         self.lastDevicesList: List[Device] = []
 

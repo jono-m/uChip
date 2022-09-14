@@ -1,5 +1,6 @@
 from typing import List, Optional
-from PySide6.QtWidgets import QGraphicsView, QGraphicsScene, QWidget, QGraphicsProxyWidget, QGraphicsRectItem, \
+from PySide6.QtWidgets import QGraphicsView, QGraphicsScene, QWidget, QGraphicsProxyWidget, \
+    QGraphicsRectItem, \
     QVBoxLayout, QLabel, QFrame
 from PySide6.QtGui import QPen, QColor, QPainter, QBrush, QTransform, QGuiApplication, QPalette
 from PySide6.QtCore import Qt, QPointF, QSizeF, QRectF, QLineF, QRect, QMarginsF, QPoint, QTimer
@@ -32,9 +33,16 @@ class CustomGraphicsViewItem:
             self.inspectorProxy.setWidget(widget)
         self.borderRectItem = QGraphicsRectItem()
         self.updateTimer = QTimer(self.itemProxy)
-        self.updateTimer.timeout.connect(self.Update)
+        self.updateTimer.timeout.connect(self._Update)
         self.updateTimer.start(30)
+        self.isResizable = True
+        self.isUpdating = False
+        self._Update()
+
+    def _Update(self):
+        self.isUpdating = True
         self.Update()
+        self.isUpdating = False
 
     def Update(self):
         pass
@@ -131,14 +139,31 @@ class CustomGraphicsView(QGraphicsView):
         self.UpdateInspectors()
         self.UpdateCursor()
 
+        self.updateTimer = QTimer(self)
+        self.updateTimer.timeout.connect(self.Update)
+        self.updateTimer.start(100)
+
     def Clear(self):
         self.DeleteItems(self.allItems.copy())
+
+    def Update(self):
+        self.UpdateSelectionDisplay()
 
     def UpdateViewMatrix(self):
         transform = QTransform()
         transform.scale(self.zoom, self.zoom)
         self.setTransform(transform)
         self.setSceneRect(QRectF(self.viewOffset, QSizeF(1, 1)))
+
+    def SelectAll(self):
+        self.SelectItems(self.allItems)
+
+    def CenterOnSelection(self):
+        if len(self.selectedItems) == 0:
+            return
+        selectionRect = reduce(QRectF.united, [item.GetRect() for item in self.selectedItems])
+        self.viewOffset = selectionRect.center()
+        self.UpdateViewMatrix()
 
     def UpdateZoom(self, scenePositionAnchor: QPointF, newZoom: float):
         anchorScreenSpace = self.mapFromScene(scenePositionAnchor)
@@ -161,7 +186,8 @@ class CustomGraphicsView(QGraphicsView):
         self.resizeHandleIndexUnderMouse = -1
         for item in self.allItems:
             if item.inspectorProxy is not None and item.inspectorProxy.isVisible():
-                itemUnder = item.inspectorProxy.contains(item.inspectorProxy.mapFromScene(self.mouseScenePosition))
+                itemUnder = item.inspectorProxy.contains(
+                    item.inspectorProxy.mapFromScene(self.mouseScenePosition))
                 if itemUnder:
                     self.isInspectorUnderMouse = True
                     return
@@ -263,7 +289,8 @@ class CustomGraphicsView(QGraphicsView):
                 ((p.y() - initialRect.y()) / initialRect.height()) * newRect.height() + newRect.y())
 
         for (r, i) in zip(self._transformStartRects, self.selectedItems):
-            i.SetRect(QRectF(Transform(r.topLeft()), Transform(r.bottomRight())))
+            if i.isResizable:
+                i.SetRect(QRectF(Transform(r.topLeft()), Transform(r.bottomRight())))
 
         self.UpdateSelectionBox()
 
@@ -324,7 +351,8 @@ class CustomGraphicsView(QGraphicsView):
         for item in self.allItems:
             isSelected = item in self.selectedItems
             item.borderRectItem.setVisible(isSelected)
-            item.borderRectItem.setPen(QPen(self.selectedItemBorderColor, selectedItemBorderSceneSize))
+            item.borderRectItem.setPen(
+                QPen(self.selectedItemBorderColor, selectedItemBorderSceneSize))
         self.UpdateSelectionBox()
 
     def UpdateInspectors(self):
@@ -332,8 +360,8 @@ class CustomGraphicsView(QGraphicsView):
         for i in self.allItems:
             if i.inspectorProxy is None:
                 continue
-            if self.isInteractive and i in self.selectedItems and self.state in [CustomGraphicsViewState.IDLE,
-                                                                                 CustomGraphicsViewState.PANNING]:
+            if self.isInteractive and i in self.selectedItems and self.state in \
+                    [CustomGraphicsViewState.IDLE, CustomGraphicsViewState.PANNING]:
                 i.inspectorProxy.setVisible(True)
                 i.inspectorProxy.setScale(1 / self.zoom)
                 i.inspectorProxy.setZValue(maxZValue + 3)
@@ -361,24 +389,29 @@ class CustomGraphicsView(QGraphicsView):
                          QRect(0, 0, self.selectionBoxRectScreenSize, 1)).boundingRect().width(),
                      j=Qt.MiterJoin))
 
-            handlePositions = (
-                selectionRect.topLeft(), QPointF(selectionRect.center().x(), selectionRect.top()),
-                selectionRect.topRight(), QPointF(selectionRect.left(), selectionRect.center().y()),
-                QPointF(selectionRect.right(), selectionRect.center().y()),
-                selectionRect.bottomLeft(),
-                QPointF(selectionRect.center().x(), selectionRect.bottom()),
-                selectionRect.bottomRight())
-            handleSize = self.GetPixelSceneSize(self.resizeHandleScreenSize)
-            for pos, h in zip(handlePositions, self.resizeHandles):
-                h.setVisible(True)
-                h.setPen(QPen(self.resizeHandleBorderColor,
-                              self.GetPixelSceneSize(self.resizeHandleBorderScreenSize),
-                              j=Qt.MiterJoin))
-                h.setBrush(QBrush(self.resizeHandleColor))
-                h.setZValue(maxZValue + 2)
-                r = QRectF(QPointF(), QSizeF(handleSize, handleSize))
-                r.moveCenter(pos)
-                h.setRect(r)
+            if all([not x.isResizable for x in self.selectedItems]):
+                [h.setVisible(False) for h in self.resizeHandles]
+            else:
+                handlePositions = (
+                    selectionRect.topLeft(),
+                    QPointF(selectionRect.center().x(), selectionRect.top()),
+                    selectionRect.topRight(),
+                    QPointF(selectionRect.left(), selectionRect.center().y()),
+                    QPointF(selectionRect.right(), selectionRect.center().y()),
+                    selectionRect.bottomLeft(),
+                    QPointF(selectionRect.center().x(), selectionRect.bottom()),
+                    selectionRect.bottomRight())
+                handleSize = self.GetPixelSceneSize(self.resizeHandleScreenSize)
+                for pos, h in zip(handlePositions, self.resizeHandles):
+                    h.setVisible(True)
+                    h.setPen(QPen(self.resizeHandleBorderColor,
+                                  self.GetPixelSceneSize(self.resizeHandleBorderScreenSize),
+                                  j=Qt.MiterJoin))
+                    h.setBrush(QBrush(self.resizeHandleColor))
+                    h.setZValue(maxZValue + 2)
+                    r = QRectF(QPointF(), QSizeF(handleSize, handleSize))
+                    r.moveCenter(pos)
+                    h.setRect(r)
         else:
             self.selectionBoxRectItem.setVisible(False)
             [h.setVisible(False) for h in self.resizeHandles]
@@ -421,7 +454,6 @@ class CustomGraphicsView(QGraphicsView):
         event.accept()
 
     def keyPressEvent(self, event):
-        print(self.scene().focusItem())
         if self.isInteractive and len(self.selectedItems) > 0 and self.scene().focusItem() is None:
             if event.key() == Qt.Key_Delete:
                 self.DeleteItems(self.selectedItems)

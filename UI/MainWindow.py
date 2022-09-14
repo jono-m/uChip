@@ -1,12 +1,13 @@
 import pathlib
 
-from PySide6.QtWidgets import QMainWindow, QDockWidget, QTabWidget, QWidget, QMenuBar, QFileDialog, \
-    QMessageBox
-from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QMainWindow, QTabWidget, QWidget, QMenuBar, QFileDialog, \
+    QMessageBox, QHBoxLayout, QPushButton, QSizePolicy
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QIcon, QKeySequence
 from UI.ChipView import ChipView
 from UI.RigView import RigView
 from UI.UIMaster import UIMaster
+from UI.BackgroundWorker import BackgroundWorker
 from Data.FileIO import SaveObject, LoadObject
 from Data.Chip import Chip
 
@@ -15,7 +16,12 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.chipEditor = ChipView()
-        self.setCentralWidget(self.chipEditor)
+        centralWidget = QWidget()
+        l = QHBoxLayout()
+        l.setContentsMargins(0, 0, 0, 0)
+        l.setSpacing(0)
+        centralWidget.setLayout(l)
+        self.setCentralWidget(centralWidget)
         self.setWindowIcon(QIcon("Assets/Images/icon.png"))
 
         self.setTabPosition(Qt.AllDockWidgetAreas, QTabWidget.TabPosition.North)
@@ -27,15 +33,50 @@ class MainWindow(QMainWindow):
 
         self.BuildMenu()
 
-        self.ShowWidget(self.rigView)
+        self.toggleButton = QPushButton()
+        self.toggleButton.clicked.connect(self.ToggleRig)
+        self.toggleButton.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Expanding)
+        self.toggleButton.setStyleSheet("""
+        QPushButton {
+        background-color: rgba(0, 0, 0, 0.1);
+        padding: 5px;
+        font-weight: bold;
+        }
+        QPushButton:hover {
+        background-color: rgba(0, 0, 0, 0.2);
+        }
+        """)
+        l.addWidget(self.chipEditor, stretch=1)
+        l.addWidget(self.toggleButton)
+        l.addWidget(self.rigView, stretch=0)
+
+        self.backgroundWorker = BackgroundWorker(5.0)
+        watchdogTimer = QTimer(self)
+        watchdogTimer.timeout.connect(self.CheckForTimeout)
+        watchdogTimer.start(1000)
 
         self.NewChip()
+        self.ToggleRig()
+        self.ToggleRig()
+
+    def ToggleRig(self):
+        self.rigView.setHidden(not self.rigView.isHidden())
+        self.toggleButton.setText("<" if self.rigView.isHidden() else ">")
+
+    def CheckForTimeout(self):
+        if self.backgroundWorker.IsStuck():
+            QMessageBox.critical(self, "Stuck",
+                                 "Function %s in program %s has blocked the update thread for "
+                                 ">5 seconds. Ensure that this script does not have a long-running "
+                                 "or infinite loop. Programs may not run until uChip is restarted."
+                                 % (self.backgroundWorker.tickStartFunctionSymbol,
+                                    self.backgroundWorker.tickStartProgram.program.name))
 
     def NewChip(self):
         if not self.PromptCloseChip():
             return
-        UIMaster.Instance().currentChip = Chip()
         self.chipEditor.CloseChip()
+        UIMaster.Instance().currentChip = Chip()
         self.chipEditor.OpenChip()
         UIMaster.Instance().modified = False
 
@@ -102,19 +143,16 @@ class MainWindow(QMainWindow):
         exitAction = fileMenu.addAction("Exit")
         exitAction.triggered.connect(self.close)
 
-        viewMenu = menuBar.addMenu("View")
-        viewRigAction = viewMenu.addAction("Rig")
-        viewRigAction.triggered.connect(lambda: self.ShowWidget(self.rigView))
+        selectMenu = menuBar.addMenu("&Select")
+        selectAllAction = selectMenu.addAction("All")
+        selectAllAction.triggered.connect(lambda: self.chipEditor.graphicsView.SelectAll())
+        selectAllAction.setShortcut(QKeySequence("Ctrl+A"))
+        selectNoneAction = selectMenu.addAction("None")
+        selectNoneAction.triggered.connect(lambda: self.chipEditor.graphicsView.SelectItems([]))
+        selectNoneAction.setShortcut(QKeySequence("Esc"))
+
+        viewMenu = menuBar.addMenu("&View")
+        centerOnSelected = viewMenu.addAction("Center On Selection")
+        centerOnSelected.triggered.connect(lambda: self.chipEditor.graphicsView.CenterOnSelection())
 
         self.setMenuBar(menuBar)
-
-    def ShowWidget(self, widget: QWidget):
-        if widget.isVisible():
-            return
-
-        dock = QDockWidget()
-        dock.setWindowTitle(widget.objectName())
-        dock.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
-        dock.setWidget(widget)
-        dock.setFeatures(QDockWidget.DockWidgetClosable | QDockWidget.DockWidgetMovable)
-        self.addDockWidget(self.dockPositions[widget], dock)

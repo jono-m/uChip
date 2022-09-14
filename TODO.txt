@@ -1,0 +1,9 @@
+TO DO:
+
+- Program error/message boxes & clear
+- Icons and clean up style/layout
+- Beautification of parameter names
+
+
+BUGS:
+- Resizing rig panel blows up the window past a certain point
