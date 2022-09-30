@@ -68,6 +68,7 @@ def BuildEnvironment():
     # Grab builtins
     globalsDict = {}
     exec("", globalsDict)
+    globalsDict = globalsDict.copy()
 
     # The built-in importer
     builtInImporter = globalsDict['__builtins__']['__import__']
@@ -80,6 +81,7 @@ def BuildEnvironment():
             return builtInImporter(name, *args, **kwargs)
 
     # Replace the importer
+    globalsDict['__builtins__'] = globalsDict['__builtins__'].copy()
     globalsDict['__builtins__']['__import__'] = ImportInterceptor
     return globalsDict
 

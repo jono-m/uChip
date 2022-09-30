@@ -8,13 +8,13 @@ from serial.tools.list_ports_common import ListPortInfo
 class Rig:
     def __init__(self):
         self.solenoidStates: Dict[int, bool] = {}
-        self.allDevices: List[Device] = [DummyDevice(), DummyDevice()]
+        self.allDevices: List[Device] = []
 
     def RescanForDevices(self):
         portInfos = RescanPorts()
 
         for device in self.allDevices:
-            match = next([p for p in portInfos if p.serial_number == device.portInfo.serial_number],
+            match = next((p for p in portInfos if p.serial_number == device.portInfo.serial_number),
                          None)
             if match is not None:
                 device.portInfo = match
@@ -28,6 +28,7 @@ class Rig:
                 newDevice = Device()
                 newDevice.portInfo = portInfo
                 newDevice.available = True
+                self.allDevices.append(newDevice)
 
     def SetSolenoidState(self, number: int, state: bool):
         self.solenoidStates[number] = state

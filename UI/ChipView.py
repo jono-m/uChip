@@ -41,7 +41,7 @@ class ChipView(QWidget):
         self.addValveButton.setFocusPolicy(Qt.NoFocus)
         self.addValveButton.setToolTip("Add valve")
         self.addValveButton.setIcon(
-            ColoredIcon("Assets/Images/plusIcon.png", QColor(100, 100, 100)))
+            ColoredIcon("Assets/Images/ValveIcon.png", QColor(100, 100, 100)))
         self.addValveButton.setFixedSize(30, 30)
         self.addValveButton.setIconSize(QSize(20, 20))
         self.addValveButton.clicked.connect(self.AddNewValve)
@@ -50,7 +50,7 @@ class ChipView(QWidget):
         self.addImageButton.setFocusPolicy(Qt.NoFocus)
         self.addImageButton.setToolTip("Add image")
         self.addImageButton.setIcon(
-            ColoredIcon("Assets/Images/plusIcon.png", QColor(100, 100, 100)))
+            ColoredIcon("Assets/Images/imageIcon.png", QColor(100, 100, 100)))
         self.addImageButton.setFixedSize(30, 30)
         self.addImageButton.setIconSize(QSize(20, 20))
         self.addImageButton.clicked.connect(self.AddNewImage)
@@ -59,7 +59,7 @@ class ChipView(QWidget):
         self.addProgramButton.setFocusPolicy(Qt.NoFocus)
         self.addProgramButton.setToolTip("Add program")
         self.addProgramButton.setIcon(
-            ColoredIcon("Assets/Images/plusIcon.png", QColor(100, 100, 100)))
+            ColoredIcon("Assets/Images/CodeIcon.png", QColor(100, 100, 100)))
         self.addProgramButton.setFixedSize(30, 30)
         self.addProgramButton.setIconSize(QSize(20, 20))
         self.addProgramButton.clicked.connect(self.AddNewProgram)
@@ -68,7 +68,7 @@ class ChipView(QWidget):
         self.addTextButton.setFocusPolicy(Qt.NoFocus)
         self.addTextButton.setToolTip("Add text")
         self.addTextButton.setIcon(
-            ColoredIcon("Assets/Images/plusIcon.png", QColor(100, 100, 100)))
+            ColoredIcon("Assets/Images/TextIcon.png", QColor(100, 100, 100)))
         self.addTextButton.setFixedSize(30, 30)
         self.addTextButton.setIconSize(QSize(20, 20))
         self.addTextButton.clicked.connect(self.AddNewText)

@@ -6,17 +6,18 @@ from UI.UIMaster import UIMaster
 from Data.ProgramCompilation import TickFunction, CompiledProgram
 
 
-class BackgroundWorker:
+class ProgramWorker:
     def __init__(self, timeout: float):
         self.tickStartTime: typing.Optional[float] = None
         self.tickStartProgram: typing.Optional[CompiledProgram] = None
         self.tickStartFunctionSymbol: str = ""
         self.timeout = timeout
         self.thread = threading.Thread(target=self.Loop, daemon=True)
+        self.doStop = False
         self.thread.start()
 
     def Loop(self):
-        while True:
+        while not self.doStop:
             for x in UIMaster.GetCompiledPrograms().copy():
                 self.tickStartProgram = x
                 for s in x.asyncFunctions.copy():
@@ -30,4 +31,5 @@ class BackgroundWorker:
         if self.tickStartTime is None or self.thread is None:
             return False
         if time.time() - self.tickStartTime >= self.timeout:
+            self.tickStartTime = time.time()
             return True

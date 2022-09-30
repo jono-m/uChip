@@ -130,7 +130,7 @@ class RigView(QWidget):
         devices = [d for d in UIMaster.Instance().rig.allDevices if d.available]
         if devices == self.lastDevicesList:
             return
-        self.lastDevicesList = devices
+        self.lastDevicesList = devices.copy()
         self.devicesList.clear()
         for d in UIMaster.Instance().rig.allDevices:
             if d.available:

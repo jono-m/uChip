@@ -1,8 +1,8 @@
 import typing
 import pathlib
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QFormLayout, QLineEdit, \
-    QSpinBox, QDoubleSpinBox, QComboBox, QFileDialog, QGridLayout, QHBoxLayout
-from PySide6.QtCore import QRectF, Signal
+    QSpinBox, QDoubleSpinBox, QComboBox, QFileDialog, QGridLayout, QHBoxLayout, QScrollArea, QFrame
+from PySide6.QtCore import QRectF, Signal, Qt
 
 import ucscript
 from UI.UIMaster import UIMaster
@@ -19,7 +19,8 @@ class ProgramItem(CustomGraphicsViewItem):
 
         # Set up the inspector for this item:
         inspectorWidget = QWidget()
-        inspectorWidget.setLayout(QVBoxLayout())
+        inspectorWidgetLayout = QVBoxLayout()
+        inspectorWidget.setLayout(inspectorWidgetLayout)
 
         # Program name field
         nameAndSourceLayout = QFormLayout()
@@ -48,20 +49,39 @@ class ProgramItem(CustomGraphicsViewItem):
 
         # Parameters will be kept in this layout for the inspector. All parameters are shown here.
         self.parametersLayout = QGridLayout()
-        parametersWidget = QWidget()
+        self.parametersLayout.setContentsMargins(0, 0, 0, 0)
+        self.parametersLayout.setSpacing(0)
+        parametersWidget = QFrame()
+        parametersWidget.setFrameShape(QFrame.Shape.Panel)
+        parametersWidget.setFrameShadow(QFrame.Sunken)
+        parametersWidget.setLineWidth(2)
+        parametersWidget.setStyleSheet("""
+        QLabel {
+        padding: 5px;
+        }""")
         parametersWidget.setLayout(self.parametersLayout)
         inspectorWidget.layout().addWidget(parametersWidget)
 
         # Parameters will be kept in this layout for the item. Only visible parameters will be
         # shown.
         self.visibleParametersLayout = QGridLayout()
-        visibleParametersWidget = QWidget()
+        self.visibleParametersLayout.setContentsMargins(0, 0, 0, 0)
+        self.visibleParametersLayout.setSpacing(0)
+        visibleParametersWidget = QFrame()
+        visibleParametersWidget.setFrameShape(QFrame.Shape.Panel)
+        visibleParametersWidget.setFrameShadow(QFrame.Sunken)
+        visibleParametersWidget.setLineWidth(2)
+        visibleParametersWidget.setStyleSheet("""
+        QLabel {
+        padding: 5px;
+        }""")
         visibleParametersWidget.setLayout(self.visibleParametersLayout)
         inspectorWidget.layout().addWidget(visibleParametersWidget)
 
         # Functions will be kept in this layout for the item. All zero-argument functions will be
         # shown here as buttons.
         self.functionsLayout = QGridLayout()
+        self.functionsLayout.setContentsMargins(0, 0, 0, 0)
         functionsWidget = QWidget()
         functionsWidget.setLayout(self.functionsLayout)
 
@@ -74,19 +94,31 @@ class ProgramItem(CustomGraphicsViewItem):
         # Actual item widget
         itemWidget = QWidget()
         self.nameWidget = QLabel()
-        itemWidget.setLayout(QVBoxLayout())
+        self.nameWidget.setAlignment(Qt.AlignCenter)
+        itemLayout = QVBoxLayout()
+        itemWidget.setLayout(itemLayout)
         itemWidget.layout().addWidget(self.nameWidget)
         itemWidget.layout().addWidget(visibleParametersWidget)
         itemWidget.layout().addWidget(functionsWidget)
 
         # Compilation/program error reporting
-        self.messagesLabel = QLabel()
-        self.messagesLabel.setStyleSheet("color: red")
-        itemWidget.layout().addWidget(self.messagesLabel)
+        self.messageArea = MessageArea()
+        clearMessagesButton = QPushButton("Clear")
+        clearMessagesButton.clicked.connect(self.ClearMessages)
+        spacerWidget = QLabel()
+        spacerWidget.setStyleSheet("background-color: #999999;")
+        spacerWidget.setFixedHeight(1)
+        itemWidget.layout().addWidget(spacerWidget)
+        itemWidget.layout().addWidget(self.messageArea)
+        itemWidget.layout().addWidget(clearMessagesButton)
 
         super().__init__("Program", itemWidget, inspectorWidget)
         super().SetRect(QRectF(*program.position, 0, 0))
         self.isResizable = False
+
+    def ClearMessages(self):
+        compiled = UIMaster.GetCompiledProgram(self.program)
+        compiled.messages.clear()
 
     @staticmethod
     def Browse(parent: QWidget):
@@ -128,13 +160,13 @@ class ProgramItem(CustomGraphicsViewItem):
         if self.program.name != self.nameField.text():
             self.nameField.setText(self.program.name)
         if self.program.name != self.nameWidget.text():
-            self.nameWidget.setText(self.program.name)
+            self.nameWidget.setText("<b>%s</b>" % self.program.name)
         path = str(self.program.path.absolute())
         if path != self.pathWidget.text():
             self.pathWidget.setText(path)
 
         compiled = UIMaster.GetCompiledProgram(self.program)
-        self.messagesLabel.setText("\n".join(compiled.messages))
+        self.messageArea.Update(compiled.messages)
         if self.scaleWidget.value() != self.program.scale:
             self.scaleWidget.setValue(self.program.scale)
 
@@ -156,9 +188,15 @@ class ProgramItem(CustomGraphicsViewItem):
         for i in range(len(self.parameterWidgetSets), len(compiled.parameters)):
             newSet = ParameterWidgetSet()
             self.parameterWidgetSets.append(newSet)
+            newSet.inspectorNameLabel.setStyleSheet(
+                "background-color: " + (
+                    "rgba(0, 0, 0, 0.2)" if i % 2 == 0 else "rgba(0, 0, 0, 0.1)"))
             self.parametersLayout.addWidget(newSet.inspectorNameLabel, i, 0)
             self.parametersLayout.addWidget(newSet.inspectorVisibilityToggle, i, 2)
             self.visibleParametersLayout.addWidget(newSet.itemNameLabel, i, 0)
+            newSet.itemNameLabel.setStyleSheet(
+                "background-color: " + (
+                    "rgba(0, 0, 0, 0.2)" if i % 2 == 0 else "rgba(0, 0, 0, 0.1)"))
             newSet.inspectorVisibilityToggle.setCheckable(True)
             newSet.inspectorVisibilityToggle.toggled.connect(self.RecordChanges)
 
@@ -299,6 +337,7 @@ class ParameterWidgetSet:
         self.inspectorValueWidget = ParameterValueWidget()
         self.inspectorNameLabel = QLabel()
         self.inspectorVisibilityToggle = QPushButton("O")
+        self.inspectorVisibilityToggle.setFixedWidth(40)
         self.itemValueWidget = ParameterValueWidget()
         self.itemNameLabel = QLabel()
 
@@ -341,24 +380,26 @@ class ParameterValueWidget(QWidget):
         elif IsTypeValidList(self.parameterType):
             controlWidget = QWidget()
             controlLayout = QVBoxLayout()
+            controlLayout.setContentsMargins(0, 0, 0, 0)
             controlWidget.setLayout(controlLayout)
 
             self.listItemsLayout = QVBoxLayout()
             controlLayout.addLayout(self.listItemsLayout)
 
             countLayout = QHBoxLayout()
-            countLayout.addWidget(QLabel("Size"))
+            countLayout.setSpacing(0)
+            countLayout.addWidget(QLabel("Count"))
             self.listCountWidget = QSpinBox()
             self.listCountWidget.setMinimum(0)
             self.listCountWidget.setMaximum(1000)
             self.listCountWidget.valueChanged.connect(self.OnChanged)
-            countLayout.addWidget(self.listCountWidget)
+            countLayout.addWidget(self.listCountWidget, stretch=1)
             controlLayout.addLayout(countLayout)
 
             self.listContents: typing.List[ParameterValueWidget] = []
         self._updating = False
-        self.setLayout(QVBoxLayout())
-
+        pLayout = QVBoxLayout()
+        self.setLayout(pLayout)
         self.controlWidget: typing.Union[
             QSpinBox, QDoubleSpinBox, QLineEdit, QComboBox, QWidget, None] = controlWidget
         self.layout().addWidget(self.controlWidget)
@@ -436,3 +477,40 @@ class ParameterValueWidget(QWidget):
                 self.topLevelWidget().adjustSize()
             [x.SetValue(v) for x, v in zip(self.listContents, value)]
         self._updating = False
+
+
+class MessageArea(QScrollArea):
+    def __init__(self):
+        super().__init__()
+
+        scrollContents = QWidget()
+        self.setWidget(scrollContents)
+        self.setWidgetResizable(True)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scrollLayout = QVBoxLayout()
+        self.scrollLayout.setAlignment(Qt.AlignTop)
+        self.scrollLayout.setContentsMargins(0, 0, 0, 0)
+        self.scrollLayout.setSpacing(0)
+        scrollContents.setLayout(self.scrollLayout)
+
+        self.lastMessages = []
+        self.labels = []
+
+    def Update(self, messages):
+        if messages == self.lastMessages:
+            return
+
+        [label.deleteLater() for label in self.labels]
+        self.labels = []
+        self.lastMessages = messages.copy()
+
+        for i, message in enumerate(self.lastMessages):
+            newEntry = QLabel(message)
+            newEntry.setStyleSheet("""
+            padding: 5px;
+            background-color: """ + ("#FFFFFF" if i % 2 == 0 else "#CCCCCC"))
+            newEntry.setWordWrap(True)
+            self.labels.append(newEntry)
+            self.scrollLayout.addWidget(newEntry)
+        self.verticalScrollBar().setSliderPosition(self.verticalScrollBar().maximum())

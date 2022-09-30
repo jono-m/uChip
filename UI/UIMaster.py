@@ -1,5 +1,6 @@
 from Data.Rig import Rig
 from Data.Chip import Chip, Program
+from Data.FileIO import SaveObject, LoadObject
 import Data.ProgramCompilation as ProgramCompilation
 from typing import Optional, List, Dict
 from pathlib import Path
@@ -16,10 +17,22 @@ class UIMaster:
         self._compiledPrograms: List[ProgramCompilation.CompiledProgram] = []
         self._programLookup: Dict[Program, ProgramCompilation.CompiledProgram] = {}
         self.rig = Rig()
+        self.rig.allDevices = []
+        try:
+            self.rig.allDevices = LoadObject(Path("devices.pkl"))
+        except EOFError:
+            pass
+        except IOError:
+            pass
         self.currentChip = Chip()
         self.modified = False
         self.currentChipPath: Optional[Path] = None
         self.currentCursorShape: Optional[QCursor] = None
+
+    @staticmethod
+    def Shutdown():
+        self = UIMaster.Instance()
+        SaveObject(self.rig.allDevices, Path("devices.pkl"))
 
     @staticmethod
     def CompileProgram(program: Program):

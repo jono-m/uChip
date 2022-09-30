@@ -7,7 +7,8 @@ from PySide6.QtGui import QIcon, QKeySequence
 from UI.ChipView import ChipView
 from UI.RigView import RigView
 from UI.UIMaster import UIMaster
-from UI.BackgroundWorker import BackgroundWorker
+from UI.ProgramWorker import ProgramWorker
+from UI.USBWorker import USBWorker
 from Data.FileIO import SaveObject, LoadObject
 from Data.Chip import Chip
 
@@ -23,7 +24,6 @@ class MainWindow(QMainWindow):
         centralWidget.setLayout(l)
         self.setCentralWidget(centralWidget)
         self.setWindowIcon(QIcon("Assets/Images/icon.png"))
-
         self.setTabPosition(Qt.AllDockWidgetAreas, QTabWidget.TabPosition.North)
 
         self.resize(1600, 900)
@@ -50,7 +50,8 @@ class MainWindow(QMainWindow):
         l.addWidget(self.toggleButton)
         l.addWidget(self.rigView, stretch=0)
 
-        self.backgroundWorker = BackgroundWorker(5.0)
+        self.programWorker = ProgramWorker(5.0)
+        self.usbWorker = USBWorker()
         watchdogTimer = QTimer(self)
         watchdogTimer.timeout.connect(self.CheckForTimeout)
         watchdogTimer.start(1000)
@@ -64,13 +65,13 @@ class MainWindow(QMainWindow):
         self.toggleButton.setText("<" if self.rigView.isHidden() else ">")
 
     def CheckForTimeout(self):
-        if self.backgroundWorker.IsStuck():
+        if self.programWorker.IsStuck():
             QMessageBox.critical(self, "Stuck",
                                  "Function %s in program %s has blocked the update thread for "
                                  ">5 seconds. Ensure that this script does not have a long-running "
                                  "or infinite loop. Programs may not run until uChip is restarted."
-                                 % (self.backgroundWorker.tickStartFunctionSymbol,
-                                    self.backgroundWorker.tickStartProgram.program.name))
+                                 % (self.programWorker.tickStartFunctionSymbol,
+                                    self.programWorker.tickStartProgram.program.name))
 
     def NewChip(self):
         if not self.PromptCloseChip():
@@ -79,6 +80,7 @@ class MainWindow(QMainWindow):
         UIMaster.Instance().currentChip = Chip()
         self.chipEditor.OpenChip()
         UIMaster.Instance().modified = False
+        self.SetWindowTitle()
 
     def SaveChip(self, saveAs: bool):
         if saveAs or UIMaster.Instance().currentChipPath is None:
@@ -89,6 +91,7 @@ class MainWindow(QMainWindow):
                 return False
         SaveObject(UIMaster.Instance().currentChip, UIMaster.Instance().currentChipPath)
         UIMaster.Instance().modified = False
+        self.SetWindowTitle()
         return True
 
     def OpenChip(self):
@@ -101,6 +104,7 @@ class MainWindow(QMainWindow):
             UIMaster.Instance().currentChip = LoadObject(UIMaster.Instance().currentChipPath)
             self.chipEditor.OpenChip()
             UIMaster.Instance().modified = False
+            self.SetWindowTitle()
         else:
             return
 
@@ -115,9 +119,18 @@ class MainWindow(QMainWindow):
                 return self.SaveChip(False)
         return True
 
+    def SetWindowTitle(self):
+        chipName = "New Chip" if UIMaster.Instance().currentChipPath is None else UIMaster.Instance().currentChipPath.stem
+        self.setWindowTitle("µChip - " + chipName)
+
     def closeEvent(self, event):
         if self.PromptCloseChip():
             super().closeEvent(event)
+            self.programWorker.doStop = True
+            self.usbWorker.doStop = True
+            self.programWorker.thread.join()
+            self.usbWorker.thread.join()
+            UIMaster.Shutdown()
         else:
             event.ignore()
 
