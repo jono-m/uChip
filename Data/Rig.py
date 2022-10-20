@@ -19,6 +19,8 @@ class Rig:
             if match is not None:
                 device.portInfo = match
                 device.available = True
+                if device.enabled:
+                    device.Connect()
             else:
                 device.available = False
                 device.Disconnect()

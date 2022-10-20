@@ -1,3 +1,5 @@
 TO DO:
 
 - Beautification of parameter names
+- Build executable
+- Import program window has templates/built-ins

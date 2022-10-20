@@ -9,12 +9,6 @@ class Chip:
         self.text: List[Text] = []
         self.programs: List[Program] = []
 
-        testProgram = Program()
-        testProgram.path = Path("Builtins/ValveSet.py")
-        testProgram.name = "Program name"
-        testProgram.rect = [0, 0, 400, 400]
-        self.programs.append(testProgram)
-
 
 class Valve:
     def __init__(self):

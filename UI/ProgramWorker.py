@@ -25,7 +25,7 @@ class ProgramWorker:
                     self.tickStartFunctionSymbol = s
                     TickFunction(x, s)
                     self.tickStartTime = None
-                time.sleep(0.01)
+            time.sleep(0.01)
 
     def IsStuck(self):
         if self.tickStartTime is None or self.thread is None:
