@@ -39,6 +39,9 @@ class CustomGraphicsViewItem:
         self.isUpdating = False
         self._Update()
 
+    def SetEnabled(self, state):
+        self.itemProxy.setEnabled(state)
+
     def _Update(self):
         self.isUpdating = True
         self.Update()
@@ -301,7 +304,7 @@ class CustomGraphicsView(QGraphicsView):
             self.scene().addItem(i.borderRectItem)
             self.scene().addItem(i.inspectorProxy)
             self.scene().addItem(i.itemProxy)
-            i.itemProxy.setEnabled(not self.isInteractive)
+            i.SetEnabled(not self.isInteractive)
             i.itemProxy.setZValue(z + 1)
             i.borderRectItem.setZValue(z + 2)
             i.UpdateGeometry()
@@ -333,7 +336,7 @@ class CustomGraphicsView(QGraphicsView):
         self.showGrid = interactive
         self.SelectItems([])
         for item in self.allItems:
-            item.itemProxy.setEnabled(not interactive)
+            item.SetEnabled(not interactive)
         self.scene().update()
 
     def SelectItems(self, items: List[CustomGraphicsViewItem]):

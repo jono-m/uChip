@@ -1,10 +1,9 @@
 import pathlib
 import time
 import types
-import typing
 
 import ucscript
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union
 import Data.Chip as Chip
 from Data.Rig import Rig
 import inspect
@@ -34,7 +33,7 @@ class CompiledProgram:
         self.showableFunctions: List[str] = []
 
         # Message queue and any fatal error message.
-        self.messages: List[str] = []
+        self.messages: List[Union[str, Exception]] = []
 
         # Zero-argument functions can be run by button press. Functions that yield values will
         # be run asynchronously and are stored in this dictionary.
@@ -108,7 +107,7 @@ def Recompile(compiledProgram: CompiledProgram, chip: Chip, rig: Rig,
         MatchParameterValues(compiledProgram)
         AttachEnvironment(globalsDict, compiledProgram, chip, rig, programList)
     except Exception as e:
-        compiledProgram.messages.append(repr(e.with_traceback(e.__traceback__)))
+        compiledProgram.messages.append(e)
     return compiledProgram
 
 
@@ -260,8 +259,12 @@ def AttachEnvironment(globalsDict: Dict, compiledProgram: CompiledProgram, chip:
                                   "Could not find a program named '%s'." % name)
         return BuildUCSProgram(program)
 
+    def DoPrint(text: str):
+        compiledProgram.messages.append(text)
+
     globalsDict['FindValve'] = FindValveInChip
     globalsDict['FindProgram'] = FindProgramInChip
+    globalsDict['Log'] = DoPrint
 
 
 # Calls a function named [functionSymbol] in [compiledProgram]. This is often called by the GUI when
@@ -278,7 +281,7 @@ def CallFunction(compiledProgram: CompiledProgram, functionSymbol: str, *fargs, 
     try:
         returnValue = function(*fargs, **fkwargs)
     except Exception as e:
-        compiledProgram.messages.append(str(e))
+        compiledProgram.messages.append(e)
         return
     if isinstance(returnValue, types.GeneratorType) and \
             compiledProgram.programFunctions[functionSymbol].canAsync:

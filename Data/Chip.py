@@ -9,6 +9,13 @@ class Chip:
         self.text: List[Text] = []
         self.programs: List[Program] = []
 
+        testP = Program()
+        testP.name = "dummy"
+        testP.path = Path(r"C:\Users\jonoj\Downloads\testChip.py")
+        testP.scale = 1
+        testP.position = [0, 0]
+        self.programs.append(testP)
+
 
 class Valve:
     def __init__(self):

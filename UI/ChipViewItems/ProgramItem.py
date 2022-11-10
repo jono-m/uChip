@@ -1,3 +1,4 @@
+import traceback
 import typing
 import pathlib
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QFormLayout, QLineEdit, \
@@ -103,14 +104,14 @@ class ProgramItem(CustomGraphicsViewItem):
 
         # Compilation/program error reporting
         self.messageArea = MessageArea()
-        clearMessagesButton = QPushButton("Clear")
-        clearMessagesButton.clicked.connect(self.ClearMessages)
+        self.clearMessagesButton = QPushButton("Clear Messages")
+        self.clearMessagesButton.clicked.connect(self.ClearMessages)
         spacerWidget = QLabel()
         spacerWidget.setStyleSheet("background-color: #999999;")
         spacerWidget.setFixedHeight(1)
         itemWidget.layout().addWidget(spacerWidget)
         itemWidget.layout().addWidget(self.messageArea)
-        itemWidget.layout().addWidget(clearMessagesButton)
+        itemWidget.layout().addWidget(self.clearMessagesButton)
 
         super().__init__("Program", itemWidget, inspectorWidget)
         super().SetRect(QRectF(*program.position, 0, 0))
@@ -119,6 +120,11 @@ class ProgramItem(CustomGraphicsViewItem):
     def ClearMessages(self):
         compiled = UIMaster.GetCompiledProgram(self.program)
         compiled.messages.clear()
+
+    def SetEnabled(self, state):
+        for c in self.itemProxy.widget().children():
+            if isinstance(c, QWidget) and c != self.messageArea and c != self.clearMessagesButton:
+                c.setEnabled(state)
 
     @staticmethod
     def Browse(parent: QWidget):
@@ -492,6 +498,7 @@ class MessageArea(QScrollArea):
         self.scrollLayout.setAlignment(Qt.AlignTop)
         self.scrollLayout.setContentsMargins(0, 0, 0, 0)
         self.scrollLayout.setSpacing(0)
+        self.setMinimumWidth(200)
         scrollContents.setLayout(self.scrollLayout)
 
         self.lastMessages = []
@@ -506,11 +513,16 @@ class MessageArea(QScrollArea):
         self.lastMessages = messages.copy()
 
         for i, message in enumerate(self.lastMessages):
+            if isinstance(message, Exception):
+                message = "".join(
+                    traceback.format_exception(type(message), message, message.__traceback__))
             newEntry = QLabel(message)
             newEntry.setStyleSheet("""
             padding: 5px;
             background-color: """ + ("#FFFFFF" if i % 2 == 0 else "#CCCCCC"))
             newEntry.setWordWrap(True)
+            newEntry.setFixedSize(newEntry.sizeHint())
             self.labels.append(newEntry)
             self.scrollLayout.addWidget(newEntry)
+        self.updateGeometry()
         self.verticalScrollBar().setSliderPosition(self.verticalScrollBar().maximum())

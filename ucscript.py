@@ -4,10 +4,22 @@ import typing
 from typing import Any, Callable, Union
 
 
-# Parameters must be declared on the global scope to be recognized by uChip.
 class Parameter:
+    """Used to declare global parameters for a script. Parameter objects must be declared on the
+    global scope of the script to be recognized by uChip."""
+
     def __init__(self, parameterType, displayName=None, defaultValue=None, minimum=None,
                  maximum=None):
+        """Create a Parameter object for a given type, with optional display name and range for
+        numeric types.
+
+        Keyword arguments:
+            parameterType -- A uChip-compatible type (e.g. int, float, str, OptionsParameter,
+                             ListParameter, Valve, Program).
+            displayName -- A string. If specified, override the parameter's display name.
+            defaultValue -- If specified, initialize the parameter with this value.
+            minimum/maximum -- If specified, set a minimum or maximum value for numeric parameters.
+        """
         self.parameterType = parameterType
         self.defaultValue = defaultValue
         self.displayName = displayName
@@ -15,9 +27,11 @@ class Parameter:
         self.maximum = maximum
 
     def Set(self, value):
+        """Set the parameter to a given value."""
         pass
 
     def Get(self) -> Any:
+        """Get the current parameter value."""
         pass
 
 
@@ -201,4 +215,9 @@ def FindValve(name: str) -> Valve:
 
 # Finds a program in the chip project named [name].
 def FindProgram(name: str) -> Program:
+    pass
+
+
+# Logs text to the program output.
+def Log(text: str):
     pass
