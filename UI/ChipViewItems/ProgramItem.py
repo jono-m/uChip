@@ -513,9 +513,6 @@ class MessageArea(QScrollArea):
         self.lastMessages = messages.copy()
 
         for i, message in enumerate(self.lastMessages):
-            if isinstance(message, Exception):
-                message = "".join(
-                    traceback.format_exception(type(message), message, message.__traceback__))
             newEntry = QLabel(message)
             newEntry.setStyleSheet("""
             padding: 5px;

@@ -1,6 +1,7 @@
 import pathlib
 import time
 import types
+import traceback
 
 import ucscript
 from typing import Optional, List, Dict, Any, Union
@@ -33,7 +34,7 @@ class CompiledProgram:
         self.showableFunctions: List[str] = []
 
         # Message queue and any fatal error message.
-        self.messages: List[Union[str, Exception]] = []
+        self.messages: List[str] = []
 
         # Zero-argument functions can be run by button press. Functions that yield values will
         # be run asynchronously and are stored in this dictionary.
@@ -89,6 +90,7 @@ def BuildEnvironment():
 def Recompile(compiledProgram: CompiledProgram, chip: Chip, rig: Rig,
               programList: List[CompiledProgram]) -> CompiledProgram:
     try:
+        compiledProgram.messages = []
         program = compiledProgram.program
         scriptFile = open(program.path, "r")
         script = scriptFile.read()
@@ -107,7 +109,7 @@ def Recompile(compiledProgram: CompiledProgram, chip: Chip, rig: Rig,
         MatchParameterValues(compiledProgram)
         AttachEnvironment(globalsDict, compiledProgram, chip, rig, programList)
     except Exception as e:
-        compiledProgram.messages.append(e)
+        LogError(compiledProgram, e)
     return compiledProgram
 
 
@@ -281,7 +283,7 @@ def CallFunction(compiledProgram: CompiledProgram, functionSymbol: str, *fargs, 
     try:
         returnValue = function(*fargs, **fkwargs)
     except Exception as e:
-        compiledProgram.messages.append(e)
+        LogError(compiledProgram, e)
         return
     if isinstance(returnValue, types.GeneratorType) and \
             compiledProgram.programFunctions[functionSymbol].canAsync:
@@ -310,7 +312,7 @@ def TickFunction(compiledProgram: CompiledProgram, functionSymbol: str):
         functionInfo.yieldedValue = next(functionInfo.iterator, FinishedIndicator)
         functionInfo.lastIterationTime = time.time()
     except Exception as e:
-        compiledProgram.messages.append(str(e))
+        LogError(compiledProgram, e)
         StopFunction(compiledProgram, functionSymbol)
         return
     compiledProgram.lastCallTime = time.time()
@@ -399,3 +401,8 @@ def ExceptionIfNone(value, message):
     if value is None:
         raise Exception(message)
     return value
+
+
+def LogError(compiledProgram: CompiledProgram, error: Exception):
+    compiledProgram.messages.append("".join(
+        traceback.format_exception(type(error), error, error.__traceback__)))
