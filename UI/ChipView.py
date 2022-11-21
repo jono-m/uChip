@@ -162,16 +162,13 @@ class ChipView(QWidget):
         self.graphicsView.Clear()
 
     def OpenChip(self):
-        valveItems = [ValveItem.ValveItem(valve) for valve in
-                      UIMaster.Instance().currentChip.valves]
-        [v.SetRect(QRectF(*valve.rect)) for v, valve in
-         zip(valveItems, UIMaster.Instance().currentChip.valves)]
-        [v.valveWidget.setEnabled(not self.graphicsView.isInteractive) for v in valveItems]
-        self.graphicsView.AddItems(valveItems)
-
         imageItems = [ImageItem.ImageItem(image) for image in
                       UIMaster.Instance().currentChip.images]
         self.graphicsView.AddItems(imageItems)
+
+        valveItems = [ValveItem.ValveItem(valve) for valve in
+                      UIMaster.Instance().currentChip.valves]
+        self.graphicsView.AddItems(valveItems)
 
         textItems = [TextItem.TextItem(text) for text in UIMaster.Instance().currentChip.text]
         self.graphicsView.AddItems(textItems)

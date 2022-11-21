@@ -217,10 +217,11 @@ def AttachEnvironment(globalsDict: Dict, compiledProgram: CompiledProgram, chip:
             return Prepare(value)
 
         def SetParameterValue(value: Any):
+            print("Setting %s to %s" % (symbol, str(value)))
             if not DoesValueMatchType(value, p.parameterType):
                 raise Exception("Value did not match type of parameter '%s' (%s)" % (
-                    parameterSymbol, str(p.parameterType)))
-            compiledProgram.program.parameterValues[parameterSymbol] = value
+                    symbol, str(p.parameterType)))
+            compiledProgram.program.parameterValues[symbol] = value
 
         p.Get = GetParameterValue
         p.Set = SetParameterValue
@@ -252,12 +253,12 @@ def AttachEnvironment(globalsDict: Dict, compiledProgram: CompiledProgram, chip:
 
     # Bind the FindValve and FindProgram global methods to the uChip environment.
     def FindValveInChip(name: str):
-        valve = ExceptionIfNone(next([x for x in chip.valves if x.name == name], None),
+        valve = ExceptionIfNone(next((x for x in chip.valves if x.name == name), None),
                                 "Could not find a valve named '%s'." % name)
         return BuildUCSValve(valve)
 
     def FindProgramInChip(name: str):
-        program = ExceptionIfNone(next([x for x in chip.programs if x.name == name], None),
+        program = ExceptionIfNone(next((x for x in chip.programs if x.name == name), None),
                                   "Could not find a program named '%s'." % name)
         return BuildUCSProgram(program)
 

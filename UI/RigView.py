@@ -251,7 +251,6 @@ class SolenoidButton(QPushButton):
     def ToggleState(self):
         r = UIMaster.Instance().rig
         r.SetSolenoidState(self.number, not r.GetSolenoidState(self.number))
-        r.FlushStates()
         self.UpdateDisplay()
 
     def UpdateDisplay(self):
@@ -294,4 +293,3 @@ class SetAllButton(QPushButton):
         r = UIMaster.Instance().rig
         for i in self.numbers:
             r.SetSolenoidState(i, self.stateToSet)
-        r.FlushStates()

@@ -18,6 +18,7 @@ class ProgramWorker:
 
     def Loop(self):
         while not self.doStop:
+            UIMaster.Instance().rig.FlushStates()
             for x in UIMaster.GetCompiledPrograms().copy():
                 self.tickStartProgram = x
                 for s in x.asyncFunctions.copy():

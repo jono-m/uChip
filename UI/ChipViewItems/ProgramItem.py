@@ -149,11 +149,9 @@ class ProgramItem(CustomGraphicsViewItem):
         rect = self.GetRect()
         self.program.position = [rect.x(), rect.y()]
 
-        # Record parameter and visibility changes
+        # Record visibility changes
         for parameterSymbol, parameterWidgetSet in zip(self.program.parameterValues,
                                                        self.parameterWidgetSets):
-            self.program.parameterValues[parameterSymbol] = \
-                parameterWidgetSet.inspectorValueWidget.GetValue()
             self.program.parameterVisibility[
                 parameterSymbol] = parameterWidgetSet.inspectorVisibilityToggle.isChecked()
 
@@ -232,14 +230,17 @@ class ProgramItem(CustomGraphicsViewItem):
                 # change the inspector value field, which is what actually reports the change to
                 # the backing program.
                 inspectorWidget = ParameterValueWidget(parameterType)
-                inspectorWidget.OnValueChanged.connect(self.RecordChanges)
+
+                def RecordValueChange(ps=parameterSymbol, w=inspectorWidget):
+                    self.program.parameterValues[ps] = w.GetValue()
+
+                inspectorWidget.OnValueChanged.connect(RecordValueChange)
                 itemWidget = ParameterValueWidget(parameterType)
 
-                def OnChangedFunc(x=inspectorWidget, y=itemWidget):
-                    x.SetValue(y.GetValue())
-                    x.OnChanged()
+                def RecordValueChange(ps=parameterSymbol, w=itemWidget):
+                    self.program.parameterValues[ps] = w.GetValue()
 
-                itemWidget.OnValueChanged.connect(OnChangedFunc)
+                itemWidget.OnValueChanged.connect(RecordValueChange)
 
                 # Add them to the layouts.
                 self.parameterWidgetSets[i].inspectorValueWidget = inspectorWidget
