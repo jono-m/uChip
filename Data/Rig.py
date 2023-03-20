@@ -14,7 +14,7 @@ class Rig:
         portInfos = RescanPorts()
 
         for device in self.allDevices:
-            match = next((p for p in portInfos if p.serial_number == device.portInfo.serial_number),
+            match = next((p for p in portInfos if p.hwid == device.portInfo.hwid),
                          None)
             if match is not None:
                 device.portInfo = match
@@ -26,11 +26,16 @@ class Rig:
                 device.Disconnect()
 
         for portInfo in portInfos:
-            if portInfo.serial_number not in [d.portInfo.serial_number for d in self.allDevices]:
+            if portInfo.hwid not in [d.portInfo.hwid for d in
+                                     self.allDevices] or portInfo.hwid == "":
                 newDevice = Device()
                 newDevice.portInfo = portInfo
                 newDevice.available = True
                 self.allDevices.append(newDevice)
+
+    def Disconnect(self):
+        for device in self.allDevices:
+            device.Disconnect()
 
     def SetSolenoidState(self, number: int, state: bool):
         self.solenoidStates[number] = state
@@ -43,6 +48,8 @@ class Rig:
     def FlushStates(self):
         for device in self.allDevices:
             device.SetSolenoids(self.solenoidStates)
+        # for device in self.allDevices:
+        #     device.Flush()
 
     def GetConnectedSolenoidNumbers(self):
         numbers = []
@@ -81,8 +88,7 @@ class Device:
             return
 
         for i in range(self.startNumber, self.startNumber + 24):
-            if i in solenoidStates and \
-                    solenoidStates[i] != self.solenoidStates[i - self.startNumber]:
+            if i in solenoidStates:
                 self.solenoidStates[i - self.startNumber] = solenoidStates[i]
 
         polarizedStates = [state != self.polarities[int(i / 8)] for (i, state) in
@@ -93,18 +99,19 @@ class Device:
         self.Write(b'A' + aState)
         self.Write(b'B' + bState)
         self.Write(b'C' + cState)
-        self.Flush()
 
     def Write(self, data):
         self.serialPort.write(data)
 
     def Flush(self):
+        if not self.enabled or not self.IsConnected():
+            return
         self.serialPort.flush()
 
     def Connect(self):
         if self.IsConnected():
             return
-        self.serialPort = Serial(self.portInfo.device, timeout=0, writeTimeout=0)
+        self.serialPort = Serial(self.portInfo.device, baudrate=115200, timeout=0, write_timeout=0)
         self.serialPort.write(b'!A' + bytes([0]))
         self.serialPort.write(b'!B' + bytes([0]))
         self.serialPort.write(b'!C' + bytes([0]))

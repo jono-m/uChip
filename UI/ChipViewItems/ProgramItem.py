@@ -494,7 +494,7 @@ class MessageArea(QScrollArea):
         self.setWidget(scrollContents)
         self.setWidgetResizable(True)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.scrollLayout = QVBoxLayout()
         self.scrollLayout.setAlignment(Qt.AlignTop)
         self.scrollLayout.setContentsMargins(0, 0, 0, 0)

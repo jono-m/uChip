@@ -32,6 +32,7 @@ class UIMaster:
     @staticmethod
     def Shutdown():
         self = UIMaster.Instance()
+        self.rig.Disconnect()
         SaveObject(self.rig.allDevices, Path("devices.pkl"))
 
     @staticmethod

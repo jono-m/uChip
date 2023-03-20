@@ -18,13 +18,14 @@ class ProgramWorker:
 
     def Loop(self):
         while not self.doStop:
+            currentTime = time.time()
             UIMaster.Instance().rig.FlushStates()
             for x in UIMaster.GetCompiledPrograms().copy():
                 self.tickStartProgram = x
                 for s in x.asyncFunctions.copy():
                     self.tickStartTime = time.time()
                     self.tickStartFunctionSymbol = s
-                    TickFunction(x, s)
+                    TickFunction(x, currentTime, s)
                     self.tickStartTime = None
             time.sleep(0.01)
 

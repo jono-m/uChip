@@ -35,6 +35,7 @@ class TextItem(CustomGraphicsViewItem):
         self.buttonColor = QColor()
 
         super().__init__("Text", self.textWidget, inspectorWidget)
+        super().SetRect(QRectF(*text.rect))
 
     def RecordChanges(self):
         if self.isUpdating:

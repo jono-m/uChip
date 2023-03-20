@@ -294,7 +294,7 @@ def CallFunction(compiledProgram: CompiledProgram, functionSymbol: str, *fargs, 
         return returnValue
 
 
-def TickFunction(compiledProgram: CompiledProgram, functionSymbol: str):
+def TickFunction(compiledProgram: CompiledProgram, currentTime: float, functionSymbol: str):
     if functionSymbol not in compiledProgram.asyncFunctions:
         return
 
@@ -307,16 +307,16 @@ def TickFunction(compiledProgram: CompiledProgram, functionSymbol: str):
     if functionInfo.paused:
         return
     if isinstance(functionInfo.yieldedValue, ucscript.WaitForSeconds):
-        if time.time() - functionInfo.lastIterationTime < functionInfo.yieldedValue.seconds:
+        if currentTime - functionInfo.lastIterationTime < functionInfo.yieldedValue.seconds:
             return
     try:
         functionInfo.yieldedValue = next(functionInfo.iterator, FinishedIndicator)
-        functionInfo.lastIterationTime = time.time()
+        functionInfo.lastIterationTime = currentTime
     except Exception as e:
         LogError(compiledProgram, e)
         StopFunction(compiledProgram, functionSymbol)
         return
-    compiledProgram.lastCallTime = time.time()
+    compiledProgram.lastCallTime = currentTime
     if functionInfo.yieldedValue is FinishedIndicator:
         del compiledProgram.asyncFunctions[functionSymbol]
 

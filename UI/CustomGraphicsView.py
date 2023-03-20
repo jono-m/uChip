@@ -34,7 +34,7 @@ class CustomGraphicsViewItem:
         self.borderRectItem = QGraphicsRectItem()
         self.updateTimer = QTimer(self.itemProxy)
         self.updateTimer.timeout.connect(self._Update)
-        self.updateTimer.start(30)
+        self.updateTimer.start(100)
         self.isResizable = True
         self.isUpdating = False
         self._Update()

@@ -232,7 +232,7 @@ class SolenoidButton(QPushButton):
         self.clicked.connect(self.ToggleState)
         self.checkTimer = QTimer(self)
         self.checkTimer.timeout.connect(self.UpdateDisplay)
-        self.checkTimer.start(30)
+        self.checkTimer.start(100)
 
         self._displayState = None
 
