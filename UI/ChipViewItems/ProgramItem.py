@@ -322,6 +322,7 @@ class ProgramItem(CustomGraphicsViewItem):
         newProgram = Program()
         newProgram.name = self.program.name
         newProgram.path = self.program.path
+        newProgram.scale = self.program.scale
         newProgram.parameterValues = self.program.parameterValues.copy()
         newProgram.parameterVisibility = self.program.parameterVisibility.copy()
         UIMaster.Instance().currentChip.programs.append(newProgram)

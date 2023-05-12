@@ -185,7 +185,7 @@ def AttachEnvironment(globalsDict: Dict, compiledProgram: CompiledProgram, chip:
     # bound to the functions and parameters that are bound to the uChip environment.
     def BuildUCSProgram(program: Chip.Program):
         p = ucscript.Program()
-        cp = next([x for x in compiledProgramList if x.program == program], None)
+        cp = next((x for x in compiledProgramList if x.program == program), None)
         for fs in cp.programFunctions:
             p.__dict__[fs] = cp.programFunctions[fs]
         for ps in cp.parameters:
@@ -388,6 +388,8 @@ def DoTypesMatch(t1, t2):
 
 def DoesValueMatchType(value, t):
     if isinstance(t, type) and isinstance(value, t):
+        return True
+    if t == int or t == float and isinstance(value, int) or isinstance(value, float):
         return True
     if isinstance(value, Chip.Valve) and t == ucscript.Valve or \
             isinstance(value, Chip.Program) and t == ucscript.Program:
