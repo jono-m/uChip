@@ -1,3 +1,4 @@
+import weakref
 from typing import List, Optional
 from PySide6.QtWidgets import QGraphicsView, QGraphicsScene, QWidget, QGraphicsProxyWidget, \
     QGraphicsRectItem, \
@@ -233,7 +234,7 @@ class CustomGraphicsView(QGraphicsView):
                     UIMaster.SetCursor(Qt.SizeBDiagCursor)
                 if self.resizeHandleIndexUnderMouse == 3 or self.resizeHandleIndexUnderMouse == 4:
                     UIMaster.SetCursor(Qt.SizeHorCursor)
-            elif self.itemUnderMouse in self.selectedItems:
+            elif self.itemUnderMouse in self.selectedItems and not self.WidgetUnderMouseAlwaysInteractable():
                 UIMaster.SetCursor(Qt.SizeAllCursor)
             else:
                 UIMaster.SetCursor(None)
@@ -243,6 +244,17 @@ class CustomGraphicsView(QGraphicsView):
     @staticmethod
     def Snap(x, div):
         return round(float(x) / div) * div
+
+    def WidgetUnderMouseAlwaysInteractable(self):
+        if self.itemUnderMouse is None:
+            return False
+        p = self.itemUnderMouse.itemProxy.mapFromScene(self.mouseScenePosition).toPoint()
+        item = self.itemUnderMouse.itemProxy.widget().childAt(p)
+        while item is not None and item != self.itemUnderMouse.itemProxy.widget():
+            if item.property("AlwaysInteractable"):
+                return True
+            item = item.parentWidget()
+        return False
 
     def SnapPoint(self, p: QPointF):
         return QPointF(self.Snap(p.x(), self.gridSpacing.width()),
@@ -451,6 +463,9 @@ class CustomGraphicsView(QGraphicsView):
 
     # Events
     def wheelEvent(self, event):
+        if self.WidgetUnderMouseAlwaysInteractable():
+            super().wheelEvent(event)
+            return
         self.UpdateMouseInfo(event.position().toPoint())
         self.UpdateZoom(self.mouseScenePosition,
                         self.zoom + float(event.angleDelta().y()) * self.scrollSensitivity)
@@ -491,6 +506,9 @@ class CustomGraphicsView(QGraphicsView):
                 self._transformStartMousePos = self.mouseScenePosition
                 self.state = CustomGraphicsViewState.RESIZING
             elif self.itemUnderMouse is not None:
+                if self.WidgetUnderMouseAlwaysInteractable():
+                    super().mousePressEvent(event)
+                    return
                 if self.IsMultiSelect():
                     self.DoMultiSelection()
                 else:

@@ -8,9 +8,10 @@ from PySide6.QtCore import QRectF, Signal, Qt
 import ucscript
 from UI.UIMaster import UIMaster
 from UI.CustomGraphicsView import CustomGraphicsViewItem
-from Data.Chip import Program
+from UI.ScriptBrowser import ScriptBrowser
+from Data.Chip import Program, Script
 from Data.ProgramCompilation import IsTypeValidList, IsTypeValidOptions, DoTypesMatch, \
-    NoneValueForType
+    NoneValueForType, Message
 
 
 # The most complicated/involved chip item. Lots of components!
@@ -31,14 +32,13 @@ class ProgramItem(CustomGraphicsViewItem):
         nameAndSourceLayout.addRow("Name", self.nameField)
 
         # Program source field with browse button.
-        self.pathWidget = QLineEdit()
-        self.pathWidget.textChanged.connect(self.RecordChanges)
-        self.browseButton = QPushButton("...")
-        self.browseButton.clicked.connect(self.BrowseForProgram)
+        self.scriptNameWidget = QLabel()
+        self.selectScriptButton = QPushButton("...")
+        self.selectScriptButton.clicked.connect(self.SelectScript)
         sourceLayout = QHBoxLayout()
-        sourceLayout.addWidget(self.pathWidget, stretch=1)
-        sourceLayout.addWidget(self.browseButton, stretch=0)
-        nameAndSourceLayout.addRow("Path", sourceLayout)
+        sourceLayout.addWidget(self.scriptNameWidget, stretch=1)
+        sourceLayout.addWidget(self.selectScriptButton, stretch=0)
+        nameAndSourceLayout.addRow("Source", sourceLayout)
 
         # Program scale field
         self.scaleWidget = QDoubleSpinBox()
@@ -104,8 +104,10 @@ class ProgramItem(CustomGraphicsViewItem):
 
         # Compilation/program error reporting
         self.messageArea = MessageArea()
+        self.messageArea.setProperty("AlwaysInteractable", True)
         self.clearMessagesButton = QPushButton("Clear Messages")
         self.clearMessagesButton.clicked.connect(self.ClearMessages)
+        self.clearMessagesButton.setProperty("AlwaysInteractable", True)
         spacerWidget = QLabel()
         spacerWidget.setStyleSheet("background-color: #999999;")
         spacerWidget.setFixedHeight(1)
@@ -119,32 +121,26 @@ class ProgramItem(CustomGraphicsViewItem):
 
     def ClearMessages(self):
         compiled = UIMaster.GetCompiledProgram(self.program)
-        compiled.messages.clear()
+        compiled.messages = [m for m in compiled.messages if m.messageType == Message.ERROR_CT]
 
     def SetEnabled(self, state):
         for c in self.itemProxy.widget().children():
             if isinstance(c, QWidget) and c != self.messageArea and c != self.clearMessagesButton:
                 c.setEnabled(state)
 
-    @staticmethod
-    def Browse(parent: QWidget):
-        programToAdd = QFileDialog.getOpenFileName(parent, "Browse for program",
-                                                   filter="uChip program (*.py)")
-        if programToAdd[0]:
-            return pathlib.Path(programToAdd[0])
+    def SelectScript(self):
+        def Selected(s: Script):
+            self.program.script = s
+            self.RecordChanges()
 
-    def BrowseForProgram(self):
-        path = self.Browse(self.pathWidget)
-        if path:
-            self.program.path = path
+        ScriptBrowser.Instance().Show(Selected, self.program.script)
 
     # Called whenever the user changes the program parameters/name/visibility etc.
     def RecordChanges(self):
         if self.isUpdating:
             return
 
-        # Store the program path, name, and widget size.
-        self.program.path = pathlib.Path(self.pathWidget.text())
+        # Store the program name and widget size.
         self.program.name = self.nameField.text()
         rect = self.GetRect()
         self.program.position = [rect.x(), rect.y()]
@@ -165,9 +161,12 @@ class ProgramItem(CustomGraphicsViewItem):
             self.nameField.setText(self.program.name)
         if self.program.name != self.nameWidget.text():
             self.nameWidget.setText("<b>%s</b>" % self.program.name)
-        path = str(self.program.path.absolute())
-        if path != self.pathWidget.text():
-            self.pathWidget.setText(path)
+        if self.program.script.isBuiltIn:
+            path = self.program.script.Name() + " <i>[BUILTIN]</i>"
+        else:
+            path = str(self.program.script.path.absolute())
+        if path != self.scriptNameWidget.text():
+            self.scriptNameWidget.setText(path)
 
         compiled = UIMaster.GetCompiledProgram(self.program)
         self.messageArea.Update(compiled.messages)
@@ -495,16 +494,20 @@ class MessageArea(QScrollArea):
         self.setWidget(scrollContents)
         self.setWidgetResizable(True)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        self.scrollLayout = QVBoxLayout()
-        self.scrollLayout.setAlignment(Qt.AlignTop)
-        self.scrollLayout.setContentsMargins(0, 0, 0, 0)
-        self.scrollLayout.setSpacing(0)
-        self.setMinimumWidth(200)
-        scrollContents.setLayout(self.scrollLayout)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.messageLayout = QVBoxLayout()
+        self.messageLayout.setAlignment(Qt.AlignTop)
+        self.messageLayout.setContentsMargins(0, 0, 0, 0)
+        self.messageLayout.setSpacing(0)
+        scrollContents.setLayout(self.messageLayout)
 
-        self.lastMessages = []
+        self.verticalScrollBar().rangeChanged.connect(self.ScrollToBottom)
+        self.lastMessages = None
         self.labels = []
+        self.Update([])
+
+    def ScrollToBottom(self):
+        self.verticalScrollBar().setValue(self.verticalScrollBar().maximum())
 
     def Update(self, messages):
         if messages == self.lastMessages:
@@ -514,14 +517,17 @@ class MessageArea(QScrollArea):
         self.labels = []
         self.lastMessages = messages.copy()
 
+        maxWidth = 200
         for i, message in enumerate(self.lastMessages):
-            newEntry = QLabel(message)
+            newEntry = QLabel(message.text)
+            if message.messageType == Message.MESSAGE:
+                bgColor = "#FFFFFF" if i % 2 == 0 else "#CCCCCC"
+            else:
+                bgColor = "#FFCCCC" if i % 2 == 0 else "#FFAAAA"
             newEntry.setStyleSheet("""
             padding: 5px;
-            background-color: """ + ("#FFFFFF" if i % 2 == 0 else "#CCCCCC"))
-            newEntry.setWordWrap(True)
-            newEntry.setFixedSize(newEntry.sizeHint())
+            background-color: """ + bgColor)
             self.labels.append(newEntry)
-            self.scrollLayout.addWidget(newEntry)
-        self.updateGeometry()
-        self.verticalScrollBar().setSliderPosition(self.verticalScrollBar().maximum())
+            self.messageLayout.addWidget(newEntry)
+            maxWidth = max(maxWidth, newEntry.sizeHint().width())
+        self.setMinimumWidth(maxWidth)

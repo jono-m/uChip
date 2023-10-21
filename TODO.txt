@@ -1,4 +1,0 @@
-TO DO:
-
-- Import program window has templates/built-ins
-- Programs and images are imported directly, but can be reloaded from disk if needed.

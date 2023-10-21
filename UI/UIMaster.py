@@ -72,6 +72,13 @@ class UIMaster:
         return UIMaster._instance
 
     @staticmethod
+    def StyleSheet():
+        f = open("UI/stylesheet.css")
+        ss = f.read()
+        f.close()
+        return ss
+
+    @staticmethod
     def SetCursor(cursorShape: Optional[QCursor]):
         if UIMaster.Instance().currentCursorShape != cursorShape:
             if cursorShape is not None:

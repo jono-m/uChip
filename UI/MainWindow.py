@@ -1,7 +1,9 @@
 import pathlib
 
+import PySide6
+import typing
 from PySide6.QtWidgets import QMainWindow, QTabWidget, QWidget, QMenuBar, QFileDialog, \
-    QMessageBox, QHBoxLayout, QPushButton, QSizePolicy
+    QMessageBox, QHBoxLayout, QPushButton, QSizePolicy, QProxyStyle, QStyle
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QIcon, QKeySequence
 from UI.ChipView import ChipView
@@ -60,6 +62,8 @@ class MainWindow(QMainWindow):
         self.ToggleRig()
         self.ToggleRig()
 
+        self.setStyleSheet(UIMaster.StyleSheet())
+
     def ToggleRig(self):
         self.rigView.setHidden(not self.rigView.isHidden())
         self.toggleButton.setText("<" if self.rigView.isHidden() else ">")
@@ -89,7 +93,9 @@ class MainWindow(QMainWindow):
                 UIMaster.Instance().currentChipPath = pathlib.Path(d[0])
             else:
                 return False
+        UIMaster.Instance().currentChip.ConvertPathsToRelative(UIMaster.Instance().currentChipPath)
         SaveObject(UIMaster.Instance().currentChip, UIMaster.Instance().currentChipPath)
+        UIMaster.Instance().currentChip.ConvertPathsToAbsolute(UIMaster.Instance().currentChipPath)
         UIMaster.Instance().modified = False
         self.SetWindowTitle()
         return True
@@ -102,6 +108,7 @@ class MainWindow(QMainWindow):
             self.chipEditor.CloseChip()
             UIMaster.Instance().currentChipPath = pathlib.Path(d[0])
             UIMaster.Instance().currentChip = LoadObject(UIMaster.Instance().currentChipPath)
+            UIMaster.Instance().currentChip.ConvertPathsToAbsolute(UIMaster.Instance().currentChipPath)
             self.chipEditor.OpenChip()
             UIMaster.Instance().modified = False
             self.SetWindowTitle()
@@ -112,10 +119,11 @@ class MainWindow(QMainWindow):
         if UIMaster.Instance().modified:
             value = QMessageBox.critical(self, "Confirm Action",
                                          "This uChip project has been modified. Do you want to discard changes?",
-                                         QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
-            if value == QMessageBox.Cancel:
+                                         QMessageBox.StandardButton.Save | QMessageBox.StandardButton.Discard |
+                                         QMessageBox.StandardButton.Cancel)
+            if value == QMessageBox.StandardButton.Cancel:
                 return False
-            elif value == QMessageBox.Save:
+            elif value == QMessageBox.StandardButton.Save:
                 return self.SaveChip(False)
         return True
 

@@ -1,3 +1,4 @@
+import enum
 import pathlib
 import time
 import types
@@ -15,13 +16,14 @@ import inspect
 # should be persisted across recompilation and saved to the project file.
 class CompiledProgram:
     def __init__(self, program: Chip.Program):
-        # The chip script that this instance was compiled from.
+        # The chip program that this instance was compiled from.
         self.program = program
 
         # The path to the script file used for compilation and the time of last modification. This
         # is used to automatically recompile when out-of-date.
         self.compiledPath: Optional[pathlib.Path] = None
         self.lastModTime: Optional[float] = None
+        self.lastBuiltin: Optional[Chip.Script] = None
 
         # The description from the compiled program.
         self.description = ""
@@ -30,11 +32,11 @@ class CompiledProgram:
         self.parameters: Dict[str, ucscript.Parameter] = {}
         self.programFunctions: Dict[str, ucscript.ProgramFunction] = {}
 
-        # Zero argument functions are important becase they can be run through GUI buttons.
+        # Zero argument functions are important because they can be run through GUI buttons.
         self.showableFunctions: List[str] = []
 
         # Message queue and any fatal error message.
-        self.messages: List[str] = []
+        self.messages: List[Message] = []
 
         # Zero-argument functions can be run by button press. Functions that yield values will
         # be run asynchronously and are stored in this dictionary.
@@ -56,10 +58,22 @@ class CompiledProgram:
             self.lastIterationTime = None
 
 
+class Message:
+    MESSAGE = 0
+    ERROR_RT = 1
+    ERROR_CT = 2
+
+    def __init__(self, text, messageType: int):
+        self.text = text
+        self.messageType = messageType
+
+
 # Returns 'True' if the compiled program is out-of-date.
 def IsOutOfDate(compiledProgram: CompiledProgram):
-    return compiledProgram.compiledPath != compiledProgram.program.path or \
-           compiledProgram.lastModTime != compiledProgram.program.path.stat().st_mtime
+    if compiledProgram.program.script.isBuiltIn:
+        return compiledProgram.program.script != compiledProgram.lastBuiltin
+    return compiledProgram.lastBuiltin is not None or compiledProgram.compiledPath != compiledProgram.program.script.path or \
+        compiledProgram.lastModTime != compiledProgram.program.script.path.stat().st_mtime
 
 
 # Builds an environment with built-ins as well as an import interceptor to pass along the correct
@@ -86,19 +100,22 @@ def BuildEnvironment():
     return globalsDict
 
 
-# Recompiles a CompiledProgram object (which must have a Chip.Program already attached.
+# Recompiles a CompiledProgram object (which must have a Chip.Program already attached).
 def Recompile(compiledProgram: CompiledProgram, chip: Chip, rig: Rig,
               programList: List[CompiledProgram]) -> CompiledProgram:
     try:
         compiledProgram.messages = []
         program = compiledProgram.program
-        scriptFile = open(program.path, "r")
-        script = scriptFile.read()
-        scriptFile.close()
+        script = program.script.Read()
+        script = "from ucscript import *\n" + script
 
         CompiledProgram.__init__(compiledProgram, program)
-        compiledProgram.lastModTime = program.path.stat().st_mtime
-        compiledProgram.compiledPath = program.path.absolute()
+        if program.script.isBuiltIn:
+            compiledProgram.lastBuiltin = program.script
+        else:
+            compiledProgram.lastBuiltin = None
+            compiledProgram.lastModTime = program.script.path.stat().st_mtime
+            compiledProgram.compiledPath = program.script.path.absolute()
 
         globalsDict = BuildEnvironment()
         # Compile the script. The globals dictionary will have everything that resulted from
@@ -109,7 +126,7 @@ def Recompile(compiledProgram: CompiledProgram, chip: Chip, rig: Rig,
         MatchParameterValues(compiledProgram)
         AttachEnvironment(globalsDict, compiledProgram, chip, rig, programList)
     except Exception as e:
-        LogError(compiledProgram, e)
+        LogError(compiledProgram, e, True)
     return compiledProgram
 
 
@@ -263,7 +280,7 @@ def AttachEnvironment(globalsDict: Dict, compiledProgram: CompiledProgram, chip:
         return BuildUCSProgram(program)
 
     def DoPrint(text: str):
-        compiledProgram.messages.append(text)
+        compiledProgram.messages.append(Message(text, Message.MESSAGE))
 
     globalsDict['FindValve'] = FindValveInChip
     globalsDict['FindProgram'] = FindProgramInChip
@@ -284,7 +301,7 @@ def CallFunction(compiledProgram: CompiledProgram, functionSymbol: str, *fargs, 
     try:
         returnValue = function(*fargs, **fkwargs)
     except Exception as e:
-        LogError(compiledProgram, e)
+        LogError(compiledProgram, e, False)
         return
     if isinstance(returnValue, types.GeneratorType) and \
             compiledProgram.programFunctions[functionSymbol].canAsync:
@@ -313,7 +330,7 @@ def TickFunction(compiledProgram: CompiledProgram, currentTime: float, functionS
         functionInfo.yieldedValue = next(functionInfo.iterator, FinishedIndicator)
         functionInfo.lastIterationTime = currentTime
     except Exception as e:
-        LogError(compiledProgram, e)
+        LogError(compiledProgram, e, False)
         StopFunction(compiledProgram, functionSymbol)
         return
     compiledProgram.lastCallTime = currentTime
@@ -344,7 +361,7 @@ def IsFunctionRunning(compiledProgram: CompiledProgram, functionSymbol: str):
 
 def IsFunctionPaused(compiledProgram: CompiledProgram, functionSymbol: str):
     return IsFunctionRunning(compiledProgram, functionSymbol) and \
-           compiledProgram.asyncFunctions[functionSymbol].paused
+        compiledProgram.asyncFunctions[functionSymbol].paused
 
 
 def NoneValueForType(t):
@@ -362,7 +379,7 @@ def NoneValueForType(t):
 
 def IsTypeValid(parameterType):
     return (parameterType in [float, int, str, bool, ucscript.Valve, ucscript.Program]) or \
-           IsTypeValidOptions(parameterType) or IsTypeValidList(parameterType)
+        IsTypeValidOptions(parameterType) or IsTypeValidList(parameterType)
 
 
 # Helper method for if the parameter is an enum (a list of strings)
@@ -406,6 +423,6 @@ def ExceptionIfNone(value, message):
     return value
 
 
-def LogError(compiledProgram: CompiledProgram, error: Exception):
-    compiledProgram.messages.append("".join(
-        traceback.format_exception(type(error), error, error.__traceback__)))
+def LogError(compiledProgram: CompiledProgram, error: Exception, compileTime: bool):
+    errorText = "".join(traceback.format_exception(type(error), error, error.__traceback__))
+    compiledProgram.messages.append(Message(errorText, Message.ERROR_CT if compileTime else Message.ERROR_RT))

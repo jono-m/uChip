@@ -1,12 +1,15 @@
 import pathlib
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton
+import typing
+
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QToolButton, QSizePolicy, QFrame
 from PySide6.QtGui import QIcon, QPixmap, QColor
 from PySide6.QtCore import QPoint, Qt, QSize, QRectF
 
 from UI.CustomGraphicsView import CustomGraphicsView
 from UI.ChipViewItems import ValveItem, ImageItem, TextItem, ProgramItem
+from UI.ScriptBrowser import ScriptBrowser
 from UI.UIMaster import UIMaster
-from Data.Chip import Valve, Image, Text, Program
+from Data.Chip import Valve, Image, Text, Program, Script
 
 
 class ChipView(QWidget):
@@ -19,59 +22,39 @@ class ChipView(QWidget):
         self.layout().addWidget(self.graphicsView)
 
         self.toolPanel = QWidget(self)
-        self.finishEditsButton = QPushButton()
-        self.finishEditsButton.setFocusPolicy(Qt.NoFocus)
-        self.finishEditsButton.setToolTip("Finish editing")
-        self.finishEditsButton.setIcon(
-            ColoredIcon("Assets/Images/checkIcon.png", QColor(100, 100, 100)))
-        self.finishEditsButton.setFixedSize(50, 50)
-        self.finishEditsButton.setIconSize(QSize(30, 30))
-        self.finishEditsButton.clicked.connect(lambda: self.SetEditing(False))
+        self.finishEditsButton = ToolButton("Finish editing",
+                                            "",
+                                            "Assets/Images/checkIcon.png",
+                                            lambda: self.SetEditing(False),
+                                            size=(70, 70),
+                                            icon_size=(40, 40))
 
-        self.editButton = QPushButton()
-        self.editButton.setFocusPolicy(Qt.NoFocus)
-        self.editButton.setIcon(
-            ColoredIcon("Assets/Images/Edit.png", QColor(100, 100, 100)))
-        self.editButton.setToolTip("Edit chip")
-        self.editButton.setFixedSize(50, 50)
-        self.editButton.setIconSize(QSize(30, 30))
-        self.editButton.clicked.connect(lambda: self.SetEditing(True))
+        self.editButton = ToolButton("Edit chip",
+                                     "",
+                                     "Assets/Images/Edit.png",
+                                     lambda: self.SetEditing(True),
+                                     size=(70, 70),
+                                     icon_size=(40, 40))
 
-        self.addValveButton = QPushButton()
-        self.addValveButton.setFocusPolicy(Qt.NoFocus)
-        self.addValveButton.setToolTip("Add valve")
-        self.addValveButton.setIcon(
-            ColoredIcon("Assets/Images/ValveIcon.png", QColor(100, 100, 100)))
-        self.addValveButton.setFixedSize(30, 30)
-        self.addValveButton.setIconSize(QSize(20, 20))
-        self.addValveButton.clicked.connect(self.AddNewValve)
+        self.addValveButton = ToolButton("Add valve",
+                                         "Valve",
+                                         "Assets/Images/ValveIcon.png",
+                                         self.AddNewValve)
 
-        self.addImageButton = QPushButton()
-        self.addImageButton.setFocusPolicy(Qt.NoFocus)
-        self.addImageButton.setToolTip("Add image")
-        self.addImageButton.setIcon(
-            ColoredIcon("Assets/Images/imageIcon.png", QColor(100, 100, 100)))
-        self.addImageButton.setFixedSize(30, 30)
-        self.addImageButton.setIconSize(QSize(20, 20))
-        self.addImageButton.clicked.connect(self.AddNewImage)
+        self.addTextButton = ToolButton("Add text",
+                                        "Text",
+                                        "Assets/Images/TextIcon.png",
+                                        self.AddNewText)
 
-        self.addProgramButton = QPushButton()
-        self.addProgramButton.setFocusPolicy(Qt.NoFocus)
-        self.addProgramButton.setToolTip("Add program")
-        self.addProgramButton.setIcon(
-            ColoredIcon("Assets/Images/CodeIcon.png", QColor(100, 100, 100)))
-        self.addProgramButton.setFixedSize(30, 30)
-        self.addProgramButton.setIconSize(QSize(20, 20))
-        self.addProgramButton.clicked.connect(self.AddNewProgram)
+        self.addImageButton = ToolButton("Add image",
+                                         "Image",
+                                         "Assets/Images/imageIcon.png",
+                                         self.AddNewImage)
 
-        self.addTextButton = QPushButton()
-        self.addTextButton.setFocusPolicy(Qt.NoFocus)
-        self.addTextButton.setToolTip("Add text")
-        self.addTextButton.setIcon(
-            ColoredIcon("Assets/Images/TextIcon.png", QColor(100, 100, 100)))
-        self.addTextButton.setFixedSize(30, 30)
-        self.addTextButton.setIconSize(QSize(20, 20))
-        self.addTextButton.clicked.connect(self.AddNewText)
+        self.addProgramButton = ToolButton("Add program",
+                                           "Program",
+                                           "Assets/Images/CodeIcon.png",
+                                           self.ShowProgramBrowser)
 
         toolPanelLayout = QVBoxLayout()
         toolPanelLayout.setContentsMargins(0, 0, 0, 0)
@@ -82,13 +65,18 @@ class ChipView(QWidget):
         toolPanelLayout.addWidget(self.editButton)
 
         self.toolOptions = QWidget()
+        self.toolOptions.setAutoFillBackground(True)
         toolOptionsLayout = QVBoxLayout()
+        toolOptionsLayout.setContentsMargins(0, 5, 0, 5)
+        toolOptionsLayout.setSpacing(5)
         toolOptionsLayout.addWidget(self.addValveButton, alignment=Qt.AlignHCenter)
         toolOptionsLayout.addWidget(self.addImageButton, alignment=Qt.AlignHCenter)
         toolOptionsLayout.addWidget(self.addTextButton, alignment=Qt.AlignHCenter)
         toolOptionsLayout.addWidget(self.addProgramButton, alignment=Qt.AlignHCenter)
         self.toolOptions.setLayout(toolOptionsLayout)
         toolPanelLayout.addWidget(self.toolOptions)
+
+        self.scriptBrowser = ScriptBrowser(self)
 
         self.SetEditing(True)
 
@@ -146,17 +134,17 @@ class ChipView(QWidget):
         self.graphicsView.CenterItem(newTextItem)
         self.graphicsView.SelectItems([newTextItem])
 
-    def AddNewProgram(self):
-        path = ProgramItem.ProgramItem.Browse(self)
-        if path:
-            newProgram = Program()
-            newProgram.path = pathlib.Path(path)
-            newProgram.name = newProgram.path.stem
-            UIMaster.Instance().currentChip.programs.append(newProgram)
-            newProgramItem = ProgramItem.ProgramItem(newProgram)
-            self.graphicsView.AddItems([newProgramItem])
-            self.graphicsView.CenterItem(newProgramItem)
-            self.graphicsView.SelectItems([newProgramItem])
+    def AddProgram(self, script: Script):
+        newProgram = Program(script)
+        newProgram.name = script.Name()
+        UIMaster.Instance().currentChip.programs.append(newProgram)
+        newProgramItem = ProgramItem.ProgramItem(newProgram)
+        self.graphicsView.AddItems([newProgramItem])
+        self.graphicsView.CenterItem(newProgramItem)
+        self.graphicsView.SelectItems([newProgramItem])
+
+    def ShowProgramBrowser(self):
+        ScriptBrowser.Instance().Show(self.AddProgram)
 
     def CloseChip(self):
         self.graphicsView.Clear()
@@ -176,6 +164,22 @@ class ChipView(QWidget):
         programItems = [ProgramItem.ProgramItem(program) for program in
                         UIMaster.Instance().currentChip.programs]
         self.graphicsView.AddItems(programItems)
+
+
+class ToolButton(QToolButton):
+    def __init__(self, tooltip: str, label: str, icon_path: str, delegate: typing.Callable, size=(60, 50),
+                 icon_size=(20, 20)):
+        super().__init__()
+
+        self.setFocusPolicy(Qt.NoFocus)
+        self.setToolTip(tooltip)
+        self.setText(label)
+        self.setIcon(ColoredIcon(icon_path, QColor(100, 100, 100)))
+        self.setFixedSize(*size)
+        if label != "":
+            self.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
+        self.setIconSize(QSize(*icon_size))
+        self.clicked.connect(delegate)
 
 
 class ColoredIcon(QIcon):

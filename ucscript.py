@@ -26,6 +26,7 @@ class Parameter:
         self.minimum = minimum
         self.maximum = maximum
 
+
     def Set(self, value):
         """Set the parameter to a given value."""
         pass
@@ -33,7 +34,6 @@ class Parameter:
     def Get(self) -> Any:
         """Get the current parameter value."""
         pass
-
 
 # A Valve object should not be instantiated by itself. Valves can be retrieved by name with
 # FindValve(name), or passed through the GUI with Parameter(Valve).

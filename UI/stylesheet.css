@@ -1,0 +1,8 @@
+QPushButton[MainButton="true"] {
+    background-color: green;
+    color: white;
+    font-weight: bold;
+}
+QPushButton:disabled {
+    color:#AAAAAA;
+}
