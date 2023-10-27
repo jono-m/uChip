@@ -185,9 +185,13 @@ class SyntaxHighlighter(QSyntaxHighlighter):
         self.rules.append(SyntaxHighlighter.HighlighterRule(QRegularExpression(KeywordMatch("def")), defFormat))
         self.rules.append(SyntaxHighlighter.HighlighterRule(QRegularExpression(KeywordMatch("class")), defFormat))
 
-        commentMatch = QTextCharFormat()
-        commentMatch.setForeground(QColor(150, 150, 150))
-        self.rules.append(SyntaxHighlighter.HighlighterRule(QRegularExpression(r"#.*"), commentMatch))
+        stringFormat = QTextCharFormat()
+        stringFormat.setForeground(QColor(0, 255, 100))
+        self.rules.append(SyntaxHighlighter.HighlighterRule(QRegularExpression(r"\""), stringFormat))
+
+        commentFormat = QTextCharFormat()
+        commentFormat.setForeground(QColor(150, 150, 150))
+        self.rules.append(SyntaxHighlighter.HighlighterRule(QRegularExpression(r"#.*"), commentFormat))
 
     def highlightBlock(self, text) -> None:
         for rule in self.rules:

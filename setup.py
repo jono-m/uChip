@@ -3,7 +3,7 @@ from cx_Freeze import setup, Executable
 
 # Dependencies are automatically detected, but it might need fine tuning.
 # "packages": ["os"] is used as example only
-build_exe_options = {'include_files': ['ucscript.py', 'Assets', 'Builtins']}
+build_exe_options = {'include_files': ['Assets', 'Builtins', 'Documentation.txt', 'stylesheet.css']}
 
 # base="Win32GUI" should be used only for Windows GUI app
 base = None
@@ -11,9 +11,9 @@ if sys.platform == "win32":
     base = "Win32GUI"
 
 setup(
-    name="OrganoID",
-    version="1.0",
-    description="OrganoID UI",
+    name="uChip",
+    version="2.0",
+    description="uChip",
     options={"build_exe": build_exe_options},
     executables=[Executable("uChip.py", base=base, icon="Assets/Images/icon.ico")],
 )
