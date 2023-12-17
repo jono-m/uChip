@@ -1,4 +1,5 @@
 - improve script formatting
 - bug logging
 - document UCscript
-- clean up inspector and programitem UI
+- dark mode
+- splash screen

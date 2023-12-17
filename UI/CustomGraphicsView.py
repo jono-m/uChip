@@ -29,7 +29,8 @@ class CustomGraphicsViewItem:
             widget = QFrame()
             widget.setFrameShape(QFrame.Shape.Box)
             widget.setLayout(QVBoxLayout())
-            widget.layout().addWidget(QLabel("<b><u>" + name + "</u></b>"))
+            widget.layout().setContentsMargins(0, 0, 0, 0)
+            widget.layout().setSpacing(0)
             widget.layout().addWidget(inspectorWidget)
             self.inspectorProxy.setWidget(widget)
         self.borderRectItem = QGraphicsRectItem()
@@ -435,7 +436,7 @@ class CustomGraphicsView(QGraphicsView):
         self.rubberBandRectItem.setZValue(self.GetMaxItemZValue() + 2)
         self.rubberBandRectItem.setPen(QPen(self.rubberBandRectColor, rubberBandWidth))
 
-    def DoMultiSelection(self):
+    def DoBandSelect(self):
         itemsInRect = [x for x in self.allItems if x.itemProxy.sceneBoundingRect().intersects(
             self.rubberBandRectItem.sceneBoundingRect()) or x.borderRectItem.contains(
             self.mouseScenePosition)]
@@ -510,7 +511,11 @@ class CustomGraphicsView(QGraphicsView):
                     super().mousePressEvent(event)
                     return
                 if self.IsMultiSelect():
-                    self.DoMultiSelection()
+                    if self.itemUnderMouse in self.selectedItems:
+                        self.selectedItems.remove(self.itemUnderMouse)
+                    else:
+                        self.selectedItems.append(self.itemUnderMouse)
+                    self.SelectItems(self.selectedItems)
                 else:
                     if self.itemUnderMouse not in self.selectedItems:
                         self.SelectItems([self.itemUnderMouse])
@@ -543,7 +548,7 @@ class CustomGraphicsView(QGraphicsView):
         elif self.state == CustomGraphicsViewState.BAND_SELECTING and event.button() == Qt.LeftButton:
             self.state = CustomGraphicsViewState.IDLE
             self.rubberBandRectItem.setVisible(False)
-            self.DoMultiSelection()
+            self.DoBandSelect()
         elif event.button() == Qt.LeftButton:
             super().mouseReleaseEvent(event)
             return

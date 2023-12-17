@@ -171,15 +171,19 @@ class ToolButton(QToolButton):
                  icon_size=(20, 20)):
         super().__init__()
 
+        self.icon_path = icon_path
         self.setFocusPolicy(Qt.NoFocus)
         self.setToolTip(tooltip)
         self.setText(label)
-        self.setIcon(ColoredIcon(icon_path, QColor(100, 100, 100)))
+        self.SetColor(100, 100, 100)
         self.setFixedSize(*size)
         if label != "":
             self.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
         self.setIconSize(QSize(*icon_size))
         self.clicked.connect(delegate)
+
+    def SetColor(self, *color):
+        self.setIcon(ColoredIcon(self.icon_path, QColor(*color)))
 
 
 class ColoredIcon(QIcon):

@@ -39,7 +39,7 @@ class ValveItem(CustomGraphicsViewItem):
         self.valve = valve
 
         # The actual widget is just a pushbutton!
-        self.valveWidget = QPushButton()
+        self.valveWidget = ValveItem.ResizeDelegate(self.OnResized)
         self.valveWidget.clicked.connect(self.Toggle)
         self.valveWidget.setMinimumSize(100, 100)
         self._displayState = None
@@ -57,8 +57,28 @@ class ValveItem(CustomGraphicsViewItem):
         form.addRow("Solenoid", self.numberField)
         inspectorWidget.setLayout(form)
 
+        self.fadeWidget = QWidget(self.valveWidget)
+        self.fadeWidget.setStyleSheet("background-color: rgba(255, 255, 255, 200);")
+
         super().__init__("Valve", self.valveWidget, inspectorWidget)
         super().SetRect(QRectF(*valve.rect))
+
+    def OnResized(self, event):
+        self.fadeWidget.move(0, 0)
+        self.fadeWidget.setFixedSize(self.itemProxy.widget().size())
+
+    def SetEnabled(self, state):
+        super().SetEnabled(state)
+        self.fadeWidget.setVisible(not state)
+
+    class ResizeDelegate(QPushButton):
+        def __init__(self, delegate):
+            super().__init__()
+            self.delegate = delegate
+
+        def resizeEvent(self, event) -> None:
+            super().resizeEvent(event)
+            self.delegate(event)
 
     # Changes to the valve shape should be recorded.
     def SetRect(self, rect):

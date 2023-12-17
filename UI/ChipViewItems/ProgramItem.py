@@ -2,8 +2,9 @@ import traceback
 import typing
 import pathlib
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QFormLayout, QLineEdit, \
-    QSpinBox, QDoubleSpinBox, QComboBox, QFileDialog, QGridLayout, QHBoxLayout, QScrollArea, QFrame
+    QSpinBox, QDoubleSpinBox, QComboBox, QFileDialog, QGridLayout, QHBoxLayout, QScrollArea, QFrame, QSizePolicy
 from PySide6.QtCore import QRectF, Signal, Qt
+from PySide6.QtGui import QIcon, QColor, QPixmap
 
 import ucscript
 from UI.UIMaster import UIMaster
@@ -14,26 +15,49 @@ from Data.ProgramCompilation import IsTypeValidList, IsTypeValidOptions, DoTypes
     NoneValueForType, Message
 
 
+class ColoredIcon(QIcon):
+    def __init__(self, filename, color: QColor):
+        pixmap = QPixmap(filename)
+        replaced = QPixmap(pixmap.size())
+        replaced.fill(color)
+        replaced.setMask(pixmap.createMaskFromColor(Qt.transparent))
+        super().__init__(replaced)
+
+
 # The most complicated/involved chip item. Lots of components!
 class ProgramItem(CustomGraphicsViewItem):
     def __init__(self, program: Program):
+
+        self.shownIcon = ColoredIcon("Assets/Images/Visible.png", QColor(100, 100, 100))
+        self.hiddenIcon = ColoredIcon("Assets/Images/Hidden.png", QColor(150, 150, 150))
+
         self.program = program
 
         # Set up the inspector for this item:
         inspectorWidget = QWidget()
+        inspectorWidget.setStyleSheet("""
+        QLabel {
+        padding: 5px;
+        }""")
         inspectorWidgetLayout = QVBoxLayout()
+        inspectorWidgetLayout.setContentsMargins(0, 0, 0, 0)
+        inspectorWidgetLayout.setSpacing(0)
         inspectorWidget.setLayout(inspectorWidgetLayout)
 
         # Program name field
         nameAndSourceLayout = QFormLayout()
+        nameAndSourceLayout.setContentsMargins(1, 1, 1, 1)
+        nameAndSourceLayout.setSpacing(0)
         inspectorWidget.layout().addLayout(nameAndSourceLayout)
         self.nameField = QLineEdit()
+        self.nameField.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.MinimumExpanding)
         self.nameField.textChanged.connect(self.RecordChanges)
         nameAndSourceLayout.addRow("Name", self.nameField)
 
         # Program source field with browse button.
         self.scriptNameWidget = QLabel()
         self.selectScriptButton = QPushButton("...")
+        self.selectScriptButton.setFixedWidth(50)
         self.selectScriptButton.clicked.connect(self.SelectScript)
         sourceLayout = QHBoxLayout()
         sourceLayout.addWidget(self.scriptNameWidget, stretch=1)
@@ -42,24 +66,24 @@ class ProgramItem(CustomGraphicsViewItem):
 
         # Program scale field
         self.scaleWidget = QDoubleSpinBox()
+        self.scaleWidget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.MinimumExpanding)
         self.scaleWidget.setMinimum(0.1)
         self.scaleWidget.setMaximum(10.0)
         self.scaleWidget.setSingleStep(0.1)
         self.scaleWidget.valueChanged.connect(self.RecordChanges)
         nameAndSourceLayout.addRow("Display scale", self.scaleWidget)
 
+        dummyWidget = QWidget()
+        inspectorWidget.layout().addWidget(dummyWidget)
+        dummyWidget.setFixedHeight(5)
+        dummyWidget.setStyleSheet("""background-color: black;""")
+
         # Parameters will be kept in this layout for the inspector. All parameters are shown here.
         self.parametersLayout = QGridLayout()
         self.parametersLayout.setContentsMargins(0, 0, 0, 0)
         self.parametersLayout.setSpacing(0)
         parametersWidget = QFrame()
-        parametersWidget.setFrameShape(QFrame.Shape.Panel)
-        parametersWidget.setFrameShadow(QFrame.Sunken)
         parametersWidget.setLineWidth(2)
-        parametersWidget.setStyleSheet("""
-        QLabel {
-        padding: 5px;
-        }""")
         parametersWidget.setLayout(self.parametersLayout)
         inspectorWidget.layout().addWidget(parametersWidget)
 
@@ -69,13 +93,7 @@ class ProgramItem(CustomGraphicsViewItem):
         self.visibleParametersLayout.setContentsMargins(0, 0, 0, 0)
         self.visibleParametersLayout.setSpacing(0)
         visibleParametersWidget = QFrame()
-        visibleParametersWidget.setFrameShape(QFrame.Shape.Panel)
-        visibleParametersWidget.setFrameShadow(QFrame.Sunken)
         visibleParametersWidget.setLineWidth(2)
-        visibleParametersWidget.setStyleSheet("""
-        QLabel {
-        padding: 5px;
-        }""")
         visibleParametersWidget.setLayout(self.visibleParametersLayout)
         inspectorWidget.layout().addWidget(visibleParametersWidget)
 
@@ -83,6 +101,7 @@ class ProgramItem(CustomGraphicsViewItem):
         # shown here as buttons.
         self.functionsLayout = QGridLayout()
         self.functionsLayout.setContentsMargins(0, 0, 0, 0)
+        self.functionsLayout.setSpacing(0)
         functionsWidget = QWidget()
         functionsWidget.setLayout(self.functionsLayout)
 
@@ -93,13 +112,30 @@ class ProgramItem(CustomGraphicsViewItem):
         self.functionWidgetSets: typing.List[FunctionWidgetSet] = []
 
         # Actual item widget
-        itemWidget = QWidget()
+        itemWidget = ProgramItem.ResizeDelegate(self.OnResized)
+        itemWidget.setObjectName("itemWidget")
+        itemWidget.setStyleSheet("""
+        #itemWidget {
+        border: 1px solid black;
+        }
+        QLabel {
+        padding: 5px;
+        }""")
         self.nameWidget = QLabel()
+        self.nameWidget.setStyleSheet("color: white; background-color: black;")
         self.nameWidget.setAlignment(Qt.AlignCenter)
         itemLayout = QVBoxLayout()
+        itemLayout.setContentsMargins(0, 0, 0, 0)
+        itemLayout.setSpacing(0)
         itemWidget.setLayout(itemLayout)
         itemWidget.layout().addWidget(self.nameWidget)
         itemWidget.layout().addWidget(visibleParametersWidget)
+
+        dummyWidget = QWidget()
+        itemWidget.layout().addWidget(dummyWidget)
+        dummyWidget.setFixedHeight(5)
+        dummyWidget.setStyleSheet("""background-color: black;""")
+
         itemWidget.layout().addWidget(functionsWidget)
 
         # Compilation/program error reporting
@@ -115,9 +151,26 @@ class ProgramItem(CustomGraphicsViewItem):
         itemWidget.layout().addWidget(self.messageArea)
         itemWidget.layout().addWidget(self.clearMessagesButton)
 
+        self.fadeWidget = QWidget(itemWidget)
+        self.fadeWidget.setStyleSheet("background-color: rgba(255, 255, 255, 200);")
+
         super().__init__("Program", itemWidget, inspectorWidget)
         super().SetRect(QRectF(*program.position, 0, 0))
         self.isResizable = False
+
+    def OnResized(self, event):
+        self.fadeWidget.move(1, 1)
+        height = self.itemProxy.widget().height() - self.messageArea.height() - self.clearMessagesButton.height()
+        self.fadeWidget.setFixedSize(self.itemProxy.widget().width() - 2, height - 2)
+
+    class ResizeDelegate(QFrame):
+        def __init__(self, delegate):
+            super().__init__()
+            self.delegate = delegate
+
+        def resizeEvent(self, event) -> None:
+            super().resizeEvent(event)
+            self.delegate(event)
 
     def ClearMessages(self):
         compiled = UIMaster.GetCompiledProgram(self.program)
@@ -127,6 +180,7 @@ class ProgramItem(CustomGraphicsViewItem):
         for c in self.itemProxy.widget().children():
             if isinstance(c, QWidget) and c != self.messageArea and c != self.clearMessagesButton:
                 c.setEnabled(state)
+        self.fadeWidget.setVisible(not state)
 
     def SelectScript(self):
         def Selected(s: Script):
@@ -258,8 +312,8 @@ class ProgramItem(CustomGraphicsViewItem):
                 compiled.parameters[parameterSymbol].displayName)
             parameterWidgetSet.inspectorNameLabel.setText(
                 compiled.parameters[parameterSymbol].displayName)
-            parameterWidgetSet.inspectorVisibilityToggle.setText(
-                "O" if self.program.parameterVisibility[parameterSymbol] else "X")
+            parameterWidgetSet.inspectorVisibilityToggle.setIcon(
+                self.shownIcon if self.program.parameterVisibility[parameterSymbol] else self.hiddenIcon)
             parameterWidgetSet.inspectorVisibilityToggle.setChecked(
                 self.program.parameterVisibility[parameterSymbol])
             parameterWidgetSet.itemNameLabel.setVisible(
@@ -277,6 +331,7 @@ class ProgramItem(CustomGraphicsViewItem):
             newSet = FunctionWidgetSet()
             self.functionWidgetSets.append(newSet)
             self.functionsLayout.addWidget(newSet.startButton, index, 0, 1, 6)
+            self.functionsLayout.addWidget(newSet.label, index, 0, 1, 5)
             self.functionsLayout.addWidget(newSet.stopButton, index, 6)
             self.functionsLayout.addWidget(newSet.pauseButton, index, 7)
             self.functionsLayout.addWidget(newSet.resumeButton, index, 7)
@@ -304,7 +359,9 @@ class ProgramItem(CustomGraphicsViewItem):
                                                      self.functionWidgetSets):
             functionWidgetSet.startButton.setText(
                 compiled.programFunctions[functionSymbol].functionName)
-            functionWidgetSet.startButton.setEnabled(functionSymbol not in compiled.asyncFunctions)
+            functionWidgetSet.label.setText(compiled.programFunctions[functionSymbol].functionName)
+            functionWidgetSet.startButton.setVisible(functionSymbol not in compiled.asyncFunctions)
+            functionWidgetSet.label.setVisible(functionSymbol in compiled.asyncFunctions)
             functionWidgetSet.stopButton.setVisible(functionSymbol in compiled.asyncFunctions)
             functionWidgetSet.pauseButton.setVisible(functionSymbol in compiled.asyncFunctions and
                                                      not compiled.asyncFunctions[
@@ -343,7 +400,21 @@ class ParameterWidgetSet:
     def __init__(self):
         self.inspectorValueWidget = ParameterValueWidget()
         self.inspectorNameLabel = QLabel()
-        self.inspectorVisibilityToggle = QPushButton("O")
+        self.inspectorVisibilityToggle = QPushButton("")
+        self.inspectorVisibilityToggle.setStyleSheet("""
+        QPushButton {
+        background-color: rgb(200, 200, 200);
+        border: none;
+        icon-size: 20px 20px;
+        }
+        QPushButton:hover {
+        background-color: rgb(230, 230, 230);
+        }
+        QPushButton:pressed {
+        background-color: rgb(180, 180, 180);
+        }
+        """)
+        self.inspectorVisibilityToggle.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.MinimumExpanding)
         self.inspectorVisibilityToggle.setFixedWidth(40)
         self.itemValueWidget = ParameterValueWidget()
         self.itemNameLabel = QLabel()
@@ -353,9 +424,49 @@ class ParameterWidgetSet:
 class FunctionWidgetSet:
     def __init__(self):
         self.startButton = QPushButton()
+        self.label = QLabel()
         self.stopButton = QPushButton("Stop")
+        self.stopButton.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.MinimumExpanding)
+        self.stopButton.setStyleSheet("""
+        QPushButton {
+        border: none;
+        background-color: rgb(250, 150, 150);
+        }
+        QPushButton:hover {
+        background-color: rgb(250, 200, 200);
+        }
+        QPushButton:pressed {
+        background-color: rgb(250, 100, 100);
+        }""")
         self.resumeButton = QPushButton("Resume")
+        self.resumeButton.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.MinimumExpanding)
+        self.resumeButton.setStyleSheet("""
+        QPushButton {
+        border: none;
+        background-color: rgb(150, 250, 150);
+        }
+        QPushButton:hover {
+        background-color: rgb(200, 250, 200);
+        }
+        QPushButton:pressed {
+        background-color: rgb(150, 250, 150);
+        }""")
         self.pauseButton = QPushButton("Pause")
+        self.pauseButton.setStyleSheet("""
+        QPushButton {
+        border: none;
+        background-color: rgb(200, 200, 200);
+        }
+        QPushButton:hover {
+        background-color: rgb(250, 250, 250);
+        }
+        QPushButton:pressed {
+        background-color: rgb(150, 150, 150);
+        }""")
+        self.pauseButton.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.MinimumExpanding)
+        self.pauseButton.setFixedWidth(50)
+        self.resumeButton.setFixedWidth(50)
+        self.stopButton.setFixedWidth(50)
 
 
 # Control widget for a UI-editable parameter.
@@ -404,8 +515,11 @@ class ParameterValueWidget(QWidget):
             controlLayout.addLayout(countLayout)
 
             self.listContents: typing.List[ParameterValueWidget] = []
+        controlWidget.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.MinimumExpanding)
         self._updating = False
         pLayout = QVBoxLayout()
+        pLayout.setContentsMargins(0, 0, 0, 0)
+        pLayout.setSpacing(0)
         self.setLayout(pLayout)
         self.controlWidget: typing.Union[
             QSpinBox, QDoubleSpinBox, QLineEdit, QComboBox, QWidget, None] = controlWidget

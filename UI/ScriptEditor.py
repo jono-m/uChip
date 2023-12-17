@@ -44,7 +44,7 @@ class ScriptEditor(QDialog):
         self.enabled = True
 
         self.currentScript: typing.Optional[Script] = None
-        self.resize(1024, 768)
+        self.resize(1200, 768)
 
         self.pythonEditor.modificationChanged.connect(self.UpdateTitle)
         self.ToggleDocumentation()
@@ -135,7 +135,3 @@ class DocumentationWidget(QFrame):
         mainLayout.setSpacing(0)
         mainLayout.addWidget(self.scrollArea)
         self.setLayout(mainLayout)
-
-    def resizeEvent(self, event) -> None:
-        print(self.sizePolicy())
-        super().resizeEvent(event)

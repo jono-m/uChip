@@ -1,3 +1,10 @@
+* {
+    background-color: rgb(60, 60, 60);
+    color: white;
+}
+QPushButton, QToolButton {
+    background-color: rgb(
+}
 QPushButton[MainButton="true"] {
     background-color: green;
     color: white;

@@ -73,7 +73,7 @@ class UIMaster:
 
     @staticmethod
     def StyleSheet():
-        f = open("stylesheet.css")
+        f = open("stylesheet_light.css")
         ss = f.read()
         f.close()
         return ss
