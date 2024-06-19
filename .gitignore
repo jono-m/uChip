@@ -3,3 +3,9 @@ venv/
 *.pkl
 build/
 .idea/
+.vs/
+obj/
+bin/
+*.sln
+*.csproj*
+Cell Counter Tool/CellCounter/Properties/
