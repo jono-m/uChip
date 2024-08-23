@@ -272,8 +272,10 @@ class ProgramItem(CustomGraphicsViewItem):
                 zip(compiled.parameters, self.parameterWidgetSets)):
             # Ensure that the value fields match the type given.
             parameterType = compiled.parameters[parameterSymbol].parameterType
+            minimum = compiled.parameters[parameterSymbol].minimum
+            maximum = compiled.parameters[parameterSymbol].maximum
             if not DoTypesMatch(parameterWidgetSet.inspectorValueWidget.parameterType,
-                                parameterType):
+                                parameterType) or parameterWidgetSet.inspectorValueWidget.minimum != minimum or  parameterWidgetSet.inspectorValueWidget.maximum != maximum:
                 # If the types don't match (or they haven't been set, i.e. parameterType is None),
                 # we need to rebuild the value fields.
                 self.parameterWidgetSets[i].inspectorValueWidget.deleteLater()
@@ -282,13 +284,13 @@ class ProgramItem(CustomGraphicsViewItem):
                 # Inspector value field is the master. Changes to the item value field instead
                 # change the inspector value field, which is what actually reports the change to
                 # the backing program.
-                inspectorWidget = ParameterValueWidget(parameterType)
+                inspectorWidget = ParameterValueWidget(parameterType, minimum, maximum)
 
                 def RecordValueChange(ps=parameterSymbol, w=inspectorWidget):
                     self.program.parameterValues[ps] = w.GetValue()
 
                 inspectorWidget.OnValueChanged.connect(RecordValueChange)
-                itemWidget = ParameterValueWidget(parameterType)
+                itemWidget = ParameterValueWidget(parameterType, minimum, maximum)
 
                 def RecordValueChange(ps=parameterSymbol, w=itemWidget):
                     self.program.parameterValues[ps] = w.GetValue()
@@ -473,16 +475,20 @@ class FunctionWidgetSet:
 class ParameterValueWidget(QWidget):
     OnValueChanged = Signal()
 
-    def __init__(self, parameterType=None):
+    def __init__(self, parameterType=None, minimum=None, maximum=None):
         super().__init__()
         self.parameterType = parameterType
         if parameterType is None:
             return
         controlWidget = None
+        self.minimum=minimum
+        self.maximum=maximum
         if self.parameterType in (int, float):
             controlWidget = QSpinBox() if self.parameterType == int else QDoubleSpinBox()
-            controlWidget.setMinimum(-1000000)
-            controlWidget.setMaximum(1000000)
+            if minimum is not None:
+                controlWidget.setMinimum(minimum)
+            if maximum is not None:
+                controlWidget.setMaximum(maximum)
             controlWidget.valueChanged.connect(self.OnChanged)
         elif self.parameterType == str:
             controlWidget = QLineEdit()
@@ -509,7 +515,7 @@ class ParameterValueWidget(QWidget):
             countLayout.addWidget(QLabel("Count"))
             self.listCountWidget = QSpinBox()
             self.listCountWidget.setMinimum(0)
-            self.listCountWidget.setMaximum(1000)
+            self.listCountWidget.setMaximum(100)
             self.listCountWidget.valueChanged.connect(self.OnChanged)
             countLayout.addWidget(self.listCountWidget, stretch=1)
             controlLayout.addLayout(countLayout)

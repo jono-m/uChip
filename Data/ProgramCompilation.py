@@ -371,9 +371,9 @@ def NoneValueForType(t):
         return 0.0
     if t == str:
         return ""
-    if isinstance(t, ucscript.OptionsParameter):
+    if isinstance(t, ucscript.OptionsParameterType):
         return t.options[0]
-    if isinstance(t, ucscript.ListParameter):
+    if isinstance(t, ucscript.ListParameterType):
         return []
 
 
@@ -384,21 +384,21 @@ def IsTypeValid(parameterType):
 
 # Helper method for if the parameter is an enum (a list of strings)
 def IsTypeValidOptions(parameterType):
-    return isinstance(parameterType, ucscript.OptionsParameter) and len(
+    return isinstance(parameterType, ucscript.OptionsParameterType) and len(
         parameterType.options) > 0 and all([isinstance(x, str) for x in parameterType.options])
 
 
 # Helper method for if the parameter is a list of displayable parameters
 def IsTypeValidList(parameterType):
-    return isinstance(parameterType, ucscript.ListParameter) and IsTypeValid(parameterType.listType)
+    return isinstance(parameterType, ucscript.ListParameterType) and IsTypeValid(parameterType.listType)
 
 
 def DoTypesMatch(t1, t2):
     if isinstance(t1, type) and isinstance(t2, type):
         return t1 == t2
-    if isinstance(t1, ucscript.ListParameter) and isinstance(t2, ucscript.ListParameter):
+    if isinstance(t1, ucscript.ListParameterType) and isinstance(t2, ucscript.ListParameterType):
         return DoTypesMatch(t1.listType, t2.listType)
-    if isinstance(t1, ucscript.OptionsParameter) and isinstance(t2, ucscript.OptionsParameter):
+    if isinstance(t1, ucscript.OptionsParameterType) and isinstance(t2, ucscript.OptionsParameterType):
         return t1.options == t2.options
     return False
 
@@ -411,9 +411,9 @@ def DoesValueMatchType(value, t):
     if isinstance(value, Chip.Valve) and t == ucscript.Valve or \
             isinstance(value, Chip.Program) and t == ucscript.Program:
         return True
-    if isinstance(value, list) and isinstance(t, ucscript.ListParameter):
+    if isinstance(value, list) and isinstance(t, ucscript.ListParameterType):
         return [DoesValueMatchType(v, t.listType) for v in value]
-    if isinstance(value, str) and isinstance(t, ucscript.OptionsParameter):
+    if isinstance(value, str) and isinstance(t, ucscript.OptionsParameterType):
         return value in t.options
 
 

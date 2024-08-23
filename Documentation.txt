@@ -1,19 +1,179 @@
-Hi! This is the documentation. Here is some information about uChip coding.
+<title>Scripting Reference</title>
+<p>uChip scripting is done with Python syntax. All standard Python modules are available.
+uChip includes extra functions and structures to access chip functions. This document describes their usage.
+</p>
 
-<h1>Heading</h1>
-Some more <b>info</b>.
+<h1>Script Functions</h1>
+<p>A script can have any number of python functions in it. Functions with <b><u><i>zero arguments</i></u></b>
+can be displayed as a button in the uChip window with the <code>@display</code> decorator.</p>
 
-<p>Make sure to read about <font color="red">This</color>.</p>
+<h2><code>@display([functionName])</code></h2>
+<p>Use this decorator to show a zero-argument function as a pressable button in the uChip window.</p>
+<p><code>functionName</code> - optional string to override the display name of the function.</p>
+<h3>Example Usage</h3>
+<code><pre>
+def GetChipValves():
+    return [FindValve("Inlet"), FindValve("Outlet")]
 
-Code signature is:
-<blockquote><tt><b>some</b> code</tt></blockquote>
+@display
+def CloseValves():
+    for valve in GetChipValves():
+        valve.Close()
+</pre></code>
 
+<h2><code>WaitForSeconds(seconds: float)</code></h2>
+<p>You can <code>yield</code> this value from a function to pause execution for a given number of seconds.</p>
+<h3>Example Usage</h3>
+<code><pre>
+@display
+def RinseChip():
+    rinseValve = FindValve("Rinse")
+    rinseValve.Open()
+    yield WaitForSeconds(30)
+    rinseValve.Close()
+</pre></code>
+<h2><code>WaitForMinutes(minutes: float)</code></h2>
+<h2><code>WaitForHours(hours: float)</code></h2>
+<h2><code>Log(text: str)</code></h2>
+<p>Use this to show a message in the chip messages list.</p>
+<h2><code>@onStop(functionToCall)</code></h2>
+<p>Use this decorator on an asynchronous function (i.e. one that uses <code>yield WaitForSeconds</code>)
+ to call another function when it has been stopped or completed.</p>
+<h2><code>@onPause(functionToCall)</code></h2>
+<p>Use this decorator on an asynchronous function (i.e. one that uses <code>yield WaitForSeconds</code>)
+ to call another function when it has been paused.</p>
+<h2><code>@onResume(functionToCall)</code></h2>
+<p>Use this decorator on an asynchronous function (i.e. one that uses <code>yield WaitForSeconds</code>)
+ to call another function when it has been resumed.</p>
+</pre></code>
+<h1>Accessing Named Chip Objects</h1>
 
-Code signature is:
-<blockquote><tt><b>some</b> code</tt></blockquote>
-Code signature is:
-<blockquote><tt><b>some</b> code</tt></blockquote>
-Code signature is:
-<blockquote><tt><b>some</b> code</tt></blockquote>
-Code signature is:
-<blockquote><tt><b>some</b> code</tt></blockquote>
+<h2><code>FindValve(name: str)</code></h2>
+<p>Finds a valve in the chip project with the name <i>name</i>.</p>
+<p>Returns a <b>Valve</b> object.</p>
+<h3>Example Usage</h3>
+<code><pre>
+inletValve = FindValve("Inlet")
+</pre></code>
+
+<h2><code>FindProgram(name: str)</code></h2>
+<p>Finds a program  in the chip project with the name <i>name</i>.</p>
+<p>Returns a <b>Program</b> object.</p>
+<h3>Example Usage</h3>
+<code><pre>
+pumpA = FindProgram("Pump A")
+</code></pre>
+
+<h1>Chip Objects</h1>
+
+<h2>Valve</h2>
+<p>A Valve object should not be instantiated by itself.
+Valves can be retrieved by name with FindValve(name), or passed through the GUI with Parameter(Valve).</p>
+<h3>Methods</h3>
+<code>
+    <p>Valve.SetOpen(state: bool)</p>
+    <p>Valve.Open()</p>
+    <p>Valve.Close()</p>
+    <p>Valve.IsOpen() -> bool</p>
+    <p>Valve.IsClosed() -> bool</p>
+    <p>Valve.Name() -> str</p>
+    <p>Valve.SetName(name: str)</p>
+    <p>Valve.SolenoidNumber() -> int</p>
+    <p>Valve.SetSolenoidNumber() -> int</p>
+</code>
+<h3>Example Usage</h3>
+<code><pre>
+@display
+def ToggleRinse():
+    rinseValve = FindValve("Rinse")
+    rinsevalve.SetOpen(not rinseValve.Open())
+</pre></code>
+
+<h2>Program</h2>
+<p>A Program object should not be instantiated by itself. Programs can be retrieved by name with
+FindProgram(name) or passed through the GUI with Parameter(Program). All of the program's parameters and functions are accessible through this object by their symbol name.</p>
+<h3>Methods</h3>
+    <code>
+    <p>Program.Name() -> str</p>
+    <p>Program.SetName(name: str)</p>
+    </code>
+<h3>Example usage</h3>
+    <p>Given a program <i>Chip Functions</i> with the following script:</p>
+<code><pre>
+def SetRinse(open: bool):
+    FindValve("Rinse").SetOpen(open)
+</code></pre>
+<p>A second program can access this method as such:</p>
+<code><pre>
+@display
+def DoRinse():
+    chipFunctions = FindProgram("Chip Functions")
+    chipFunctions.SetRinse(True)
+    yield WaitForSeconds(15)
+    chipFunctions.SetRinse(False)
+</code></pre>
+
+<h1>Parameters</h1>
+<p>Parameters are objects that you can create in your scripts which will be visible in the chip
+program as changeable options (e.g. a number entry, text entry, a valve, a dropdown, a list of valves).
+<b>Parameters must be declared on the global scope of the script to be recognized by uChip</b></p>
+
+<h2>Parameter</h2>
+<p>A basic parameter for a Python built-in type, Programs, and Valves</p>
+<p>Support parameter types are:</p>
+<ul>
+    <li>int</li>
+    <li>float</li>
+    <li>str</li>
+    <li>Valve</li>
+    <li>Program</li>
+</ul>
+<h3>Methods</h3>
+<code>
+    <p>Parameter(parameterType: ParameterType, [displayName], [defaultValue], [minimum], [maximum])</p>
+    <p>Parameter.Set(value)</p>
+    <p>Parameter.Get()</p>
+</code>
+<h3>Example Usage</h3>
+<code><pre>
+rinseTime = Parameter(float, defaultValue=1, minimum=0.1, maximum=20)
+rv = Parameter(Valve, displayName="Rinse Valve")
+@display
+def DoRinse():
+    rinseValve = rv.Get()
+    rinseValve.Open()
+    yield WaitForSeconds(rinseTime.Get())
+    rinseValve.Close()
+</pre></code>
+
+<h2>OptionsParameter</h2>
+<p>An OptionsParameter represents a dropdown selection.</p>
+<h3>Methods</h3>
+<code>
+<p>OptionsParameter(options: List[str], [displayName], [defaultIndex])</p>
+</code>
+<h3>Example Usage</h3>
+<code><pre>
+pumpDirection=OptionsParameter(["Forward", "Reverse"])
+@display
+def RunPump():
+    if pumpDirection.Get() == "Forward":
+        # run pump forwards
+    else:
+        # run pump backwards
+</pre></code>
+
+<h2>ListParameter</h2>
+<p>A list parameter represents a variable-length list of parameters. For example, this can represent a list of valves.</p>
+<h3>Methods</h3>
+<code>
+<p>ListParameter(listType: Type, [displayName])</p>
+</code>
+<h3>Example Usage</h3>
+<code><pre>
+inletValves = ListParameter(Valve)
+@display
+def CloseAllInlets():
+    for inletValve in inletValves.Get():
+        inletValve.Close()
+</pre></code>

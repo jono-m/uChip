@@ -19,6 +19,7 @@ class ScriptBrowser(QDialog):
         self.onScriptChosen = None
         self.setWindowTitle("Script Browser")
 
+        self.setModal(False)
         self.previewPath = QLabel("")
         self.previewWindow = PythonEditor()
         self.previewWindow.setMinimumWidth(500)
@@ -62,7 +63,7 @@ class ScriptBrowser(QDialog):
         mainLayout.addLayout(listLayout, stretch=0)
         mainLayout.addLayout(previewLayout, stretch=1)
 
-        self.scriptEditor = ScriptEditor(self)
+        self.scriptEditor = ScriptEditor(self, self.OnClosed)
         self.scriptEditor.hide()
         self.setLayout(mainLayout)
 
@@ -97,7 +98,9 @@ class ScriptBrowser(QDialog):
         self.OpenEditor()
 
     def OpenEditor(self):
-        self.scriptEditor.exec()
+        self.scriptEditor.show()
+
+    def OnClosed(self):
         if self.scriptEditor.currentScript is not None:
             self.Relist()
             self.SelectScript(self.scriptEditor.currentScript)
@@ -193,7 +196,7 @@ class ScriptBrowser(QDialog):
         self.Relist()
         if selectedScript:
             self.SelectScript(selectedScript)
-        self.exec()
+        self.show()
 
     @staticmethod
     def Instance():

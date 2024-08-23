@@ -26,7 +26,6 @@ class Parameter:
         self.minimum = minimum
         self.maximum = maximum
 
-
     def Set(self, value):
         """Set the parameter to a given value."""
         pass
@@ -34,6 +33,7 @@ class Parameter:
     def Get(self) -> Any:
         """Get the current parameter value."""
         pass
+
 
 # A Valve object should not be instantiated by itself. Valves can be retrieved by name with
 # FindValve(name), or passed through the GUI with Parameter(Valve).
@@ -89,7 +89,7 @@ class ProgramFunction:
         self.onStop: typing.Optional[Callable] = lambda: None
         self.onPause: typing.Optional[Callable] = lambda: None
         self.onResume: typing.Optional[Callable] = lambda: None
-        self.hidden = False
+        self.hidden = True
 
     def __call__(self, *args, **kwargs):
         return self.Call(*args, **kwargs)
@@ -131,55 +131,52 @@ class WaitForHours(WaitForSeconds):
         super().__init__(60 * 60 * hours)
 
 
-class OptionsParameter:
-    def __init__(self, *args):
-        self.options = args
+class OptionsParameterType:
+    def __init__(self, options: typing.List[str]):
+        self.options = options
 
 
-class ListParameter:
+class OptionsParameter(Parameter):
+    def __init__(self, options: typing.List[str], displayName=None, defaultIndex=0):
+        super().__init__(OptionsParameterType(options), displayName, defaultIndex)
+
+
+class ListParameterType:
     def __init__(self, listType):
         self.listType = listType
+
+
+class ListParameter(Parameter):
+    def __init__(self, listType: typing.Type, displayName=None):
+        super().__init__(ListParameterType(listType), displayName)
 
 
 def _pf(f):
     return f if isinstance(f, ProgramFunction) else ProgramFunction(f)
 
 
-# A decorator that sets the function name to [fName]
-# e.g. @functionName("Rinse Valves")
-def functionName(fName: str):
-    def decorate(function: Union[Callable, ProgramFunction]):
+def display(displayName):
+    def GenerateDecorator(function: Union[Callable, ProgramFunction]):
         f = _pf(function)
-        f.functionName = fName
+        if displayName is not None:
+            f.functionName = displayName
+        f.hidden = False
         return f
 
-    return decorate
-
-
-# A decorator that forces the function to not execute asynchronously EVER.
-# e.g. @nonAsync
-def nonAsync(function: Union[Callable, ProgramFunction]):
-    f = _pf(function)
-    f.canAsync = False
-    return f
-
-
-# A decorator that forces the function to not show in the program item list
-# e.g. @hidden
-def hidden(function: Union[Callable, ProgramFunction]):
-    f = _pf(function)
-    f.hidden = True
-    return f
+    if callable(displayName):
+        func = displayName
+        displayName = None
+        return GenerateDecorator(func)
+    return GenerateDecorator
 
 
 # A decorator that calls a function once the decorated asynchronous function is stopped.
 def onStop(funcToCall: typing.Callable):
-    def decorate(function: Union[Callable, ProgramFunction]):
+    def Inner(function: Union[Callable, ProgramFunction]):
         f = _pf(function)
         f.onStop = funcToCall
         return f
-
-    return decorate
+    return Inner
 
 
 # A decorator that calls a function once the decorated asynchronous function is paused.

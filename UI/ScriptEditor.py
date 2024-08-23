@@ -12,13 +12,14 @@ from UI.UIMaster import UIMaster
 
 
 class ScriptEditor(QDialog):
-    def __init__(self, parent):
+    def __init__(self, parent, OnClose):
         super().__init__(parent)
         self.pythonEditor = PythonEditor()
         self.pythonEditor.setMinimumWidth(500)
 
         self.toggleButton = QPushButton()
         self.toggleButton.clicked.connect(self.ToggleDocumentation)
+        self.setModal(False)
         self.toggleButton.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Expanding)
         self.toggleButton.setStyleSheet("""
         QPushButton {
@@ -48,6 +49,7 @@ class ScriptEditor(QDialog):
 
         self.pythonEditor.modificationChanged.connect(self.UpdateTitle)
         self.ToggleDocumentation()
+        self.OnClose = OnClose
 
     def ToggleDocumentation(self):
         v = self.documentationWidget.isVisible()
@@ -81,6 +83,7 @@ class ScriptEditor(QDialog):
                 event.ignore()
                 return
         super().closeEvent(event)
+        self.OnClose()
 
     def PromptClose(self):
         value = QMessageBox.critical(self, "Confirm Action",
@@ -121,6 +124,7 @@ class DocumentationWidget(QFrame):
         f.close()
         self.documentationLabel.setTextFormat(Qt.TextFormat.RichText)
         self.documentationLabel.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.documentationLabel.setWordWrap(True)
         self.documentationLabel.setContentsMargins(20, 20, 20, 20)
 
         self.scrollArea = QScrollArea()
@@ -135,3 +139,8 @@ class DocumentationWidget(QFrame):
         mainLayout.setSpacing(0)
         mainLayout.addWidget(self.scrollArea)
         self.setLayout(mainLayout)
+
+    def showEvent(self, event) -> None:
+        super().showEvent(event)
+        f = open("Documentation.txt")
+        self.documentationLabel.setText(f.read())

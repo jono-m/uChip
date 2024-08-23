@@ -11,6 +11,7 @@ valveClosedStyle = """
 QPushButton {
 background-color: #f03535; 
 border: 1px solid black;
+color: black;
 }
 QPushButton::hover {
 background-color: #cc2d2d;
@@ -24,6 +25,7 @@ valveOpenStyle = """
 QPushButton {
 background-color: #aeeb34; 
 border: 1px solid black;
+color: black;
 }
 QPushButton::hover {
 background-color: #99cf2d;
