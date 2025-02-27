@@ -13,13 +13,13 @@ pattern = [(0, 0, 0),
            (0, 0, 1)]
 
 
-@hidden
 def ClosePump():
     [valve.Get().SetOpen(False) for valve in pumpValves]
 
 
 @onStop(ClosePump)
 @onPause(ClosePump)
+@display
 def RunPump():
     i = 0
     while True:

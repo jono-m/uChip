@@ -1,5 +1,0 @@
-- improve script formatting
-- bug logging
-- document UCscript
-- dark mode
-- splash screen
