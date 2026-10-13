@@ -1,0 +1,330 @@
+{
+  "format": "uchip",
+  "version": 1,
+  "valves": [
+    {
+      "name": "V4",
+      "solenoid": 0,
+      "rect": [1650.0, 0.0, 100.0, 100.0]
+    },
+    {
+      "name": "R4",
+      "solenoid": 1,
+      "rect": [1500.0, 0.0, 100.0, 100.0]
+    },
+    {
+      "name": "V3",
+      "solenoid": 2,
+      "rect": [1350.0, 0.0, 100.0, 100.0]
+    },
+    {
+      "name": "R3",
+      "solenoid": 3,
+      "rect": [1200.0, 0.0, 100.0, 100.0]
+    },
+    {
+      "name": "V2",
+      "solenoid": 4,
+      "rect": [1050.0, 0.0, 100.0, 100.0]
+    },
+    {
+      "name": "R2",
+      "solenoid": 5,
+      "rect": [900.0, 0.0, 100.0, 100.0]
+    },
+    {
+      "name": "V1",
+      "solenoid": 6,
+      "rect": [750.0, 0.0, 100.0, 100.0]
+    },
+    {
+      "name": "R1",
+      "solenoid": 7,
+      "rect": [600.0, 0.0, 100.0, 100.0]
+    },
+    {
+      "name": "R6",
+      "solenoid": 13,
+      "rect": [900.0, 800.0, 100.0, 100.0]
+    },
+    {
+      "name": "V6",
+      "solenoid": 12,
+      "rect": [1050.0, 800.0, 100.0, 100.0]
+    },
+    {
+      "name": "R5",
+      "solenoid": 15,
+      "rect": [600.0, 800.0, 100.0, 100.0]
+    },
+    {
+      "name": "V5",
+      "solenoid": 14,
+      "rect": [750.0, 800.0, 100.0, 100.0]
+    },
+    {
+      "name": "R8",
+      "solenoid": 17,
+      "rect": [1500.0, 800.0, 100.0, 100.0]
+    },
+    {
+      "name": "V8",
+      "solenoid": 16,
+      "rect": [1650.0, 800.0, 100.0, 100.0]
+    },
+    {
+      "name": "R7",
+      "solenoid": 19,
+      "rect": [1200.0, 800.0, 100.0, 100.0]
+    },
+    {
+      "name": "V7",
+      "solenoid": 18,
+      "rect": [1350.0, 800.0, 100.0, 100.0]
+    },
+    {
+      "name": "Discard",
+      "solenoid": 8,
+      "rect": [1800.0, 550.0, 100.0, 100.0]
+    },
+    {
+      "name": "Keep",
+      "solenoid": 9,
+      "rect": [1800.0, 250.0, 100.0, 100.0]
+    },
+    {
+      "name": "Oil",
+      "solenoid": 10,
+      "rect": [1250.0, 250.0, 100.0, 100.0]
+    },
+    {
+      "name": "Sample",
+      "solenoid": 11,
+      "rect": [1000.0, 350.0, 100.0, 100.0]
+    }
+  ],
+  "texts": [],
+  "images": [
+    {
+      "path": "SSV12.png",
+      "rect": [-377.7803643916591, -204.32817119911667, 2377.780364391659, 1304.3281711991167]
+    }
+  ],
+  "scripts": [
+    {
+      "path": "ReagentToggle.py"
+    },
+    {
+      "path": "PluriDrop.py"
+    }
+  ],
+  "programs": [
+    {
+      "name": "Priming",
+      "script": {
+        "path": "PluriDrop.py"
+      },
+      "position": [2050.0, 88.00000000000003],
+      "scale": 3.0,
+      "show_log": true,
+      "parameters": {
+        "valveCloseDelay": {
+          "value": 0.2,
+          "visible": true
+        },
+        "conditionStabilizeTime": {
+          "value": 1.0,
+          "visible": true
+        },
+        "dropletStabilizeTime": {
+          "value": 0.2,
+          "visible": true
+        }
+      }
+    },
+    {
+      "name": "REAGENT 1",
+      "script": {
+        "path": "ReagentToggle.py"
+      },
+      "position": [500.0, -346.0],
+      "scale": 2.0,
+      "show_log": false,
+      "parameters": {
+        "valveNumber": {
+          "value": 1,
+          "visible": false
+        },
+        "pwmFraction": {
+          "value": 50.0,
+          "visible": true
+        },
+        "frequency": {
+          "value": 20.0,
+          "visible": true
+        }
+      }
+    },
+    {
+      "name": "REAGENT 2",
+      "script": {
+        "path": "ReagentToggle.py"
+      },
+      "position": [918.9999999999999, -350.0],
+      "scale": 2.0,
+      "show_log": false,
+      "parameters": {
+        "valveNumber": {
+          "value": 2,
+          "visible": false
+        },
+        "pwmFraction": {
+          "value": 0.0,
+          "visible": true
+        },
+        "frequency": {
+          "value": 0.0,
+          "visible": true
+        }
+      }
+    },
+    {
+      "name": "REAGENT 3",
+      "script": {
+        "path": "ReagentToggle.py"
+      },
+      "position": [1219.0, -350.0],
+      "scale": 2.0,
+      "show_log": false,
+      "parameters": {
+        "valveNumber": {
+          "value": 3,
+          "visible": false
+        },
+        "pwmFraction": {
+          "value": 0.0,
+          "visible": true
+        },
+        "frequency": {
+          "value": 0.0,
+          "visible": true
+        }
+      }
+    },
+    {
+      "name": "REAGENT 4",
+      "script": {
+        "path": "ReagentToggle.py"
+      },
+      "position": [1519.0, -350.0],
+      "scale": 2.0,
+      "show_log": false,
+      "parameters": {
+        "valveNumber": {
+          "value": 4,
+          "visible": false
+        },
+        "pwmFraction": {
+          "value": 50.0,
+          "visible": true
+        },
+        "frequency": {
+          "value": 8.0,
+          "visible": true
+        }
+      }
+    },
+    {
+      "name": "REAGENT 5",
+      "script": {
+        "path": "ReagentToggle.py"
+      },
+      "position": [600.0, 954.0000000000001],
+      "scale": 2.0,
+      "show_log": false,
+      "parameters": {
+        "valveNumber": {
+          "value": 5,
+          "visible": false
+        },
+        "pwmFraction": {
+          "value": 0.0,
+          "visible": true
+        },
+        "frequency": {
+          "value": 0.0,
+          "visible": true
+        }
+      }
+    },
+    {
+      "name": "REAGENT 6",
+      "script": {
+        "path": "ReagentToggle.py"
+      },
+      "position": [900.0, 954.0000000000001],
+      "scale": 2.0,
+      "show_log": false,
+      "parameters": {
+        "valveNumber": {
+          "value": 6,
+          "visible": false
+        },
+        "pwmFraction": {
+          "value": 0.0,
+          "visible": true
+        },
+        "frequency": {
+          "value": 0.0,
+          "visible": true
+        }
+      }
+    },
+    {
+      "name": "REAGENT 7",
+      "script": {
+        "path": "ReagentToggle.py"
+      },
+      "position": [1200.0, 954.0000000000001],
+      "scale": 2.0,
+      "show_log": false,
+      "parameters": {
+        "valveNumber": {
+          "value": 7,
+          "visible": false
+        },
+        "pwmFraction": {
+          "value": 0.0,
+          "visible": true
+        },
+        "frequency": {
+          "value": 0.0,
+          "visible": true
+        }
+      }
+    },
+    {
+      "name": "REAGENT 8",
+      "script": {
+        "path": "ReagentToggle.py"
+      },
+      "position": [1500.0, 954.0000000000001],
+      "scale": 2.0,
+      "show_log": false,
+      "parameters": {
+        "valveNumber": {
+          "value": 8,
+          "visible": false
+        },
+        "pwmFraction": {
+          "value": 0.0,
+          "visible": true
+        },
+        "frequency": {
+          "value": 0.0,
+          "visible": true
+        }
+      }
+    }
+  ]
+}

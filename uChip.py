@@ -1,13 +1,10 @@
-from PySide6 import QtWidgets
-from UI.MainWindow import MainWindow
-from UI.DebugWindow import DebugWindow
+"""Runs uChip. Usage: python uChip.py [project.uchip]"""
 import sys
+from pathlib import Path
+
+from gui.app import run
+
+DEFAULT_CHIP = Path("examples/PluriDrop.uchip")
 
 if __name__ == '__main__':
-    app = QtWidgets.QApplication(sys.argv)
-    window = MainWindow()
-
-    window.show()
-
-    app.exec()
-
+    sys.exit(run(Path(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT_CHIP))
