@@ -1,0 +1,154 @@
+<title>Scripting Reference</title>
+<h1>uChip Scripting Reference</h1>
+<p>A uChip script is a Python file. Place it on the chip as a <b>program</b>: its
+<a href="#parameters">parameters</a> appear as settings, and its <a href="#functions">functions</a>
+can be shown as buttons. Everything in the scripting API is available without importing anything,
+and all standard Python modules can be imported as usual.</p>
+<p>Hover over an API name in the editor to see its documentation, and press <b>Ctrl+Space</b> for
+suggestions.</p>
+
+<p><b>Contents:</b>
+<a href="#functions">Functions</a> &middot;
+<a href="#waiting">Waiting</a> &middot;
+<a href="#parameters">Parameters</a> &middot;
+<a href="#valves">Valves</a> &middot;
+<a href="#programs">Other programs</a> &middot;
+<a href="#logging">Logging and description</a> &middot;
+<a href="#api">Full API</a></p>
+
+<a name="functions"></a>
+<h2>Functions</h2>
+<p>A script can define any number of functions. Use the <code>@display</code> decorator to show a
+function as a button on the program. Only functions with <b>no arguments</b> can be shown.</p>
+<pre>
+@display
+def CloseValves():
+    FindValve("Inlet").Close()
+    FindValve("Outlet").Close()
+
+@display("Open everything")   # Changes the button text.
+def OpenAll():
+    ...
+</pre>
+<p>Functions without <code>@display</code> can still be called from other functions, or from other
+programs.</p>
+
+<a name="waiting"></a>
+<h2>Waiting: background functions</h2>
+<p>A function that <code>yield</code>s a wait runs in the background: uChip keeps running other
+functions while it waits, and the program shows pause and stop buttons for it.</p>
+<pre>
+@display
+def Rinse():
+    rinse = FindValve("Rinse")
+    rinse.Open()
+    # Also WaitForMinutes(m) and WaitForHours(h).
+    yield WaitForSeconds(30)
+    rinse.Close()
+</pre>
+<p>Never wait with a plain loop or <code>time.sleep</code>: that blocks every program until it
+finishes. Yield inside long loops instead.</p>
+<p>To run cleanup when a background function stops, pauses or resumes, use the
+<code>@onStop</code>, <code>@onPause</code> and <code>@onResume</code> decorators:</p>
+<pre>
+def ClosePump():
+    for valve in pumpValves.Get():
+        valve.Close()
+
+@onStop(ClosePump)
+@onPause(ClosePump)
+@display
+def RunPump():
+    while True:
+        ...
+        yield WaitForSeconds(0.5)
+</pre>
+
+<a name="parameters"></a>
+<h2>Parameters</h2>
+<p>Parameters are settings the user can change on the program, such as a number, some text, a valve
+or a list of valves. Declare them at the top level of the script (not inside a function), and read
+them with <code>.Get()</code>.</p>
+<pre>
+rinseTime = Parameter(float, defaultValue=1, minimum=0.1, maximum=20)
+rinseValve = Parameter(Valve, displayName="Rinse valve")
+
+@display
+def Rinse():
+    valve = rinseValve.Get()
+    valve.Open()
+    yield WaitForSeconds(rinseTime.Get())
+    valve.Close()
+</pre>
+<p><code>Parameter(type)</code> types: <code>int</code>, <code>float</code>, <code>str</code>,
+<code>bool</code>, <code>Valve</code> and <code>Program</code>.</p>
+
+<h3>Dropdowns</h3>
+<p><code>.Get()</code> returns the text of the chosen option.</p>
+<pre>
+direction = OptionsParameter(["Forward", "Reverse"])
+
+@display
+def RunPump():
+    if direction.Get() == "Forward":
+        ...
+</pre>
+
+<h3>Lists</h3>
+<pre>
+inlets = ListParameter(Valve, displayName="Inlet valves")
+
+@display
+def CloseInlets():
+    for valve in inlets.Get():
+        valve.Close()
+</pre>
+<p>A script can also change a parameter with <code>.Set(value)</code>.</p>
+
+<a name="valves"></a>
+<h2>Valves</h2>
+<p>Get a valve by name with <code>FindValve(name)</code>, or let the user pick one with
+<code>Parameter(Valve)</code>.</p>
+<pre>
+inlet = FindValve("Inlet")
+inlet.Open()
+inlet.SetOpen(not inlet.IsOpen())   # Toggle.
+Log("%s is on solenoid %d" % (inlet.Name(), inlet.SolenoidNumber()))
+</pre>
+
+<a name="programs"></a>
+<h2>Other programs</h2>
+<p>Get another program on the chip by name with <code>FindProgram(name)</code>, or let the user pick
+one with <code>Parameter(Program)</code>. Its functions and parameters are available by their names
+in its script.</p>
+<p>Given a program named <i>Chip Functions</i> with this script:</p>
+<pre>
+def SetRinse(open):
+    FindValve("Rinse").SetOpen(open)
+</pre>
+<p>another program can use it like this:</p>
+<pre>
+@display
+def DoRinse():
+    functions = FindProgram("Chip Functions")
+    functions.SetRinse(True)
+    yield WaitForSeconds(15)
+    functions.SetRinse(False)
+</pre>
+<p>Another program's background functions can be controlled with <code>.IsRunning()</code>,
+<code>.Pause()</code>, <code>.Resume()</code> and <code>.Stop()</code>, e.g.
+<code>FindProgram("Pump").RunPump.Stop()</code>.</p>
+
+<a name="logging"></a>
+<h2>Logging and description</h2>
+<pre>
+SetDescription("Rinses the chip with buffer.")   # Shown in the inspector.
+
+@display
+def Check():
+    Log("Inlet is " + ("open" if FindValve("Inlet").IsOpen() else "closed"))
+</pre>
+
+<a name="api"></a>
+<h2>Full API</h2>
+<!-- API -->
